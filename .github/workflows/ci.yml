@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - veera-ci-cd
+      - pranathi-ci-cd
 
   pull_request:
     branches:
