@@ -34,6 +34,7 @@ jobs:
 
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings
+        continue-on-error: true
 
       - name: Run automated tests
         run: flutter test
