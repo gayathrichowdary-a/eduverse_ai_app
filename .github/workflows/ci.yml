@@ -57,7 +57,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Flutter Web
-        run: flutter build web --release
+        run: flutter build web --release --base-href "/eduverse_ai_app/"
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
