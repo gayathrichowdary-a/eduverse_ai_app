@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'lecture_notes_screen.dart';
-import 'video_tutorials_screen.dart';
+import 'Lecture_Notes_Screen.dart';
+import 'Video_Tutorials_Screen.dart';
 
 class MaterialsScreen extends StatefulWidget {
   const MaterialsScreen({super.key});
