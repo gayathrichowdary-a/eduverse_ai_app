@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'manage_schools.dart';
 import 'manage_teachers.dart';
@@ -11,13 +12,68 @@ import 'infra_compiler.dart';
 import 'cms_bank.dart';
 import 'portal_code_generator.dart';
 
-class AdminDashboard extends StatelessWidget {
+class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
 
+  @override
+  State<AdminDashboard> createState() => _AdminDashboardState();
+}
+
+class _AdminDashboardState extends State<AdminDashboard> {
   static const Color navy = Color(0xFF1D3B64);
   static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color yellow = Color(0xFFFFD52E);
+
+  final SupabaseClient _supabase = Supabase.instance.client;
+
+  int schoolCount = 0;
+  int teacherCount = 0;
+  int studentCount = 0;
+  bool isLoadingStats = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLiveStats();
+  }
+
+  // ============================================================
+  // FETCH REAL STATS FROM SUPABASE PROFILES TABLE
+  // ============================================================
+  Future<void> _fetchLiveStats() async {
+    setState(() => isLoadingStats = true);
+    try {
+      final studentsRes = await _supabase
+          .from('profiles')
+          .select('id')
+          .ilike('role', 'student');
+
+      final teachersRes = await _supabase
+          .from('profiles')
+          .select('id')
+          .ilike('role', 'teacher');
+
+      final schoolsRes = await _supabase
+          .from('profiles')
+          .select('id')
+          .ilike('role', 'school');
+
+      if (mounted) {
+        setState(() {
+          studentCount = (studentsRes as List).length;
+          teacherCount = (teachersRes as List).length;
+          schoolCount = (schoolsRes as List).length;
+          isLoadingStats = false;
+        });
+      }
+    } catch (e) {
+      // Fallback if network delay occurs
+      if (mounted) {
+        setState(() => isLoadingStats = false);
+      }
+    }
+  }
 
   // ============================================================
   // NAVIGATION FUNCTIONS
@@ -26,81 +82,63 @@ class AdminDashboard extends StatelessWidget {
   void _openManageSchools(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ManageSchools(),
-      ),
+      MaterialPageRoute(builder: (context) => const ManageSchools()),
     );
   }
 
   void _openManageTeachers(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ManageTeachers(),
-      ),
+      MaterialPageRoute(builder: (context) => const ManageTeachers()),
     );
   }
 
   void _openManageStudents(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ManageStudents(),
-      ),
+      MaterialPageRoute(builder: (context) => const ManageStudents()),
     );
   }
 
   void _openSystemReports(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SystemReports(),
-      ),
+      MaterialPageRoute(builder: (context) => const SystemReports()),
     );
   }
 
   void _openPlatformSettings(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const PlatformSettings(),
-      ),
+      MaterialPageRoute(builder: (context) => const PlatformSettings()),
     );
   }
 
   void _openGlobalAnalytics(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const GlobalAnalyticsScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const GlobalAnalyticsScreen()),
     );
   }
 
   void _openTenantClientHub(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const TenantClientHubScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const TenantClientHubScreen()),
     );
   }
 
   void _openInfraCompiler(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const InfraCompilerScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const InfraCompilerScreen()),
     );
   }
 
   void _openCmsBank(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const CmsBankScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const CmsBankScreen()),
     );
   }
 
@@ -131,12 +169,7 @@ class AdminDashboard extends StatelessWidget {
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(
-                  20,
-                  18,
-                  20,
-                  28,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
                 decoration: const BoxDecoration(
                   color: navy,
                   borderRadius: BorderRadius.only(
@@ -168,8 +201,7 @@ class AdminDashboard extends StatelessWidget {
 
                         const Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "Admin Console",
@@ -191,6 +223,16 @@ class AdminDashboard extends StatelessWidget {
                           ),
                         ),
 
+                        // Refresh Stats Button
+                        IconButton(
+                          onPressed: _fetchLiveStats,
+                          tooltip: 'Refresh live stats',
+                          icon: const Icon(
+                            Icons.refresh_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+
                         IconButton(
                           onPressed: () {
                             Navigator.of(context).maybePop();
@@ -205,14 +247,14 @@ class AdminDashboard extends StatelessWidget {
 
                     const SizedBox(height: 22),
 
-                    // ---------------- STAT CARDS ----------------
+                    // ---------------- LIVE STAT CARDS ----------------
 
                     Row(
                       children: [
                         Expanded(
                           child: _StatCard(
                             label: "Schools",
-                            value: "12",
+                            value: isLoadingStats ? "..." : "$schoolCount",
                             color: yellow,
                           ),
                         ),
@@ -222,7 +264,7 @@ class AdminDashboard extends StatelessWidget {
                         Expanded(
                           child: _StatCard(
                             label: "Teachers",
-                            value: "184",
+                            value: isLoadingStats ? "..." : "$teacherCount",
                             color: yellow,
                           ),
                         ),
@@ -232,7 +274,7 @@ class AdminDashboard extends StatelessWidget {
                         Expanded(
                           child: _StatCard(
                             label: "Students",
-                            value: "6.2K",
+                            value: isLoadingStats ? "..." : "$studentCount",
                             color: yellow,
                           ),
                         ),
@@ -249,9 +291,7 @@ class AdminDashboard extends StatelessWidget {
               // ==================================================
 
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -266,172 +306,112 @@ class AdminDashboard extends StatelessWidget {
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 1. MANAGE SCHOOLS
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.business_rounded,
                       color: const Color(0xFF58C7F3),
                       title: "Manage Schools",
-                      subtitle:
-                          "Add, edit, or remove schools",
-                      onTap: () {
-                        _openManageSchools(context);
-                      },
+                      subtitle: "Add, edit, or remove schools",
+                      onTap: () => _openManageSchools(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 2. MANAGE TEACHERS
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.psychology_rounded,
                       color: const Color(0xFFE94A56),
                       title: "Manage Teachers",
-                      subtitle:
-                          "Approve and oversee teacher accounts",
-                      onTap: () {
-                        _openManageTeachers(context);
-                      },
+                      subtitle: "Approve and oversee teacher accounts",
+                      onTap: () => _openManageTeachers(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 3. MANAGE STUDENTS
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.groups_rounded,
                       color: const Color(0xFF57B97A),
                       title: "Manage Students",
-                      subtitle:
-                          "View and manage student accounts",
-                      onTap: () {
-                        _openManageStudents(context);
-                      },
+                      subtitle: "View and manage student accounts",
+                      onTap: () => _openManageStudents(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 4. SYSTEM REPORTS
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.bar_chart_rounded,
                       color: const Color(0xFFF7C948),
                       title: "System Reports",
-                      subtitle:
-                          "Platform-wide usage and performance",
-                      onTap: () {
-                        _openSystemReports(context);
-                      },
+                      subtitle: "Platform-wide usage and performance",
+                      onTap: () => _openSystemReports(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 5. PLATFORM SETTINGS
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.settings_rounded,
                       color: const Color(0xFF9BE3A6),
                       title: "Platform Settings",
-                      subtitle:
-                          "Configure global app settings",
-                      onTap: () {
-                        _openPlatformSettings(context);
-                      },
+                      subtitle: "Configure global app settings",
+                      onTap: () => _openPlatformSettings(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 6. GLOBAL ANALYTICS
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.analytics_rounded,
                       color: const Color(0xFF7E57C2),
                       title: "Global Analytics",
-                      subtitle:
-                          "View system-wide analytics and insights",
-                      onTap: () {
-                        _openGlobalAnalytics(context);
-                      },
+                      subtitle: "View system-wide analytics and insights",
+                      onTap: () => _openGlobalAnalytics(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 7. TENANT CLIENT HUB
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.hub_rounded,
                       color: const Color(0xFF26A69A),
                       title: "Tenant Client Hub",
-                      subtitle:
-                          "Manage tenant and client operations",
-                      onTap: () {
-                        _openTenantClientHub(context);
-                      },
+                      subtitle: "Manage tenant and client operations",
+                      onTap: () => _openTenantClientHub(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 8. INFRA COMPILER
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.build_circle_rounded,
                       color: const Color(0xFF5C6BC0),
                       title: "Infra Compiler",
-                      subtitle:
-                          "Configure and manage infrastructure",
-                      onTap: () {
-                        _openInfraCompiler(context);
-                      },
+                      subtitle: "Configure and manage infrastructure",
+                      onTap: () => _openInfraCompiler(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 9. CMS BANK
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.account_balance_rounded,
                       color: const Color(0xFFEC407A),
                       title: "CMS Bank",
-                      subtitle:
-                          "Manage CMS resources and services",
-                      onTap: () {
-                        _openCmsBank(context);
-                      },
+                      subtitle: "Manage CMS resources and services",
+                      onTap: () => _openCmsBank(context),
                     ),
 
                     const SizedBox(height: 14),
 
-                    // ==================================================
                     // 10. PORTAL CODE GENERATOR
-                    // ==================================================
-
                     _AdminModuleTile(
                       icon: Icons.code_rounded,
                       color: const Color(0xFF42A5F5),
                       title: "Portal Code Generator",
-                      subtitle:
-                          "Generate portal code and configurations",
-                      onTap: () {
-                        _openPortalCodeGenerator(context);
-                      },
+                      subtitle: "Generate portal code and configurations",
+                      onTap: () => _openPortalCodeGenerator(context),
                     ),
 
                     const SizedBox(height: 20),
@@ -464,17 +444,11 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 14,
-        horizontal: 8,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color,
-          width: 1.4,
-        ),
+        border: Border.all(color: color, width: 1.4),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -487,9 +461,7 @@ class _StatCard extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-
           const SizedBox(height: 4),
-
           Text(
             label,
             style: const TextStyle(
@@ -536,15 +508,10 @@ class _AdminModuleTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: navy,
-            width: 2,
-          ),
+          border: Border.all(color: navy, width: 2),
         ),
         child: Row(
           children: [
-            // ---------------- ICON ----------------
-
             Container(
               width: 48,
               height: 48,
@@ -553,21 +520,12 @@ class _AdminModuleTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
               alignment: Alignment.center,
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 24,
-              ),
+              child: Icon(icon, color: Colors.white, size: 24),
             ),
-
             const SizedBox(width: 14),
-
-            // ---------------- TEXT ----------------
-
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
@@ -577,9 +535,7 @@ class _AdminModuleTile extends StatelessWidget {
                       color: navy,
                     ),
                   ),
-
                   const SizedBox(height: 3),
-
                   Text(
                     subtitle,
                     style: const TextStyle(
@@ -590,13 +546,7 @@ class _AdminModuleTile extends StatelessWidget {
                 ],
               ),
             ),
-
-            // ---------------- ARROW ----------------
-
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: navy,
-            ),
+            const Icon(Icons.chevron_right_rounded, color: navy),
           ],
         ),
       ),

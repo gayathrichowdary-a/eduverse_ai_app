@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import '../onboarding/onboarding_student_information.dart';
-// ================= IMPORTS ADDED HERE =================
 import '../teacher/teacher_portal_hub.dart';
 import '../parent/parent_home_dashboard.dart';
 import '../admin/admin_dashboard.dart';
 import '../school/school_dashboard.dart';
 
 class SuccessPage extends StatelessWidget {
-  // ================= ROLE ADDED HERE =================
   final String role;
 
-  const SuccessPage({super.key, required this.role});
+  const SuccessPage({
+    super.key,
+    this.role = 'Student',
+  });
 
   // =========================
   // COLORS
@@ -44,7 +45,6 @@ class SuccessPage extends StatelessWidget {
         destination = const SchoolDashboard();
         break;
       default:
-        // Unrecognized role: no screen exists yet.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

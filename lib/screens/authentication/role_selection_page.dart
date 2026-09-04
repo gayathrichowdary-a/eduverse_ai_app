@@ -262,7 +262,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: isSelected ? brandRed : Colors.transparent,
+                color: isSelected ? brandRed : const Color(0xFFD0D5DD),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected ? brandRed : const Color(0xFFD0D5DD),
@@ -288,7 +288,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
   // =========================================================
 
   void _continueToNextPage() {
-    final String chosenRole = roles[selectedRole]['title'];
+    final String chosenRole = roles[selectedRole]['title'] as String;
 
     if (widget.onRoleSelected != null) {
       widget.onRoleSelected!(chosenRole);

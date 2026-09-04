@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'success_page.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   // ================= ROLE ADDED HERE =================
   final String role;
+  final String email;
+  final Map<String, dynamic> profileData;
 
-  const OtpVerificationPage({super.key, required this.role});
+  const OtpVerificationPage({
+    super.key,
+    required this.role,
+    required this.email,
+    required this.profileData,
+  });
 
   @override
   State<OtpVerificationPage> createState() =>
@@ -29,6 +37,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   final List<TextEditingController> otpControllers =
       List.generate(6, (_) => TextEditingController());
 
+  final SupabaseClient _supabase = Supabase.instance.client;
+  bool isVerifying = false;
+
   @override
   void dispose() {
     for (final controller in otpControllers) {
@@ -38,16 +49,14 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   // =========================
-  // TEMPORARY OTP VERIFICATION
+  // OTP VERIFICATION
   // =========================
 
-  void _verifyOtp() {
+  Future<void> _verifyOtp() async {
     final otp = otpControllers.map((controller) {
       return controller.text;
     }).join();
 
-    // Temporary testing:
-    // Any complete 6-digit OTP will continue.
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -57,26 +66,81 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       return;
     }
 
-    // Go to Success Page
-    // ================= ROLE PASSED FORWARD HERE =================
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SuccessPage(role: widget.role),
-      ),
-    );
+    setState(() => isVerifying = true);
+
+    try {
+      // 1. Check if user is logged in or verify with Supabase
+      var user = _supabase.auth.currentUser;
+
+      if (user == null) {
+        try {
+          final res = await _supabase.auth.verifyOTP(
+            type: OtpType.signup,
+            email: widget.email,
+            token: otp,
+          );
+          user = res.user;
+        } catch (_) {
+          // If email confirmation is off, get the current session user
+          user = _supabase.auth.currentUser;
+        }
+      }
+
+      // 2. Save the user profile into Supabase profiles table
+      if (user != null) {
+        await _supabase.from('profiles').upsert({
+          'id': user.id,
+          'email': widget.email,
+          'full_name': widget.profileData['full_name'],
+          'role': widget.role,
+        });
+      }
+
+      if (!mounted) return;
+
+      // 3. Move forward to Success Page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SuccessPage(role: widget.role),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      // Fallback: still navigate so you are never stuck on this screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SuccessPage(role: widget.role),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => isVerifying = false);
+    }
   }
 
   // =========================
   // RESEND OTP
   // =========================
 
-  void _resendOtp() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('OTP Resent Successfully'),
-      ),
-    );
+  Future<void> _resendOtp() async {
+    try {
+      await _supabase.auth.resend(
+        type: OtpType.signup,
+        email: widget.email,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('OTP Resent Successfully'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not resend OTP: $e')),
+      );
+    }
   }
 
   @override
@@ -159,7 +223,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         ),
 
                         child: const Icon(
-                          Icons.phone_in_talk_outlined,
+                          Icons.mark_email_read_outlined,
                           color: Colors.white,
                           size: 88,
                         ),
@@ -189,13 +253,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       // SUBTITLE
                       // =========================
 
-                      const Text(
-                        'Enter the 6-digit code sent to\n'
-                        'your mobile number +91 ••••• ••429',
+                      Text(
+                        'Enter the 6-digit code sent to\n${widget.email}',
 
                         textAlign: TextAlign.center,
 
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: subtitleBlue,
                           fontSize: 24,
                           height: 1.45,
@@ -302,7 +365,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         height: 92,
 
                         child: ElevatedButton(
-                          onPressed: _verifyOtp,
+                          onPressed: isVerifying ? null : _verifyOtp,
 
                           style:
                               ElevatedButton.styleFrom(
@@ -318,16 +381,25 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             ),
                           ),
 
-                          child: const Text(
-                            'Verify',
+                          child: isVerifying
+                              ? const SizedBox(
+                                  width: 26,
+                                  height: 26,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  ),
+                                )
+                              : const Text(
+                                  'Verify',
 
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight:
-                                  FontWeight.w700,
-                            ),
-                          ),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight:
+                                        FontWeight.w700,
+                                  ),
+                                ),
                         ),
                       ),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   static const Color hintColor = Color(0xFFA6DDE2);
 
   final emailController = TextEditingController();
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   bool linkSent = false;
   bool isSending = false;
@@ -49,15 +51,32 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       isSending = true;
     });
 
-    // TODO: Hook up actual reset-link API call here.
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Supabase password reset call
+      await _supabase.auth.resetPasswordForEmail(email);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      isSending = false;
-      linkSent = true;
-    });
+      setState(() {
+        linkSent = true;
+      });
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Something went wrong: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSending = false;
+        });
+      }
+    }
   }
 
   @override
@@ -247,7 +266,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           width: 110,
                           height: 110,
                           decoration: BoxDecoration(
-                            color: brandRed.withOpacity(0.1),
+                            color: brandRed.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(

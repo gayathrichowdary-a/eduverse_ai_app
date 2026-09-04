@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_page.dart';
 import 'otp_verification_page.dart';
 
 class RegistrationPage extends StatefulWidget {
-  // ================= ROLE ADDED HERE =================
   final String role;
 
   const RegistrationPage({super.key, required this.role});
@@ -25,8 +25,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // =========================
   // ROLE HELPERS
   // =========================
-  // Matches roles.title strings in role_selection_page.dart:
-  // "Student", "Parent", "Teacher", "School", "Administrator"
 
   String get _role => widget.role;
 
@@ -40,8 +38,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // CONTROLLERS (shared)
   // =========================
 
-  final nameController = TextEditingController(); // Student / Parent / Teacher / Administrator name
-  final emailController = TextEditingController(); // Email / School email / Teacher email / Platform email
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
@@ -49,12 +47,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // CONTROLLERS (role-specific)
   // =========================
 
-  final schoolNameController = TextEditingController(); // Student + School
-  final uniqueCodeController = TextEditingController(); // School + Teacher + Administrator
-  final childCodeController = TextEditingController(); // Parent only — links to their child's student code
+  final schoolNameController = TextEditingController();
+  final uniqueCodeController = TextEditingController();
+  final childCodeController = TextEditingController();
 
-  DateTime? dateOfBirth; // Student only
-  String? selectedBranch; // Student only
+  DateTime? dateOfBirth;
+  String? selectedBranch;
 
   static const List<String> branches = [
     'Computer Science',
@@ -67,6 +65,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
   bool acceptedTerms = false;
+  bool isSubmitting = false;
+
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   @override
   void dispose() {
@@ -109,26 +110,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   // =========================
-  // GOOGLE LOGIN
+  // GOOGLE / GITHUB LOGIN
   // =========================
 
   void _googleLogin() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Google sign-up selected'),
-      ),
+      const SnackBar(content: Text('Google sign-up selected')),
     );
   }
 
-  // =========================
-  // GITHUB LOGIN
-  // =========================
-
   void _githubLogin() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('GitHub sign-up selected'),
-      ),
+      const SnackBar(content: Text('GitHub sign-up selected')),
     );
   }
 
@@ -206,7 +199,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // CREATE ACCOUNT
   // =========================
 
-  void _createAccount() {
+  Future<void> _createAccount() async {
     final roleError = _validateRoleFields();
     if (roleError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -224,52 +217,92 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     if (!acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please accept the Terms and Privacy Policy'),
-        ),
+        const SnackBar(content: Text('Please accept the Terms and Privacy Policy')),
       );
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match'),
-        ),
+        const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
 
-    // Navigate to OTP Verification Page
-    // ================= ROLE PASSED FORWARD HERE =================
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OtpVerificationPage(role: widget.role),
-      ),
-    );
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    final Map<String, dynamic> extraProfileData = {
+      'full_name': nameController.text.trim(),
+      'role': _role,
+      if (_isStudent) ...{
+        'school_name': schoolNameController.text.trim(),
+        'date_of_birth': dateOfBirth?.toIso8601String(),
+        'branch': selectedBranch,
+      },
+      if (_isParent) ...{
+        'child_code': childCodeController.text.trim(),
+      },
+      if (_isTeacher) ...{
+        'unique_code': uniqueCodeController.text.trim(),
+      },
+      if (_isSchool) ...{
+        'school_name': schoolNameController.text.trim(),
+        'unique_code': uniqueCodeController.text.trim(),
+      },
+      if (_isAdministrator) ...{
+        'unique_code': uniqueCodeController.text.trim(),
+      },
+    };
+
+    setState(() => isSubmitting = true);
+
+    try {
+      await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: extraProfileData,
+      );
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpVerificationPage(
+            role: widget.role,
+            email: email,
+            profileData: extraProfileData,
+          ),
+        ),
+      );
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Something went wrong: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => isSubmitting = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 const SizedBox(height: 35),
-
-                // =========================
-                // TITLE
-                // =========================
-
                 Text(
                   _pageTitle,
                   style: const TextStyle(
@@ -278,13 +311,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
-                // =========================
-                // SUBTITLE
-                // =========================
-
                 Text(
                   _pageSubtitle,
                   style: const TextStyle(
@@ -293,25 +320,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     height: 1.45,
                   ),
                 ),
-
                 const SizedBox(height: 65),
-
-                // =========================
-                // ROLE-SPECIFIC FIELDS
-                // =========================
-
                 ..._buildRoleFields(),
-
                 const SizedBox(height: 40),
-
-                // =========================
-                // PASSWORD
-                // =========================
-
                 _buildLabel('Password'),
-
                 const SizedBox(height: 12),
-
                 _buildPasswordField(
                   controller: passwordController,
                   hintText: 'Create a strong password',
@@ -322,38 +335,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 40),
-
-                // =========================
-                // CONFIRM PASSWORD
-                // =========================
-
                 _buildLabel('Confirm Password'),
-
                 const SizedBox(height: 12),
-
                 _buildPasswordField(
                   controller: confirmPasswordController,
                   hintText: 'Repeat your password',
                   obscureText: obscureConfirmPassword,
                   onToggle: () {
                     setState(() {
-                      obscureConfirmPassword =
-                          !obscureConfirmPassword;
+                      obscureConfirmPassword = !obscureConfirmPassword;
                     });
                   },
                 ),
-
                 const SizedBox(height: 45),
-
-                // =========================
-                // TERMS CHECKBOX
-                // =========================
-
                 Row(
                   children: [
-
                     Checkbox(
                       value: acceptedTerms,
                       activeColor: brandRed,
@@ -364,107 +361,66 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         });
                       },
                     ),
-
                     const Expanded(
                       child: Text(
                         'I agree to the Terms and Privacy Policy',
-                        style: TextStyle(
-                          color: navy,
-                          fontSize: 20,
-                        ),
+                        style: TextStyle(color: navy, fontSize: 20),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 30),
-
-                // =========================
-                // CREATE ACCOUNT BUTTON
-                // =========================
-
                 SizedBox(
                   width: double.infinity,
                   height: 92,
-
                   child: ElevatedButton(
-                    onPressed: _createAccount,
-
+                    onPressed: isSubmitting ? null : _createAccount,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: brandRed,
                       elevation: 0,
-
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
                     ),
-
-                    child: const Text(
-                      'Create Account',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    child: isSubmitting
+                        ? const SizedBox(
+                            width: 26,
+                            height: 26,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : const Text(
+                            'Create Account',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ),
-
                 const SizedBox(height: 55),
-
-                // =========================
-                // OR DIVIDER
-                // =========================
-
                 Row(
-                  children: [
-
-                    const Expanded(
-                      child: Divider(
-                        color: Color(0xFFE5E7EB),
-                        thickness: 1,
-                      ),
-                    ),
-
-                    const Padding(
+                  children: const [
+                    Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: Text(
-                        'OR',
-                        style: TextStyle(
-                          color: navy,
-                          fontSize: 20,
-                        ),
-                      ),
+                      child: Text('OR', style: TextStyle(color: navy, fontSize: 20)),
                     ),
-
-                    const Expanded(
-                      child: Divider(
-                        color: Color(0xFFE5E7EB),
-                        thickness: 1,
-                      ),
-                    ),
+                    Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
                   ],
                 ),
-
                 const SizedBox(height: 45),
-
-                // =========================
-                // GOOGLE AND GITHUB BUTTONS
-                // =========================
-
                 Row(
                   children: [
-
                     Expanded(
                       child: _socialButton(
                         onTap: _googleLogin,
-
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
-
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-
                             Text(
                               'G',
                               style: TextStyle(
@@ -473,9 +429,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-
                             SizedBox(width: 15),
-
                             Text(
                               'Google',
                               style: TextStyle(
@@ -488,27 +442,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 20),
-
                     Expanded(
                       child: _socialButton(
                         onTap: _githubLogin,
-
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
-
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-
-                            Icon(
-                              Icons.code,
-                              color: navy,
-                              size: 34,
-                            ),
-
+                            Icon(Icons.code, color: navy, size: 34),
                             SizedBox(width: 15),
-
                             Text(
                               'GitHub',
                               style: TextStyle(
@@ -523,42 +465,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 50),
-
-                // =========================
-                // LOGIN LINK
-                // =========================
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-
                   children: [
-
-                    Flexible(
+                    const Flexible(
                       child: Text(
                         'Already have an account?',
-                        style: const TextStyle(
-                          color: subtitleBlue,
-                          fontSize: 20,
-                        ),
+                        style: TextStyle(color: subtitleBlue, fontSize: 20),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-
                     const SizedBox(width: 10),
-
                     TextButton(
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const LoginPage(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const LoginPage()),
                         );
                       },
-
                       child: const Text(
                         'Login',
                         style: TextStyle(
@@ -570,7 +495,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 30),
               ],
             ),
@@ -580,234 +504,107 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  // =========================
-  // ROLE FIELD BUILDER
-  // =========================
-  // Student:        Name, Email, School Name, DOB, Branch
-  // Parent:         Name, Email, Child's Student Code   [not in doc — added]
-  // Teacher:        Name, School Email, Unique Code
-  // School:         School Name, School Email, Unique Code
-  // Administrator:  Unique Code, Platform Email, Name
-
   List<Widget> _buildRoleFields() {
     if (_isStudent) {
       return [
         _buildLabel('Full Name'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
-
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
         const SizedBox(height: 40),
-
         _buildLabel('Email Address'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'email@example.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-
+        _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 40),
-
         _buildLabel('School / College Name'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: schoolNameController,
-          hintText: 'Enter your school or college name',
-          icon: Icons.school_outlined,
-        ),
-
+        _buildTextField(controller: schoolNameController, hintText: 'Enter your school or college name', icon: Icons.school_outlined),
         const SizedBox(height: 40),
-
         _buildLabel('Date of Birth'),
         const SizedBox(height: 12),
         _buildDateField(),
-
         const SizedBox(height: 40),
-
         _buildLabel('Branch'),
         const SizedBox(height: 12),
         _buildBranchDropdown(),
       ];
     }
-
     if (_isParent) {
       return [
         _buildLabel('Full Name'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
-
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
         const SizedBox(height: 40),
-
         _buildLabel('Email Address'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'email@example.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-
+        _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 40),
-
         _buildLabel("Child's Student Code"),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: childCodeController,
-          hintText: "Enter your child's student code",
-          icon: Icons.link,
-        ),
+        _buildTextField(controller: childCodeController, hintText: "Enter your child's student code", icon: Icons.link),
       ];
     }
-
     if (_isTeacher) {
       return [
         _buildLabel('Teacher Name'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
-
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
         const SizedBox(height: 40),
-
         _buildLabel('School Email'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'you@school.edu',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-
+        _buildTextField(controller: emailController, hintText: 'you@school.edu', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 40),
-
         _buildLabel('Unique Code'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: uniqueCodeController,
-          hintText: 'Code provided by school',
-          icon: Icons.vpn_key_outlined,
-        ),
+        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by school', icon: Icons.vpn_key_outlined),
       ];
     }
-
     if (_isSchool) {
       return [
         _buildLabel('School Name'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: schoolNameController,
-          hintText: 'Enter school name',
-          icon: Icons.account_balance_outlined,
-        ),
-
+        _buildTextField(controller: schoolNameController, hintText: 'Enter school name', icon: Icons.account_balance_outlined),
         const SizedBox(height: 40),
-
         _buildLabel('School Email'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'school@example.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-
+        _buildTextField(controller: emailController, hintText: 'school@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 40),
-
         _buildLabel('Unique Code'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: uniqueCodeController,
-          hintText: 'Code provided by Administrator',
-          icon: Icons.vpn_key_outlined,
-        ),
+        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by Administrator', icon: Icons.vpn_key_outlined),
       ];
     }
-
     if (_isAdministrator) {
       return [
         _buildLabel('Unique Code'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: uniqueCodeController,
-          hintText: 'Code provided by platform',
-          icon: Icons.vpn_key_outlined,
-        ),
-
+        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by platform', icon: Icons.vpn_key_outlined),
         const SizedBox(height: 40),
-
         _buildLabel('Email Address'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'you@company.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-
+        _buildTextField(controller: emailController, hintText: 'you@company.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 40),
-
         _buildLabel('Full Name'),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
       ];
     }
-
-    // Fallback (role not recognized) — behaves like Student form.
     return [
       _buildLabel('Full Name'),
       const SizedBox(height: 12),
-      _buildTextField(
-        controller: nameController,
-        hintText: 'Enter your full name',
-        icon: Icons.person_outline,
-      ),
-
+      _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
       const SizedBox(height: 40),
-
       _buildLabel('Email Address'),
       const SizedBox(height: 12),
-      _buildTextField(
-        controller: emailController,
-        hintText: 'email@example.com',
-        icon: Icons.email_outlined,
-        keyboardType: TextInputType.emailAddress,
-      ),
+      _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
     ];
   }
-
-  // =========================
-  // LABEL
-  // =========================
 
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        color: navy,
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-      ),
+      style: const TextStyle(color: navy, fontSize: 22, fontWeight: FontWeight.w600),
     );
   }
-
-  // =========================
-  // NORMAL TEXT FIELD
-  // =========================
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -818,55 +615,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-
-      style: const TextStyle(
-        color: navy,
-        fontSize: 20,
-      ),
-
+      style: const TextStyle(color: navy, fontSize: 20),
       decoration: InputDecoration(
         hintText: hintText,
-
-        hintStyle: const TextStyle(
-          color: hintColor,
-          fontSize: 22,
-        ),
-
-        prefixIcon: Icon(
-          icon,
-          color: navy,
-          size: 30,
-        ),
-
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 24,
-          horizontal: 20,
-        ),
-
+        hintStyle: const TextStyle(color: hintColor, fontSize: 22),
+        prefixIcon: Icon(icon, color: navy, size: 30),
+        contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-
-          borderSide: const BorderSide(
-            color: navy,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: navy, width: 2),
         ),
-
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-
-          borderSide: const BorderSide(
-            color: brandRed,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: brandRed, width: 2),
         ),
       ),
     );
   }
-
-  // =========================
-  // DATE OF BIRTH FIELD
-  // =========================
 
   Widget _buildDateField() {
     return GestureDetector(
@@ -874,38 +639,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
       child: AbsorbPointer(
         child: TextField(
           controller: TextEditingController(text: _formattedDob),
-          style: const TextStyle(
-            color: navy,
-            fontSize: 20,
-          ),
+          style: const TextStyle(color: navy, fontSize: 20),
           decoration: InputDecoration(
             hintText: 'DD/MM/YYYY',
-            hintStyle: const TextStyle(
-              color: hintColor,
-              fontSize: 22,
-            ),
-            prefixIcon: const Icon(
-              Icons.cake_outlined,
-              color: navy,
-              size: 30,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 24,
-              horizontal: 20,
-            ),
+            hintStyle: const TextStyle(color: hintColor, fontSize: 22),
+            prefixIcon: const Icon(Icons.cake_outlined, color: navy, size: 30),
+            contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(
-                color: navy,
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: navy, width: 2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(
-                color: brandRed,
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: brandRed, width: 2),
             ),
           ),
         ),
@@ -913,55 +659,27 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  // =========================
-  // BRANCH DROPDOWN
-  // =========================
-
   Widget _buildBranchDropdown() {
     return DropdownButtonFormField<String>(
       value: selectedBranch,
       icon: const Icon(Icons.keyboard_arrow_down, color: navy),
-      style: const TextStyle(
-        color: navy,
-        fontSize: 20,
-      ),
+      style: const TextStyle(color: navy, fontSize: 20),
       decoration: InputDecoration(
         hintText: 'Select your branch',
-        hintStyle: const TextStyle(
-          color: hintColor,
-          fontSize: 22,
-        ),
-        prefixIcon: const Icon(
-          Icons.menu_book_outlined,
-          color: navy,
-          size: 30,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 20,
-          horizontal: 20,
-        ),
+        hintStyle: const TextStyle(color: hintColor, fontSize: 22),
+        prefixIcon: const Icon(Icons.menu_book_outlined, color: navy, size: 30),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            color: navy,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: navy, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            color: brandRed,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: brandRed, width: 2),
         ),
       ),
       items: branches
-          .map(
-            (branch) => DropdownMenuItem(
-              value: branch,
-              child: Text(branch),
-            ),
-          )
+          .map((b) => DropdownMenuItem(value: b, child: Text(b)))
           .toList(),
       onChanged: (value) {
         setState(() {
@@ -970,10 +688,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       },
     );
   }
-
-  // =========================
-  // PASSWORD FIELD
-  // =========================
 
   Widget _buildPasswordField({
     required TextEditingController controller,
@@ -984,93 +698,39 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return TextField(
       controller: controller,
       obscureText: obscureText,
-
-      style: const TextStyle(
-        color: navy,
-        fontSize: 20,
-      ),
-
+      style: const TextStyle(color: navy, fontSize: 20),
       decoration: InputDecoration(
         hintText: hintText,
-
-        hintStyle: const TextStyle(
-          color: hintColor,
-          fontSize: 22,
-        ),
-
-        prefixIcon: const Icon(
-          Icons.lock_outline,
-          color: navy,
-          size: 30,
-        ),
-
+        hintStyle: const TextStyle(color: hintColor, fontSize: 22),
+        prefixIcon: const Icon(Icons.lock_outline, color: navy, size: 30),
         suffixIcon: IconButton(
           onPressed: onToggle,
-
-          icon: Icon(
-            obscureText
-                ? Icons.visibility_off
-                : Icons.visibility,
-
-            color: navy,
-            size: 30,
-          ),
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: navy, size: 30),
         ),
-
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 24,
-          horizontal: 20,
-        ),
-
+        contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-
-          borderSide: const BorderSide(
-            color: navy,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: navy, width: 2),
         ),
-
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-
-          borderSide: const BorderSide(
-            color: brandRed,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: brandRed, width: 2),
         ),
       ),
     );
   }
 
-  // =========================
-  // SOCIAL BUTTON
-  // =========================
-
-  Widget _socialButton({
-    required Widget child,
-    required VoidCallback onTap,
-  }) {
+  Widget _socialButton({required Widget child, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
-
       child: Container(
         height: 100,
-
         decoration: BoxDecoration(
           color: Colors.white,
-
           borderRadius: BorderRadius.circular(25),
-
-          border: Border.all(
-            color: const Color(0xFFE9EDF0),
-            width: 1.5,
-          ),
+          border: Border.all(color: const Color(0xFFE9EDF0), width: 1.5),
         ),
-
-        child: Center(
-          child: child,
-        ),
+        child: Center(child: child),
       ),
     );
   }
