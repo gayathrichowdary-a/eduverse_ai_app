@@ -69,36 +69,35 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     setState(() => isVerifying = true);
 
     try {
-      // 1. Check if user is logged in or verify with Supabase
-      var user = _supabase.auth.currentUser;
+      // 1. Actually verify the OTP with Supabase. If this throws
+      //    (wrong code, expired code, etc.), let the exception
+      //    propagate to the outer catch below — do NOT swallow it.
+      final res = await _supabase.auth.verifyOTP(
+        type: OtpType.signup,
+        email: widget.email,
+        token: otp,
+      );
+
+      final user = res.user ?? _supabase.auth.currentUser;
 
       if (user == null) {
-        try {
-          final res = await _supabase.auth.verifyOTP(
-            type: OtpType.signup,
-            email: widget.email,
-            token: otp,
-          );
-          user = res.user;
-        } catch (_) {
-          // If email confirmation is off, get the current session user
-          user = _supabase.auth.currentUser;
-        }
+        // Verification call didn't throw, but we still don't have
+        // a verified user — treat this as a failure, not a success.
+        throw const AuthException('Verification failed. Please try again.');
       }
 
       // 2. Save the user profile into Supabase profiles table
-      if (user != null) {
-        await _supabase.from('profiles').upsert({
-          'id': user.id,
-          'email': widget.email,
-          'full_name': widget.profileData['full_name'],
-          'role': widget.role,
-        });
-      }
+      await _supabase.from('profiles').upsert({
+        'id': user.id,
+        'email': widget.email,
+        'full_name': widget.profileData['full_name'],
+        'role': widget.role,
+      });
 
       if (!mounted) return;
 
-      // 3. Move forward to Success Page
+      // 3. Only now — after a real, successful verification — move
+      //    forward to the Success Page.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -107,13 +106,20 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      // Fallback: still navigate so you are never stuck on this screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SuccessPage(role: widget.role),
+      // On any failure, stay on this screen and tell the user.
+      // Never silently navigate to SuccessPage on an error.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e is AuthException
+                ? e.message
+                : 'Invalid or expired code. Please try again.',
+          ),
         ),
       );
+      for (final controller in otpControllers) {
+        controller.clear();
+      }
     } finally {
       if (mounted) setState(() => isVerifying = false);
     }
