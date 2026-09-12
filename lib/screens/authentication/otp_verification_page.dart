@@ -61,7 +61,7 @@ class _OtpVerificationPageState
   }
 
   // =========================
-  // VERIFY OTP
+  // VERIFY OTP & RENDER TO PERSONAL PAGE
   // =========================
 
   Future<void> _verifyOtp() async {
@@ -85,8 +85,7 @@ class _OtpVerificationPageState
     });
 
     try {
-      // IMPORTANT:
-      // This verifies a REAL email OTP sent by Supabase.
+      // 1. Verify the real email OTP in Supabase
       final AuthResponse response =
           await _supabase.auth.verifyOTP(
         email: widget.email,
@@ -99,38 +98,40 @@ class _OtpVerificationPageState
 
       if (user == null) {
         throw const AuthException(
-          'OTP verification failed. Please try again.',
+          'OTP verification failed. Please check the code and try again.',
         );
       }
 
-      // =========================
-      // SAVE PROFILE
-      // =========================
-
-      await _supabase
-          .from('profiles')
-          .upsert({
+      // 2. Save / Upsert the user profile with their selected role
+      await _supabase.from('profiles').upsert({
         'id': user.id,
         'email': widget.email,
-        'full_name':
-            widget.profileData['full_name'],
+        'full_name': widget.profileData['full_name'] ?? '',
         'role': widget.role,
+        ...widget.profileData,
       });
 
       if (!mounted) return;
 
-      // =========================
-      // SUCCESS
-      // =========================
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Verification successful! Welcome to your ${widget.role} account.',
+          ),
+          backgroundColor: green,
+          duration: const Duration(seconds: 3),
+        ),
+      );
 
-      Navigator.pushReplacement(
+      // 3. Render directly to the user's personal page based on their role!
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              SuccessPage(
+          builder: (context) => SuccessPage(
             role: widget.role,
           ),
         ),
+        (route) => false,
       );
     } on AuthException catch (e) {
       if (!mounted) return;
@@ -138,8 +139,8 @@ class _OtpVerificationPageState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message),
-          duration:
-              const Duration(seconds: 4),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
         ),
       );
 
@@ -152,8 +153,8 @@ class _OtpVerificationPageState
           content: Text(
             'Verification failed: $e',
           ),
-          duration:
-              const Duration(seconds: 4),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
         ),
       );
 
@@ -179,11 +180,10 @@ class _OtpVerificationPageState
     });
 
     try {
-      // Resend the signup confirmation OTP.
-      // This keeps the password-based registration flow.
-      await _supabase.auth.resend(
-        type: OtpType.signup,
+      // Resend the 6-digit OTP code to email
+      await _supabase.auth.signInWithOtp(
         email: widget.email,
+        shouldCreateUser: false,
       );
 
       if (!mounted) return;
@@ -193,10 +193,10 @@ class _OtpVerificationPageState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'A new OTP has been sent to your email.',
+            'A new 6-digit OTP has been sent to your email.',
           ),
-          duration:
-              Duration(seconds: 4),
+          backgroundColor: green,
+          duration: Duration(seconds: 4),
         ),
       );
     } on AuthException catch (e) {
@@ -205,8 +205,8 @@ class _OtpVerificationPageState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message),
-          duration:
-              Duration(seconds: 4),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
         ),
       );
     } catch (e) {
@@ -217,6 +217,7 @@ class _OtpVerificationPageState
           content: Text(
             'Could not resend OTP: $e',
           ),
+          backgroundColor: Colors.redAccent,
         ),
       );
     } finally {
@@ -263,8 +264,7 @@ class _OtpVerificationPageState
       );
     }
 
-    // Automatically verify when
-    // all 6 digits are entered.
+    // Automatically verify when all 6 digits are entered
     final otp = otpControllers
         .map((controller) => controller.text)
         .join();

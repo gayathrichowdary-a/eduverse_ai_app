@@ -69,6 +69,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   static const List<String> branches = [
     'Computer Science',
     'AI & ML',
+    'AI & DSS',
     'Information Technology',
     'ECE',
     'Data Science',
@@ -99,25 +100,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
       final Session? session = data.session;
 
       if (event == AuthChangeEvent.signedIn && session != null) {
-        // When signed in via GitHub or OAuth, update the role metadata with the chosen role
-        try {
-          await _supabase.auth.updateUser(
-            UserAttributes(
-              data: {
-                'role': _role,
-              },
+        final provider = session.user.appMetadata['provider'];
+        // ONLY redirect automatically if signed in via an OAuth provider (GitHub / Google)
+        if (provider == 'github' || provider == 'google') {
+          try {
+            await _supabase.auth.updateUser(
+              UserAttributes(
+                data: {
+                  'role': _role,
+                },
+              ),
+            );
+          } catch (_) {}
+
+          if (!mounted) return;
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SuccessPage(role: _role),
             ),
           );
-        } catch (_) {}
-
-        if (!mounted) return;
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SuccessPage(role: _role),
-          ),
-        );
+        }
       }
     });
   }
@@ -238,7 +242,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         );
 
-        // Navigate directly to SuccessPage with the chosen role
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -289,9 +292,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (!launched) {
         throw const AuthException('Could not launch GitHub sign-in.');
       }
-
-      // The _authSubscription listener will automatically handle user redirection
-      // and assign widget.role to the user!
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -429,7 +429,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   // ============================================================
-  // CREATE ACCOUNT + SEND REAL EMAIL OTP
+  // CREATE ACCOUNT -> SENDS OTP & OPENS OTP VERIFICATION PAGE
   // ============================================================
 
   Future<void> _createAccount() async {
@@ -504,20 +504,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
 
     try {
-      final AuthResponse authResponse = await _supabase.auth.signUp(
+      // Send 6-digit OTP to the email
+      await _supabase.auth.signInWithOtp(
         email: email,
-        password: password,
+        shouldCreateUser: true,
         data: extraProfileData,
       );
 
-      if (authResponse.user == null) {
-        throw const AuthException(
-          'Could not create the account. Please try again.',
-        );
-      }
-
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A 6-digit OTP has been sent to your email!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
+        ),
+      );
+
+      // NAVIGATE DIRECTLY TO THE OTP PAGE!
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -528,27 +532,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         ),
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('A 6-digit OTP has been sent to your email.'),
-          duration: Duration(seconds: 4),
-        ),
-      );
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message),
-          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.redAccent,
         ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not send OTP: $e'),
-          duration: const Duration(seconds: 5),
+          content: Text('Registration error: $e'),
+          backgroundColor: Colors.redAccent,
         ),
       );
     } finally {
