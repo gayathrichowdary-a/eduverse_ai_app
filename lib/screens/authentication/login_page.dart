@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'role_selection_page.dart';
 import 'forgot_password_page.dart';
-import 'success_page.dart'; // <-- Added to navigate to next page
+import 'success_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,13 +22,60 @@ class _LoginPageState extends State<LoginPage> {
   static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color brandRed = Color(0xFFEF3340);
 
+  // =========================
+  // GOOGLE WEB CLIENT ID
+  // =========================
+  static const String _webClientId =
+      '562258769343-djt08qk2cg68p997l0j2lnhg8kovv81v.apps.googleusercontent.com';
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  StreamSubscription<AuthState>? _authSubscription;
   bool obscurePassword = true;
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for OAuth deep link callbacks (specifically for GitHub login)
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
+    _authSubscription = _supabase.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+
+      if (event == AuthChangeEvent.signedIn && session != null) {
+        final user = session.user;
+        final String? existingRole = user.userMetadata?['role'] as String?;
+
+        if (!mounted) return;
+
+        // Solution 1 Check:
+        // Existing user with role -> SuccessPage
+        // New user without role -> RoleSelectionPage
+        if (existingRole != null && existingRole.isNotEmpty) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SuccessPage(role: existingRole),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RoleSelectionPage(),
+            ),
+          );
+        }
+      }
+    });
+  }
 
   // =========================
   // EMAIL / PASSWORD LOGIN
@@ -57,16 +106,26 @@ class _LoginPageState extends State<LoginPage> {
 
       if (!mounted) return;
 
-      // Get user's role from metadata or default to Student
-      final role = res.user?.userMetadata?['role'] as String? ?? 'Student';
+      // Check user's role from metadata
+      final String? role = res.user?.userMetadata?['role'] as String?;
 
-      // Navigate to the next page!
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SuccessPage(role: role),
-        ),
-      );
+      if (role == null || role.isEmpty) {
+        // If no role set, prompt role selection
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RoleSelectionPage(),
+          ),
+        );
+      } else {
+        // Navigate to the next page!
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessPage(role: role),
+          ),
+        );
+      }
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -82,32 +141,139 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // =========================
-  // GOOGLE LOGIN
-  // =========================
+  // ============================================================
+  // GOOGLE LOGIN WITH INTELLIGENT ROLE DETECTION (SOLUTION 1)
+  // ============================================================
 
-  void _googleLogin() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Google login selected'),
-      ),
-    );
+  Future<void> _googleLogin() async {
+    setState(() => isLoading = true);
+
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: _webClientId,
+      );
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final String? accessToken = googleAuth.accessToken;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw const AuthException(
+          'Could not retrieve Google ID token.',
+        );
+      }
+
+      // Sign in to Supabase using Google ID Token
+      final AuthResponse response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      if (!mounted) return;
+
+      if (response.user != null) {
+        final userMetadata = response.user!.userMetadata;
+        final String? existingRole = userMetadata?['role'] as String?;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Welcome, ${googleUser.displayName ?? googleUser.email}!',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Solution 1 Check:
+        if (existingRole != null && existingRole.isNotEmpty) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SuccessPage(role: existingRole),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RoleSelectionPage(),
+            ),
+          );
+        }
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google sign-in error: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
-  // =========================
-  // GITHUB LOGIN
-  // =========================
+  // ============================================================
+  // GITHUB LOGIN WITH INTELLIGENT ROLE DETECTION (SOLUTION 1)
+  // ============================================================
 
-  void _githubLogin() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('GitHub login selected'),
-      ),
-    );
+  Future<void> _githubLogin() async {
+    setState(() => isLoading = true);
+
+    try {
+      final bool launched = await _supabase.auth.signInWithOAuth(
+        OAuthProvider.github,
+        redirectTo: 'io.supabase.eduverse://login-callback',
+      );
+
+      if (!launched) {
+        throw const AuthException('Could not launch GitHub sign-in.');
+      }
+
+      // The _listenToAuthChanges stream will automatically capture the login
+      // and redirect to SuccessPage (if role exists) or RoleSelectionPage!
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('GitHub sign-in error: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -173,7 +339,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                const SizedBox(height: 90),
+                const SizedBox(height: 70),
 
                 // =========================
                 // EMAIL LABEL
@@ -236,7 +402,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                const SizedBox(height: 55),
+                const SizedBox(height: 45),
 
                 // =========================
                 // PASSWORD LABEL
@@ -315,7 +481,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 25),
 
                 // =========================
                 // FORGOT PASSWORD
@@ -381,7 +547,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                const SizedBox(height: 70),
+                const SizedBox(height: 50),
 
                 // =========================
                 // OR DIVIDER
@@ -416,7 +582,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
 
-                const SizedBox(height: 55),
+                const SizedBox(height: 40),
 
                 // =========================
                 // SOCIAL LOGIN BUTTONS
@@ -425,31 +591,32 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-
+                    // Google Button
                     _socialButton(
                       child: const Text(
                         'G',
                         style: TextStyle(
-                          color: navy,
+                          color: Color(0xFF4285F4),
                           fontSize: 36,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      onTap: _googleLogin,
+                      onTap: isLoading ? () {} : _googleLogin,
                     ),
 
+                    // GitHub Button
                     _socialButton(
                       child: const Icon(
                         Icons.code,
                         color: navy,
                         size: 34,
                       ),
-                      onTap: _githubLogin,
+                      onTap: isLoading ? () {} : _githubLogin,
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 300),
+                const SizedBox(height: 60),
 
                 // =========================
                 // CREATE ACCOUNT
@@ -458,11 +625,10 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
-                    Flexible(
+                    const Flexible(
                       child: Text(
                         "Don't have an account?",
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: subtitleBlue,
                           fontSize: 18,
                         ),
@@ -513,21 +679,17 @@ class _LoginPageState extends State<LoginPage> {
   }) {
     return GestureDetector(
       onTap: onTap,
-
       child: Container(
         width: 72,
         height: 72,
-
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-
           border: Border.all(
             color: const Color(0xFFE9EDF0),
             width: 1.5,
           ),
         ),
-
         child: Center(
           child: child,
         ),

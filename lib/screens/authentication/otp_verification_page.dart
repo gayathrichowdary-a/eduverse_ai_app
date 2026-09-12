@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'success_page.dart';
 
 class OtpVerificationPage extends StatefulWidget {
-  // ================= ROLE ADDED HERE =================
   final String role;
   final String email;
   final Map<String, dynamic> profileData;
@@ -20,7 +19,9 @@ class OtpVerificationPage extends StatefulWidget {
       _OtpVerificationPageState();
 }
 
-class _OtpVerificationPageState extends State<OtpVerificationPage> {
+class _OtpVerificationPageState
+    extends State<OtpVerificationPage> {
+
   // =========================
   // COLORS
   // =========================
@@ -37,117 +38,245 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   final List<TextEditingController> otpControllers =
       List.generate(6, (_) => TextEditingController());
 
-  final SupabaseClient _supabase = Supabase.instance.client;
+  final List<FocusNode> otpFocusNodes =
+      List.generate(6, (_) => FocusNode());
+
+  final SupabaseClient _supabase =
+      Supabase.instance.client;
+
   bool isVerifying = false;
+  bool isResending = false;
 
   @override
   void dispose() {
     for (final controller in otpControllers) {
       controller.dispose();
     }
+
+    for (final node in otpFocusNodes) {
+      node.dispose();
+    }
+
     super.dispose();
   }
 
   // =========================
-  // OTP VERIFICATION
+  // VERIFY OTP
   // =========================
 
   Future<void> _verifyOtp() async {
-    final otp = otpControllers.map((controller) {
-      return controller.text;
-    }).join();
+    final otp = otpControllers
+        .map((controller) => controller.text.trim())
+        .join();
 
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter all 6 digits'),
+          content: Text(
+            'Please enter all 6 digits',
+          ),
         ),
       );
       return;
     }
 
-    setState(() => isVerifying = true);
+    setState(() {
+      isVerifying = true;
+    });
 
     try {
-      // 1. Actually verify the OTP with Supabase. If this throws
-      //    (wrong code, expired code, etc.), let the exception
-      //    propagate to the outer catch below — do NOT swallow it.
-      final res = await _supabase.auth.verifyOTP(
-        type: OtpType.signup,
+      // IMPORTANT:
+      // This verifies a REAL email OTP sent by Supabase.
+      final AuthResponse response =
+          await _supabase.auth.verifyOTP(
         email: widget.email,
         token: otp,
+        type: OtpType.email,
       );
 
-      final user = res.user ?? _supabase.auth.currentUser;
+      final User? user =
+          response.user ?? _supabase.auth.currentUser;
 
       if (user == null) {
-        // Verification call didn't throw, but we still don't have
-        // a verified user — treat this as a failure, not a success.
-        throw const AuthException('Verification failed. Please try again.');
+        throw const AuthException(
+          'OTP verification failed. Please try again.',
+        );
       }
 
-      // 2. Save the user profile into Supabase profiles table
-      await _supabase.from('profiles').upsert({
+      // =========================
+      // SAVE PROFILE
+      // =========================
+
+      await _supabase
+          .from('profiles')
+          .upsert({
         'id': user.id,
         'email': widget.email,
-        'full_name': widget.profileData['full_name'],
+        'full_name':
+            widget.profileData['full_name'],
         'role': widget.role,
       });
 
       if (!mounted) return;
 
-      // 3. Only now — after a real, successful verification — move
-      //    forward to the Success Page.
+      // =========================
+      // SUCCESS
+      // =========================
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => SuccessPage(role: widget.role),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      // On any failure, stay on this screen and tell the user.
-      // Never silently navigate to SuccessPage on an error.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e is AuthException
-                ? e.message
-                : 'Invalid or expired code. Please try again.',
+          builder: (context) =>
+              SuccessPage(
+            role: widget.role,
           ),
         ),
       );
-      for (final controller in otpControllers) {
-        controller.clear();
-      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          duration:
+              const Duration(seconds: 4),
+        ),
+      );
+
+      _clearOtp();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Verification failed: $e',
+          ),
+          duration:
+              const Duration(seconds: 4),
+        ),
+      );
+
+      _clearOtp();
     } finally {
-      if (mounted) setState(() => isVerifying = false);
+      if (mounted) {
+        setState(() {
+          isVerifying = false;
+        });
+      }
     }
   }
 
   // =========================
-  // RESEND OTP
+  // RESEND REAL EMAIL OTP
   // =========================
 
   Future<void> _resendOtp() async {
+    if (isResending) return;
+
+    setState(() {
+      isResending = true;
+    });
+
     try {
+      // Resend the signup confirmation OTP.
+      // This keeps the password-based registration flow.
       await _supabase.auth.resend(
         type: OtpType.signup,
         email: widget.email,
       );
+
       if (!mounted) return;
+
+      _clearOtp();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('OTP Resent Successfully'),
+          content: Text(
+            'A new OTP has been sent to your email.',
+          ),
+          duration:
+              Duration(seconds: 4),
+        ),
+      );
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          duration:
+              Duration(seconds: 4),
         ),
       );
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not resend OTP: $e')),
+        SnackBar(
+          content: Text(
+            'Could not resend OTP: $e',
+          ),
+        ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isResending = false;
+        });
+      }
     }
   }
+
+  // =========================
+  // CLEAR OTP
+  // =========================
+
+  void _clearOtp() {
+    for (final controller in otpControllers) {
+      controller.clear();
+    }
+
+    if (otpFocusNodes.isNotEmpty) {
+      FocusScope.of(context)
+          .requestFocus(otpFocusNodes[0]);
+    }
+  }
+
+  // =========================
+  // OTP BOX INPUT
+  // =========================
+
+  void _onOtpChanged(
+    String value,
+    int index,
+  ) {
+    if (value.isNotEmpty && index < 5) {
+      FocusScope.of(context).requestFocus(
+        otpFocusNodes[index + 1],
+      );
+    }
+
+    if (value.isEmpty && index > 0) {
+      FocusScope.of(context).requestFocus(
+        otpFocusNodes[index - 1],
+      );
+    }
+
+    // Automatically verify when
+    // all 6 digits are entered.
+    final otp = otpControllers
+        .map((controller) => controller.text)
+        .join();
+
+    if (otp.length == 6 && !isVerifying) {
+      _verifyOtp();
+    }
+  }
+
+  // =========================
+  // UI
+  // =========================
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +292,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             // =========================
 
             Padding(
-              padding: const EdgeInsets.fromLTRB(
+              padding:
+                  const EdgeInsets.fromLTRB(
                 46,
                 20,
                 46,
@@ -176,13 +306,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: const Color(0xFFE8ECEF),
+                    color:
+                        const Color(0xFFE8ECEF),
                     width: 1.5,
                   ),
                 ),
 
                 child: Align(
-                  alignment: Alignment.centerLeft,
+                  alignment:
+                      Alignment.centerLeft,
 
                   child: IconButton(
                     onPressed: () {
@@ -206,36 +338,43 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding:
+                      const EdgeInsets.symmetric(
                     horizontal: 46,
                   ),
 
                   child: Column(
                     children: [
 
-                      const SizedBox(height: 120),
+                      const SizedBox(
+                        height: 120,
+                      ),
 
                       // =========================
-                      // PHONE ICON
+                      // EMAIL ICON
                       // =========================
 
                       Container(
                         width: 152,
                         height: 152,
 
-                        decoration: const BoxDecoration(
+                        decoration:
+                            const BoxDecoration(
                           color: green,
                           shape: BoxShape.circle,
                         ),
 
                         child: const Icon(
-                          Icons.mark_email_read_outlined,
+                          Icons
+                              .mark_email_read_outlined,
                           color: Colors.white,
                           size: 88,
                         ),
                       ),
 
-                      const SizedBox(height: 80),
+                      const SizedBox(
+                        height: 80,
+                      ),
 
                       // =========================
                       // TITLE
@@ -244,16 +383,20 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       const Text(
                         'Verify Your Account',
 
-                        textAlign: TextAlign.center,
+                        textAlign:
+                            TextAlign.center,
 
                         style: TextStyle(
                           color: navy,
                           fontSize: 42,
-                          fontWeight: FontWeight.w700,
+                          fontWeight:
+                              FontWeight.w700,
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      const SizedBox(
+                        height: 30,
+                      ),
 
                       // =========================
                       // SUBTITLE
@@ -262,57 +405,80 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       Text(
                         'Enter the 6-digit code sent to\n${widget.email}',
 
-                        textAlign: TextAlign.center,
+                        textAlign:
+                            TextAlign.center,
 
-                        style: const TextStyle(
+                        style:
+                            const TextStyle(
                           color: subtitleBlue,
                           fontSize: 24,
                           height: 1.45,
                         ),
                       ),
 
-                      const SizedBox(height: 60),
+                      const SizedBox(
+                        height: 60,
+                      ),
 
                       // =========================
                       // OTP BOXES
                       // =========================
 
                       Row(
-                        children: List.generate(
+                        children:
+                            List.generate(
                           6,
                           (index) {
                             return Expanded(
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(
+                                    const EdgeInsets
+                                        .symmetric(
                                   horizontal: 4,
                                 ),
 
                                 child: SizedBox(
                                   height: 70,
 
-                                  child: TextField(
+                                  child:
+                                      TextField(
                                     controller:
-                                        otpControllers[index],
+                                        otpControllers[
+                                            index],
+
+                                    focusNode:
+                                        otpFocusNodes[
+                                            index],
 
                                     keyboardType:
-                                        TextInputType.number,
+                                        TextInputType
+                                            .number,
 
                                     textAlign:
                                         TextAlign.center,
 
                                     maxLength: 1,
 
-                                    style: const TextStyle(
+                                    style:
+                                        const TextStyle(
                                       color: navy,
                                       fontSize: 28,
                                       fontWeight:
                                           FontWeight.bold,
                                     ),
 
+                                    onChanged:
+                                        (value) {
+                                      _onOtpChanged(
+                                        value,
+                                        index,
+                                      );
+                                    },
+
                                     decoration:
                                         InputDecoration(
-                                      counterText: '',
+                                      counterText:
+                                          '',
 
                                       filled: true,
 
@@ -347,7 +513,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
                                         borderSide:
                                             const BorderSide(
-                                          color: brandRed,
+                                          color:
+                                              brandRed,
                                           width: 2,
                                         ),
                                       ),
@@ -360,7 +527,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         ),
                       ),
 
-                      const SizedBox(height: 65),
+                      const SizedBox(
+                        height: 65,
+                      ),
 
                       // =========================
                       // VERIFY BUTTON
@@ -370,18 +539,25 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         width: double.infinity,
                         height: 92,
 
-                        child: ElevatedButton(
-                          onPressed: isVerifying ? null : _verifyOtp,
+                        child:
+                            ElevatedButton(
+                          onPressed:
+                              isVerifying
+                                  ? null
+                                  : _verifyOtp,
 
                           style:
-                              ElevatedButton.styleFrom(
-                            backgroundColor: brandRed,
+                              ElevatedButton
+                                  .styleFrom(
+                            backgroundColor:
+                                brandRed,
                             elevation: 0,
 
                             shape:
                                 RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.circular(
+                                  BorderRadius
+                                      .circular(
                                 50,
                               ),
                             ),
@@ -391,16 +567,21 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                               ? const SizedBox(
                                   width: 26,
                                   height: 26,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
+
+                                  child:
+                                      CircularProgressIndicator(
+                                    color:
+                                        Colors.white,
                                     strokeWidth: 3,
                                   ),
                                 )
                               : const Text(
                                   'Verify',
 
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                  style:
+                                      TextStyle(
+                                    color:
+                                        Colors.white,
                                     fontSize: 24,
                                     fontWeight:
                                         FontWeight.w700,
@@ -409,7 +590,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(
+                        height: 40,
+                      ),
 
                       // =========================
                       // RESEND OTP
@@ -417,7 +600,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
                       Row(
                         mainAxisAlignment:
-                            MainAxisAlignment.center,
+                            MainAxisAlignment
+                                .center,
 
                         children: [
 
@@ -425,31 +609,55 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             child: Text(
                               "Didn't receive the code?",
 
-                              style: const TextStyle(
-                                color: subtitleBlue,
+                              style:
+                                  const TextStyle(
+                                color:
+                                    subtitleBlue,
                                 fontSize: 20,
                               ),
 
                               overflow:
-                                  TextOverflow.ellipsis,
+                                  TextOverflow
+                                      .ellipsis,
                             ),
                           ),
 
-                          const SizedBox(width: 10),
+                          const SizedBox(
+                            width: 10,
+                          ),
 
                           TextButton(
-                            onPressed: _resendOtp,
+                            onPressed:
+                                isResending
+                                    ? null
+                                    : _resendOtp,
 
-                            child: const Text(
-                              'Resend OTP',
+                            child: isResending
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
 
-                              style: TextStyle(
-                                color: brandRed,
-                                fontSize: 20,
-                                fontWeight:
-                                    FontWeight.w600,
-                              ),
-                            ),
+                                    child:
+                                        CircularProgressIndicator(
+                                      strokeWidth:
+                                          2,
+                                      color:
+                                          brandRed,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Resend OTP',
+
+                                    style:
+                                        TextStyle(
+                                      color:
+                                          brandRed,
+                                      fontSize: 20,
+                                      fontWeight:
+                                          FontWeight
+                                              .w600,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -464,7 +672,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             // =========================
 
             const Padding(
-              padding: EdgeInsets.only(
+              padding:
+                  EdgeInsets.only(
                 bottom: 35,
               ),
 
@@ -474,7 +683,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                 style: TextStyle(
                   color: navy,
                   fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  fontWeight:
+                      FontWeight.w600,
                 ),
               ),
             ),

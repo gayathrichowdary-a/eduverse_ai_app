@@ -1,12 +1,18 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_page.dart';
 import 'otp_verification_page.dart';
+import 'success_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   final String role;
 
-  const RegistrationPage({super.key, required this.role});
+  const RegistrationPage({
+    super.key,
+    required this.role,
+  });
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
@@ -23,6 +29,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
   static const Color hintColor = Color(0xFFA6DDE2);
 
   // =========================
+  // GOOGLE OAUTH CLIENT ID
+  // =========================
+  static const String _webClientId =
+      '562258769343-djt08qk2cg68p997l0j2lnhg8kovv81v.apps.googleusercontent.com';
+
+  // =========================
   // ROLE HELPERS
   // =========================
 
@@ -35,7 +47,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool get _isAdministrator => _role.toLowerCase() == 'administrator';
 
   // =========================
-  // CONTROLLERS (shared)
+  // SHARED CONTROLLERS
   // =========================
 
   final nameController = TextEditingController();
@@ -44,7 +56,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final confirmPasswordController = TextEditingController();
 
   // =========================
-  // CONTROLLERS (role-specific)
+  // ROLE-SPECIFIC CONTROLLERS
   // =========================
 
   final schoolNameController = TextEditingController();
@@ -62,27 +74,75 @@ class _RegistrationPageState extends State<RegistrationPage> {
     'Data Science',
   ];
 
+  // =========================
+  // STATE
+  // =========================
+
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
   bool acceptedTerms = false;
   bool isSubmitting = false;
 
   final SupabaseClient _supabase = Supabase.instance.client;
+  StreamSubscription<AuthState>? _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for OAuth deep link callbacks (specifically for GitHub login)
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
+    _authSubscription = _supabase.auth.onAuthStateChange.listen((data) async {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+
+      if (event == AuthChangeEvent.signedIn && session != null) {
+        // When signed in via GitHub or OAuth, update the role metadata with the chosen role
+        try {
+          await _supabase.auth.updateUser(
+            UserAttributes(
+              data: {
+                'role': _role,
+              },
+            ),
+          );
+        } catch (_) {}
+
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessPage(role: _role),
+          ),
+        );
+      }
+    });
+  }
+
+  // =========================
+  // DISPOSE
+  // =========================
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+
     schoolNameController.dispose();
     uniqueCodeController.dispose();
     childCodeController.dispose();
+
     super.dispose();
   }
 
   // =========================
-  // TITLE / SUBTITLE PER ROLE
+  // TITLE
   // =========================
 
   String get _pageTitle {
@@ -92,6 +152,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_isAdministrator) return 'Admin Registration';
     return 'Join EduVerse AI';
   }
+
+  // =========================
+  // SUBTITLE
+  // =========================
 
   String get _pageSubtitle {
     if (_isParent) {
@@ -109,24 +173,152 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return 'Empower your learning journey with your personal AI\nmentor.';
   }
 
-  // =========================
-  // GOOGLE / GITHUB LOGIN
-  // =========================
+  // ============================================================
+  // GOOGLE LOGIN WITH SUPABASE
+  // ============================================================
 
-  void _googleLogin() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Google sign-up selected')),
-    );
+  Future<void> _googleLogin() async {
+    setState(() {
+      isSubmitting = true;
+    });
+
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: _webClientId,
+      );
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        setState(() {
+          isSubmitting = false;
+        });
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final String? accessToken = googleAuth.accessToken;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw const AuthException(
+          'Could not retrieve Google ID token.',
+        );
+      }
+
+      // Sign in to Supabase using the Google ID Token
+      final AuthResponse response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      if (!mounted) return;
+
+      if (response.user != null) {
+        // Save selected role into user metadata
+        await _supabase.auth.updateUser(
+          UserAttributes(
+            data: {
+              'full_name': googleUser.displayName ?? '',
+              'role': _role,
+            },
+          ),
+        );
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Signed in successfully as ${googleUser.displayName ?? googleUser.email}!',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate directly to SuccessPage with the chosen role
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessPage(role: _role),
+          ),
+        );
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google sign-in error: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
+    }
   }
 
-  void _githubLogin() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('GitHub sign-up selected')),
-    );
+  // ============================================================
+  // GITHUB LOGIN WITH SUPABASE
+  // ============================================================
+
+  Future<void> _githubLogin() async {
+    setState(() {
+      isSubmitting = true;
+    });
+
+    try {
+      final bool launched = await _supabase.auth.signInWithOAuth(
+        OAuthProvider.github,
+        redirectTo: 'io.supabase.eduverse://login-callback',
+      );
+
+      if (!launched) {
+        throw const AuthException('Could not launch GitHub sign-in.');
+      }
+
+      // The _authSubscription listener will automatically handle user redirection
+      // and assign widget.role to the user!
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('GitHub sign-in error: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
+    }
   }
 
   // =========================
-  // DATE OF BIRTH PICKER
+  // DATE OF BIRTH
   // =========================
 
   Future<void> _pickDateOfBirth() async {
@@ -158,49 +350,91 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  // =========================
+  // FORMATTED DOB
+  // =========================
+
   String get _formattedDob {
-    if (dateOfBirth == null) return '';
+    if (dateOfBirth == null) {
+      return '';
+    }
+
     final d = dateOfBirth!;
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
   // =========================
-  // VALIDATION PER ROLE
+  // VALIDATION
   // =========================
 
   String? _validateRoleFields() {
-    if (_isStudent) {
-      if (nameController.text.trim().isEmpty) return 'Please enter your name';
-      if (emailController.text.trim().isEmpty) return 'Please enter your email';
-      if (schoolNameController.text.trim().isEmpty) return 'Please enter your school/college name';
-      if (dateOfBirth == null) return 'Please select your date of birth';
-      if (selectedBranch == null) return 'Please select your branch';
-    } else if (_isParent) {
-      if (nameController.text.trim().isEmpty) return 'Please enter your name';
-      if (emailController.text.trim().isEmpty) return 'Please enter your email';
-      if (childCodeController.text.trim().isEmpty) return "Please enter your child's student code";
-    } else if (_isTeacher) {
-      if (nameController.text.trim().isEmpty) return 'Please enter your name';
-      if (emailController.text.trim().isEmpty) return 'Please enter your school email';
-      if (uniqueCodeController.text.trim().isEmpty) return 'Please enter the unique code';
-    } else if (_isSchool) {
-      if (schoolNameController.text.trim().isEmpty) return 'Please enter school name';
-      if (emailController.text.trim().isEmpty) return 'Please enter school email';
-      if (uniqueCodeController.text.trim().isEmpty) return 'Please enter the unique code';
-    } else if (_isAdministrator) {
-      if (uniqueCodeController.text.trim().isEmpty) return 'Please enter the platform unique code';
-      if (emailController.text.trim().isEmpty) return 'Please enter your email';
-      if (nameController.text.trim().isEmpty) return 'Please enter your name';
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      return 'Please enter your email';
     }
+
+    if (!email.contains('@') || !email.contains('.')) {
+      return 'Please enter a valid email address';
+    }
+
+    if (_isStudent) {
+      if (nameController.text.trim().isEmpty) {
+        return 'Please enter your name';
+      }
+      if (schoolNameController.text.trim().isEmpty) {
+        return 'Please enter your school/college name';
+      }
+      if (dateOfBirth == null) {
+        return 'Please select your date of birth';
+      }
+      if (selectedBranch == null) {
+        return 'Please select your branch';
+      }
+    } else if (_isParent) {
+      if (nameController.text.trim().isEmpty) {
+        return 'Please enter your name';
+      }
+      if (childCodeController.text.trim().isEmpty) {
+        return 'Please enter your child\'s student code';
+      }
+    } else if (_isTeacher) {
+      if (nameController.text.trim().isEmpty) {
+        return 'Please enter your name';
+      }
+      if (uniqueCodeController.text.trim().isEmpty) {
+        return 'Please enter the unique code';
+      }
+    } else if (_isSchool) {
+      if (schoolNameController.text.trim().isEmpty) {
+        return 'Please enter school name';
+      }
+      if (uniqueCodeController.text.trim().isEmpty) {
+        return 'Please enter the unique code';
+      }
+    } else if (_isAdministrator) {
+      if (uniqueCodeController.text.trim().isEmpty) {
+        return 'Please enter the platform unique code';
+      }
+      if (nameController.text.trim().isEmpty) {
+        return 'Please enter your name';
+      }
+    } else {
+      if (nameController.text.trim().isEmpty) {
+        return 'Please enter your name';
+      }
+    }
+
     return null;
   }
 
-  // =========================
-  // CREATE ACCOUNT
-  // =========================
+  // ============================================================
+  // CREATE ACCOUNT + SEND REAL EMAIL OTP
+  // ============================================================
 
   Future<void> _createAccount() async {
     final roleError = _validateRoleFields();
+
     if (roleError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(roleError)),
@@ -208,29 +442,39 @@ class _RegistrationPageState extends State<RegistrationPage> {
       return;
     }
 
-    if (passwordController.text.isEmpty) {
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
+
+    if (password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a password')),
       );
       return;
     }
 
-    if (!acceptedTerms) {
+    if (password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please accept the Terms and Privacy Policy')),
+        const SnackBar(content: Text('Password must be at least 6 characters')),
       );
       return;
     }
 
-    if (passwordController.text != confirmPasswordController.text) {
+    if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
 
-    final email = emailController.text.trim();
-    final password = passwordController.text;
+    if (!acceptedTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please accept the Terms and Privacy Policy')),
+      );
+      return;
+    }
+
+    final email = emailController.text.trim().toLowerCase();
 
     final Map<String, dynamic> extraProfileData = {
       'full_name': nameController.text.trim(),
@@ -255,14 +499,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
       },
     };
 
-    setState(() => isSubmitting = true);
+    setState(() {
+      isSubmitting = true;
+    });
 
     try {
-      await _supabase.auth.signUp(
+      final AuthResponse authResponse = await _supabase.auth.signUp(
         email: email,
         password: password,
         data: extraProfileData,
       );
+
+      if (authResponse.user == null) {
+        throw const AuthException(
+          'Could not create the account. Please try again.',
+        );
+      }
 
       if (!mounted) return;
 
@@ -276,20 +528,41 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         ),
       );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A 6-digit OTP has been sent to your email.'),
+          duration: Duration(seconds: 4),
+        ),
+      );
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
+        SnackBar(
+          content: Text(e.message),
+          duration: const Duration(seconds: 5),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Something went wrong: $e')),
+        SnackBar(
+          content: Text('Could not send OTP: $e'),
+          duration: const Duration(seconds: 5),
+        ),
       );
     } finally {
-      if (mounted) setState(() => isSubmitting = false);
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
     }
   }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -404,12 +677,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 55),
                 Row(
                   children: const [
-                    Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
+                    Expanded(
+                      child: Divider(color: Color(0xFFE5E7EB), thickness: 1),
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: Text('OR', style: TextStyle(color: navy, fontSize: 20)),
+                      child: Text(
+                        'OR',
+                        style: TextStyle(color: navy, fontSize: 20),
+                      ),
                     ),
-                    Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
+                    Expanded(
+                      child: Divider(color: Color(0xFFE5E7EB), thickness: 1),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 45),
@@ -417,7 +697,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   children: [
                     Expanded(
                       child: _socialButton(
-                        onTap: _googleLogin,
+                        onTap: isSubmitting ? () {} : _googleLogin,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
@@ -445,7 +725,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     const SizedBox(width: 20),
                     Expanded(
                       child: _socialButton(
-                        onTap: _githubLogin,
+                        onTap: isSubmitting ? () {} : _githubLogin,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
@@ -481,7 +761,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
                         );
                       },
                       child: const Text(
@@ -504,20 +786,37 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
+  // ============================================================
+  // ROLE FIELDS
+  // ============================================================
+
   List<Widget> _buildRoleFields() {
     if (_isStudent) {
       return [
         _buildLabel('Full Name'),
         const SizedBox(height: 12),
-        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        _buildTextField(
+          controller: nameController,
+          hintText: 'Enter your full name',
+          icon: Icons.person_outline,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Email Address'),
         const SizedBox(height: 12),
-        _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        _buildTextField(
+          controller: emailController,
+          hintText: 'email@example.com',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 40),
         _buildLabel('School / College Name'),
         const SizedBox(height: 12),
-        _buildTextField(controller: schoolNameController, hintText: 'Enter your school or college name', icon: Icons.school_outlined),
+        _buildTextField(
+          controller: schoolNameController,
+          hintText: 'Enter your school or college name',
+          icon: Icons.school_outlined,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Date of Birth'),
         const SizedBox(height: 12),
@@ -528,83 +827,161 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _buildBranchDropdown(),
       ];
     }
+
     if (_isParent) {
       return [
         _buildLabel('Full Name'),
         const SizedBox(height: 12),
-        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        _buildTextField(
+          controller: nameController,
+          hintText: 'Enter your full name',
+          icon: Icons.person_outline,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Email Address'),
         const SizedBox(height: 12),
-        _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        _buildTextField(
+          controller: emailController,
+          hintText: 'email@example.com',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 40),
         _buildLabel("Child's Student Code"),
         const SizedBox(height: 12),
-        _buildTextField(controller: childCodeController, hintText: "Enter your child's student code", icon: Icons.link),
+        _buildTextField(
+          controller: childCodeController,
+          hintText: "Enter your child's student code",
+          icon: Icons.link,
+        ),
       ];
     }
+
     if (_isTeacher) {
       return [
         _buildLabel('Teacher Name'),
         const SizedBox(height: 12),
-        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        _buildTextField(
+          controller: nameController,
+          hintText: 'Enter your full name',
+          icon: Icons.person_outline,
+        ),
         const SizedBox(height: 40),
         _buildLabel('School Email'),
         const SizedBox(height: 12),
-        _buildTextField(controller: emailController, hintText: 'you@school.edu', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        _buildTextField(
+          controller: emailController,
+          hintText: 'you@school.edu',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Unique Code'),
         const SizedBox(height: 12),
-        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by school', icon: Icons.vpn_key_outlined),
+        _buildTextField(
+          controller: uniqueCodeController,
+          hintText: 'Code provided by school',
+          icon: Icons.vpn_key_outlined,
+        ),
       ];
     }
+
     if (_isSchool) {
       return [
         _buildLabel('School Name'),
         const SizedBox(height: 12),
-        _buildTextField(controller: schoolNameController, hintText: 'Enter school name', icon: Icons.account_balance_outlined),
+        _buildTextField(
+          controller: schoolNameController,
+          hintText: 'Enter school name',
+          icon: Icons.account_balance_outlined,
+        ),
         const SizedBox(height: 40),
         _buildLabel('School Email'),
         const SizedBox(height: 12),
-        _buildTextField(controller: emailController, hintText: 'school@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        _buildTextField(
+          controller: emailController,
+          hintText: 'school@example.com',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Unique Code'),
         const SizedBox(height: 12),
-        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by Administrator', icon: Icons.vpn_key_outlined),
+        _buildTextField(
+          controller: uniqueCodeController,
+          hintText: 'Code provided by Administrator',
+          icon: Icons.vpn_key_outlined,
+        ),
       ];
     }
+
     if (_isAdministrator) {
       return [
         _buildLabel('Unique Code'),
         const SizedBox(height: 12),
-        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by platform', icon: Icons.vpn_key_outlined),
+        _buildTextField(
+          controller: uniqueCodeController,
+          hintText: 'Code provided by platform',
+          icon: Icons.vpn_key_outlined,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Email Address'),
         const SizedBox(height: 12),
-        _buildTextField(controller: emailController, hintText: 'you@company.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        _buildTextField(
+          controller: emailController,
+          hintText: 'you@company.com',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 40),
         _buildLabel('Full Name'),
         const SizedBox(height: 12),
-        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        _buildTextField(
+          controller: nameController,
+          hintText: 'Enter your full name',
+          icon: Icons.person_outline,
+        ),
       ];
     }
+
     return [
       _buildLabel('Full Name'),
       const SizedBox(height: 12),
-      _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+      _buildTextField(
+        controller: nameController,
+        hintText: 'Enter your full name',
+        icon: Icons.person_outline,
+      ),
       const SizedBox(height: 40),
       _buildLabel('Email Address'),
       const SizedBox(height: 12),
-      _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+      _buildTextField(
+        controller: emailController,
+        hintText: 'email@example.com',
+        icon: Icons.email_outlined,
+        keyboardType: TextInputType.emailAddress,
+      ),
     ];
   }
+
+  // ============================================================
+  // LABEL
+  // ============================================================
 
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(color: navy, fontSize: 22, fontWeight: FontWeight.w600),
+      style: const TextStyle(
+        color: navy,
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
+
+  // ============================================================
+  // TEXT FIELD
+  // ============================================================
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -620,7 +997,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         hintText: hintText,
         hintStyle: const TextStyle(color: hintColor, fontSize: 22),
         prefixIcon: Icon(icon, color: navy, size: 30),
-        contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: navy, width: 2),
@@ -633,6 +1011,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
+  // ============================================================
+  // DATE FIELD
+  // ============================================================
+
   Widget _buildDateField() {
     return GestureDetector(
       onTap: _pickDateOfBirth,
@@ -643,8 +1025,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           decoration: InputDecoration(
             hintText: 'DD/MM/YYYY',
             hintStyle: const TextStyle(color: hintColor, fontSize: 22),
-            prefixIcon: const Icon(Icons.cake_outlined, color: navy, size: 30),
-            contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+            prefixIcon:
+                const Icon(Icons.cake_outlined, color: navy, size: 30),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
               borderSide: const BorderSide(color: navy, width: 2),
@@ -659,6 +1043,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
+  // ============================================================
+  // BRANCH DROPDOWN
+  // ============================================================
+
   Widget _buildBranchDropdown() {
     return DropdownButtonFormField<String>(
       value: selectedBranch,
@@ -667,8 +1055,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       decoration: InputDecoration(
         hintText: 'Select your branch',
         hintStyle: const TextStyle(color: hintColor, fontSize: 22),
-        prefixIcon: const Icon(Icons.menu_book_outlined, color: navy, size: 30),
-        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        prefixIcon:
+            const Icon(Icons.menu_book_outlined, color: navy, size: 30),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: navy, width: 2),
@@ -679,7 +1069,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
       items: branches
-          .map((b) => DropdownMenuItem(value: b, child: Text(b)))
+          .map(
+            (branch) => DropdownMenuItem<String>(
+              value: branch,
+              child: Text(branch),
+            ),
+          )
           .toList(),
       onChanged: (value) {
         setState(() {
@@ -688,6 +1083,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       },
     );
   }
+
+  // ============================================================
+  // PASSWORD FIELD
+  // ============================================================
 
   Widget _buildPasswordField({
     required TextEditingController controller,
@@ -705,9 +1104,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
         prefixIcon: const Icon(Icons.lock_outline, color: navy, size: 30),
         suffixIcon: IconButton(
           onPressed: onToggle,
-          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: navy, size: 30),
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            color: navy,
+            size: 30,
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: navy, width: 2),
@@ -720,7 +1124,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget _socialButton({required Widget child, required VoidCallback onTap}) {
+  // ============================================================
+  // SOCIAL BUTTON
+  // ============================================================
+
+  Widget _socialButton({
+    required Widget child,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -728,7 +1139,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: const Color(0xFFE9EDF0), width: 1.5),
+          border: Border.all(
+            color: const Color(0xFFE9EDF0),
+            width: 1.5,
+          ),
         ),
         child: Center(child: child),
       ),
