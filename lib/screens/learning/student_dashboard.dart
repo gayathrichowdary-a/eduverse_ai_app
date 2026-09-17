@@ -14,6 +14,7 @@ import 'live_ai_hunt.dart';
 import 'knowledge_hub_screen.dart';
 import 'daily_assessment_hub.dart'; 
 import 'assessment_selection.dart'; 
+import 'ai_media_studio_screen.dart';
 
 // ============================================================
 // MODELS
@@ -69,6 +70,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
     ToolModel(name: 'AI Scanner', icon: Icons.document_scanner_rounded, color: Color(0xFFF4A100)),
     ToolModel(name: 'Space Model', icon: Icons.rocket_launch_rounded, color: Color(0xFF29B6D8)),
     ToolModel(name: 'English Lab', icon: Icons.translate_rounded, color: Color(0xFF5B5FE0)),
+    ToolModel(name: 'AI Video/Audio', icon: Icons.video_library_rounded, color: Color(0xFFEF3340)),
   ];
 
   // Goals Data
@@ -87,6 +89,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
       MaterialPageRoute(
         builder: (context) => DailyAssessmentHub(studentName: widget.studentName),
       ),
+    );
+  }
+
+  void _openAIMediaStudio() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AIMediaStudioScreen()),
     );
   }
 
@@ -131,11 +140,15 @@ class _StudentDashboardState extends State<StudentDashboard> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('EduVerse AI', 
-                    style: TextStyle(color: brandRed, fontSize: 28, fontWeight: FontWeight.w800)),
+                  const Text(
+                    'EduVerse AI', 
+                    style: TextStyle(color: brandRed, fontSize: 28, fontWeight: FontWeight.w800),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Hi, ${widget.studentName}! Ready to learn?', 
-                    style: const TextStyle(color: subtitleBlue, fontSize: 16, fontWeight: FontWeight.w500)),
+                  Text(
+                    'Hi, ${widget.studentName}! Ready to learn?', 
+                    style: const TextStyle(color: subtitleBlue, fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
                 ],
               ),
               GestureDetector(
@@ -143,16 +156,79 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 child: CircleAvatar(
                   radius: 26, 
                   backgroundColor: mustard, 
-                  child: Text(widget.avatarInitial, 
-                    style: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    widget.avatarInitial, 
+                    style: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 35),
-          const Text('AI Tools & Mentors', 
-            style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 25),
+
+          // ========================================================
+          // FEATURED AI MEDIA & VIDEO STUDIO BANNER (Your Added Feature)
+          // ========================================================
+          InkWell(
+            onTap: _openAIMediaStudio,
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF214675), Color(0xFF1E3A8A)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF214675).withOpacity(0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.auto_awesome, color: Colors.amber, size: 28),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'AI Media & Video Studio',
+                          style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Synthesize 2D Video, MP3 Voiceovers & Quizzes',
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+          const Text(
+            'AI Tools & Mentors', 
+            style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 18),
 
           // Tools Grid
@@ -183,6 +259,8 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const InteractiveModelScreen()));
                   } else if (tool.name == 'English Lab') {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const EnglishLabDashboard()));
+                  } else if (tool.name == 'AI Video/Audio') {
+                    _openAIMediaStudio();
                   }
                 },
               );
@@ -190,8 +268,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
           ),
 
           const SizedBox(height: 40),
-          const Text("Today's Goals", 
-            style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w800)),
+          const Text(
+            "Today's Goals", 
+            style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 15),
 
           // Goals List
@@ -200,7 +280,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
             child: _GoalTile(
               title: goal.title, 
               time: goal.time, 
-              isCompleted: goal.isCompleted
+              isCompleted: goal.isCompleted,
             ),
           )),
         ],
@@ -241,8 +321,10 @@ class _ToolCard extends StatelessWidget {
               child: Icon(tool.icon, color: tool.color, size: 28),
             ),
             const SizedBox(height: 12),
-            Text(tool.name, 
-              style: const TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.bold, fontSize: 14)),
+            Text(
+              tool.name, 
+              style: const TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.bold, fontSize: 14),
+            ),
           ],
         ),
       ),
@@ -319,11 +401,13 @@ class _ShellBottomNav extends StatelessWidget {
         children: [
           Icon(icon, color: isSelected ? const Color(0xFFE8394A) : Colors.grey, size: 26),
           const SizedBox(height: 4),
-          Text(label, 
+          Text(
+            label, 
             style: TextStyle(
               color: isSelected ? const Color(0xFFE8394A) : Colors.grey, 
               fontSize: 11, 
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ],
       ),

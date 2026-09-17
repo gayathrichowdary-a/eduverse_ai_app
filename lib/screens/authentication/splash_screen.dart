@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'welcome_screen.dart';
 
@@ -12,6 +13,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _progressAnimation;
+  Timer? _navigationTimer;
 
   @override
   void initState() {
@@ -19,32 +21,33 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 1800),
     );
 
     _progressAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(_controller);
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
 
     _controller.forward();
 
-    // ADDED: Navigate to WelcomeScreen after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted){
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const WelcomeScreen(),
-        ),
-      );
-    }
+    // Guaranteed navigation after 2 seconds:
+    _navigationTimer = Timer(const Duration(milliseconds: 2200), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        );
+      }
     });
   }
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -52,175 +55,136 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFF5FAFF),
-              Color(0xFFFFFFFF),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Stack(
-                children: [
-
-                  // Question mark decoration
-                  Positioned(
-                    left: constraints.maxWidth * 0.15,
-                    top: constraints.maxHeight * 0.18,
-                    child: Text(
-                      '?',
-                      style: TextStyle(
-                        fontSize: constraints.maxWidth * 0.10,
-                        color: const Color(0xFFF3E8EF),
-                      ),
-                    ),
+      backgroundColor: const Color(0xFFF9FBFE),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Center(
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight,
+                    maxWidth: 500,
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Spacer(),
 
-                  // Light bulb decoration
-                  Positioned(
-                    right: constraints.maxWidth * 0.15,
-                    top: constraints.maxHeight * 0.40,
-                    child: Icon(
-                      Icons.lightbulb_outline,
-                      size: constraints.maxWidth * 0.10,
-                      color: const Color(0xFFEDEEF2),
-                    ),
-                  ),
-
-                  // Main content
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-
-                        // Logo
-                        Container(
-                          width: constraints.maxWidth * 0.42,
-                          height: constraints.maxWidth * 0.42,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFFEFF9FF),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF61D5FF)
-                                    .withOpacity(0.45),
-                                blurRadius: 35,
-                                spreadRadius: 8,
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: constraints.maxWidth * 0.31,
-                              height: constraints.maxWidth * 0.31,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFFE8475D),
-                              ),
-                              child: const Icon(
-                                Icons.school,
-                                color: Colors.white,
-                                size: 75,
-                              ),
+                      // Animated Cap Logo
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFFEFF9FF),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF61D5FF).withOpacity(0.35),
+                              blurRadius: 30,
+                              spreadRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 85,
+                            height: 85,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFFE8475D),
+                            ),
+                            child: const Icon(
+                              Icons.school,
+                              color: Colors.white,
+                              size: 48,
                             ),
                           ),
                         ),
+                      ),
 
-                        SizedBox(
-                          height: constraints.maxHeight * 0.045,
-                        ),
+                      const SizedBox(height: 20),
 
-                        // App name
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'EduVerse ',
-                                style: TextStyle(
-                                  fontSize: constraints.maxWidth * 0.075,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF214675),
-                                ),
+                      // App Name
+                      RichText(
+                        text: const TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'EduVerse ',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF214675),
                               ),
-                              TextSpan(
-                                text: 'AI',
-                                style: TextStyle(
-                                  fontSize: constraints.maxWidth * 0.075,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xFF8999AA),
-                                ),
+                            ),
+                            TextSpan(
+                              text: 'AI',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF8999AA),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                      ),
 
-                        SizedBox(
-                          height: constraints.maxHeight * 0.015,
+                      const SizedBox(height: 8),
+
+                      const Text(
+                        'Your Personal AI Learning Companion',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF4A87B9),
+                          fontWeight: FontWeight.w500,
                         ),
+                      ),
 
-                        // Subtitle
-                        Text(
-                          'Your Personal AI Learning Companion',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: constraints.maxWidth * 0.035,
-                            color: const Color(0xFF4A87B9),
-                            fontWeight: FontWeight.w400,
-                          ),
+                      const Spacer(),
+
+                      // Loading Universe Status
+                      const Text(
+                        'Loading your universe...',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF82B5D4),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  // Bottom loading section
-                  Positioned(
-                    bottom: constraints.maxHeight * 0.045,
-                    left: constraints.maxWidth * 0.12,
-                    right: constraints.maxWidth * 0.12,
-                    child: Column(
-                      children: [
+                      const SizedBox(height: 14),
 
-                        const Text(
-                          'Loading your universe...',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF82B5D4),
-                          ),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        AnimatedBuilder(
+                      // Progress Bar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: AnimatedBuilder(
                           animation: _progressAnimation,
                           builder: (context, child) {
-                            return LinearProgressIndicator(
-                              value: _progressAnimation.value,
-                              minHeight: 8,
+                            return ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              backgroundColor: const Color(0xFFE8F0F5),
-                              valueColor:
-                                  const AlwaysStoppedAnimation<Color>(
-                                Color(0xFF45BFEA),
+                              child: LinearProgressIndicator(
+                                value: _progressAnimation.value,
+                                minHeight: 6,
+                                backgroundColor: const Color(0xFFE8F0F5),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF45BFEA),
+                                ),
                               ),
                             );
                           },
                         ),
-                      ],
-                    ),
+                      ),
+
+                      const SizedBox(height: 24),
+                    ],
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

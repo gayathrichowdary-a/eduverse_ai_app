@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'registration_page.dart';
-
+import 'success_page.dart';
 class RoleSelectionPage extends StatefulWidget {
   /// Optional callback for custom flow handling (e.g., Join EduVerse AI)
   final Function(String selectedRole)? onRoleSelected;

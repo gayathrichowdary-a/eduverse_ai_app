@@ -65,7 +65,7 @@ class DailyAssessmentHub extends StatefulWidget {
   final VoidCallback? onViewWeekly;
 
   const DailyAssessmentHub({
-    Key? key,
+    super.key,
     this.studentName = 'Akhil',
     this.mastery = const HubStatCard(label: 'Mastery', value: '82%'),
     this.streak = const HubStatCard(label: 'Streak', value: '12 Days'),
@@ -95,7 +95,7 @@ class DailyAssessmentHub extends StatefulWidget {
     ],
     this.onStartLearning,
     this.onViewWeekly,
-  }) : super(key: key);
+  });
 
   @override
   State<DailyAssessmentHub> createState() => _DailyAssessmentHubState();
@@ -352,11 +352,13 @@ class _RadarChartPainter extends CustomPainter {
     final radius = math.min(size.width, size.height) / 2 * 0.8;
     
     // Background rings
-    final bgPaint = Paint()..color = Colors.grey.withOpacity(0.1)..style = PaintingStyle.stroke;
-    for (var i = 1; i <= 3; i++) canvas.drawCircle(center, radius * (i / 3), bgPaint);
+    final bgPaint = Paint()..color = Colors.grey.withValues(alpha: 0.1)..style = PaintingStyle.stroke;
+    for (var i = 1; i <= 3; i++) {
+      canvas.drawCircle(center, radius * (i / 3), bgPaint);
+    }
 
     // Data Shape
-    final paint = Paint()..color = color.withOpacity(0.4)..style = PaintingStyle.fill;
+    final paint = Paint()..color = color.withValues(alpha: 0.4)..style = PaintingStyle.fill;
     final strokePaint = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 2;
     
     final path = Path();
@@ -365,7 +367,11 @@ class _RadarChartPainter extends CustomPainter {
       double val = i < values.length ? values[i] : 0;
       double x = center.dx + radius * val * math.cos(angle);
       double y = center.dy + radius * val * math.sin(angle);
-      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
     }
     path.close();
     canvas.drawPath(path, paint);

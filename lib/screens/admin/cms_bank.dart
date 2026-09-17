@@ -74,7 +74,7 @@ class AdminCard extends StatelessWidget {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -97,7 +97,7 @@ class StatusPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -344,7 +344,7 @@ class _CmsBankScreenState extends State<CmsBankScreen> {
                   child: ChoiceChip(
                     label: Text('${e.key}  ${e.value}'),
                     selected: selected,
-                    selectedColor: AppColors.primary.withOpacity(0.15),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
                     onSelected: (sel) {
                       setState(() => _topicFilter = sel ? e.key : null);
                     },
@@ -371,7 +371,7 @@ class _CmsBankScreenState extends State<CmsBankScreen> {
                     labelStyle: TextStyle(
                         color: selected ? d.color : AppColors.textSecondary,
                         fontSize: 12),
-                    selectedColor: d.color.withOpacity(0.15),
+                    selectedColor: d.color.withValues(alpha: 0.15),
                     onSelected: (sel) {
                       setState(() => _difficultyFilter = sel ? d : null);
                     },
@@ -390,7 +390,7 @@ class _CmsBankScreenState extends State<CmsBankScreen> {
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
                     itemCount: _filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, i) {
                       final q = _filtered[i];
                       return _QuestionCard(

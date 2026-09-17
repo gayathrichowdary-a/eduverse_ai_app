@@ -21,14 +21,12 @@ class EduVerseAI extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'EduVerse AI',
-
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFEF3340),
         ),
         useMaterial3: true,
       ),
-
       home: const SplashScreen(),
     );
   }

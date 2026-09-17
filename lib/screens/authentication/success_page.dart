@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../onboarding/onboarding_student_information.dart';
+import '../learning/student_dashboard.dart';
 import '../teacher/teacher_portal_hub.dart';
 import '../parent/parent_home_dashboard.dart';
 import '../admin/admin_dashboard.dart';
@@ -13,46 +13,26 @@ class SuccessPage extends StatelessWidget {
     this.role = 'Student',
   });
 
-  // =========================
-  // COLORS
-  // =========================
-
   static const Color navy = Color(0xFF1D3B64);
   static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color brandRed = Color(0xFFEF3340);
 
-  // =========================================================
-  // ROUTE TO THE CORRECT DASHBOARD BASED ON ROLE
-  // =========================================================
-
   void _continueToDashboard(BuildContext context) {
     Widget destination;
 
-    switch (role) {
-      case 'Teacher':
-        destination = const TeacherPortalHub();
-        break;
-      case 'Parent':
-        destination = const ParentHomeDashboard();
-        break;
-      case 'Student':
-        destination = const OnboardingStudentInformation();
-        break;
-      case 'Administrator':
-        destination = const AdminDashboard();
-        break;
-      case 'School':
-        destination = const SchoolDashboard();
-        break;
-      default:
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '$role dashboard is not built yet — hook this up to your next screen.',
-            ),
-          ),
-        );
-        return;
+    final normalizedRole = role.toLowerCase().trim();
+
+    if (normalizedRole.contains('teacher')) {
+      destination = const TeacherPortalHub();
+    } else if (normalizedRole.contains('parent')) {
+      destination = const ParentHomeDashboard();
+    } else if (normalizedRole.contains('admin')) {
+      destination = const AdminDashboard();
+    } else if (normalizedRole.contains('school')) {
+      destination = const SchoolDashboard();
+    } else {
+      // Default: Student
+      destination = const StudentDashboard();
     }
 
     Navigator.pushReplacement(
@@ -65,143 +45,81 @@ class SuccessPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 46),
-
             child: Column(
               children: [
-
-                // =========================
-                // SUCCESS ICON
-                // =========================
-
-                const SizedBox(height: 180),
-
+                const SizedBox(height: 100),
                 Container(
-                  width: 225,
-                  height: 225,
-
+                  width: 180,
+                  height: 180,
                   decoration: const BoxDecoration(
                     color: Color(0xFFE6F4F0),
                     shape: BoxShape.circle,
                   ),
-
                   child: Center(
                     child: Container(
-                      width: 125,
-                      height: 125,
-
+                      width: 100,
+                      height: 100,
                       decoration: const BoxDecoration(
                         color: navy,
                         shape: BoxShape.circle,
                       ),
-
                       child: const Icon(
                         Icons.check,
                         color: Color(0xFFE6F4F0),
-                        size: 90,
+                        size: 70,
                       ),
                     ),
                   ),
                 ),
-
-                // =========================
-                // TITLE
-                // =========================
-
-                const SizedBox(height: 55),
-
-                const Text(
-                  'Welcome to EduVerse AI!',
+                const SizedBox(height: 40),
+                Text(
+                  'Welcome, $role!',
                   textAlign: TextAlign.center,
-
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: navy,
-                    fontSize: 40,
+                    fontSize: 34,
                     fontWeight: FontWeight.w700,
                     height: 1.2,
                   ),
                 ),
-
-                // =========================
-                // DESCRIPTION
-                // =========================
-
-                const SizedBox(height: 28),
-
-                const Text(
-                  "Your account has been created successfully. Let's\n"
-                  "personalize your learning experience.",
-
+                const SizedBox(height: 20),
+                Text(
+                  "Your $role account is ready.\nTap Continue to enter your dashboard.",
                   textAlign: TextAlign.center,
-
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: subtitleBlue,
-                    fontSize: 22,
-                    height: 1.6,
+                    fontSize: 18,
+                    height: 1.5,
                   ),
                 ),
-
-                const SizedBox(height: 180),
-
-                // =========================
-                // CONTINUE BUTTON
-                // =========================
-
+                const SizedBox(height: 80),
                 SizedBox(
                   width: double.infinity,
-                  height: 92,
-
+                  height: 60,
                   child: ElevatedButton(
                     onPressed: () => _continueToDashboard(context),
-
                     style: ElevatedButton.styleFrom(
                       backgroundColor: brandRed,
                       elevation: 0,
-
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-
-                    child: const Text(
-                      'Continue',
-
-                      style: TextStyle(
+                    child: Text(
+                      'Enter $role Dashboard',
+                      style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ),
-
-                // =========================
-                // TAKE A TOUR
-                // =========================
-
-                const SizedBox(height: 35),
-
-                GestureDetector(
-                  onTap: () {
-                    // App tour will be connected here
-                  },
-
-                  child: const Text(
-                    'Take a tour',
-
-                    style: TextStyle(
-                      color: brandRed,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 65),
+                const SizedBox(height: 40),
               ],
             ),
           ),

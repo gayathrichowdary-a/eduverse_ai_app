@@ -7,6 +7,7 @@ import 'students_detail.dart';
 import 'exam_compiler.dart';
 import 'agile_board_ide.dart';
 import 'virtual_meet.dart';
+import '../learning/ai_media_studio_screen.dart';
 
 class TeacherPortalHub extends StatelessWidget {
   const TeacherPortalHub({super.key});
@@ -71,6 +72,29 @@ class TeacherPortalHub extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Column(
                   children: [
+                    // AI Media Studio Launcher
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AIMediaStudioScreen()),
+                          );
+                        },
+                        icon: const Icon(Icons.auto_awesome),
+                        label: const Text('Manage & Synthesize AI Curricula'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF214675),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
                     _TeacherModuleTile(
                       icon: Icons.bar_chart_rounded,
                       color: const Color(0xFF58C7F3),
