@@ -38,7 +38,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // ROLE HELPERS
   // =========================
 
-  String get _role => widget.role;
+  String get _role => widget.role.trim();
 
   bool get _isStudent => _role.toLowerCase().contains('student');
   bool get _isParent => _role.toLowerCase().contains('parent');
@@ -112,6 +112,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 },
               ),
             );
+
+            await _supabase.from('profiles').upsert({
+              'id': session.user.id,
+              'email': session.user.email,
+              'full_name': nameController.text.trim().isNotEmpty 
+                  ? nameController.text.trim() 
+                  : (session.user.userMetadata?['full_name'] ?? ''),
+              'role': _role,
+            });
           } catch (_) {}
 
           if (!mounted) return;
@@ -219,6 +228,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
             },
           ),
         );
+
+        try {
+          await _supabase.from('profiles').upsert({
+            'id': response.user!.id,
+            'email': response.user!.email,
+            'full_name': googleUser.displayName ?? '',
+            'role': _role,
+          });
+        } catch (_) {}
 
         if (!mounted) return;
 
@@ -405,7 +423,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     setState(() => isSubmitting = true);
 
     try {
-      // 1. Sign up / initiate OTP with the user's metadata & password
+      // 1. Sign up / initiate OTP with the user's metadata & role
       await _supabase.auth.signInWithOtp(
         email: email,
         shouldCreateUser: true,
@@ -422,7 +440,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       );
 
-      // 2. ALWAYS NAVIGATE TO THE OTP VERIFICATION PAGE!
+      // 2. ALWAYS NAVIGATE TO THE OTP VERIFICATION PAGE WITH THE EXACT ROLE!
       Navigator.push(
         context,
         MaterialPageRoute(

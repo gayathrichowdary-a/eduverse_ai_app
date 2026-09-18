@@ -40,24 +40,56 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    // Listen for OAuth deep link callbacks (specifically for GitHub login)
     _listenToAuthChanges();
   }
 
+  // ============================================================
+  // HELPER TO FETCH ACCURATE USER ROLE
+  // FIX: The 'profiles' table is now treated as the SOURCE OF TRUTH,
+  // because userMetadata can hold a STALE role from an earlier signup
+  // attempt with the same email/Google account (e.g. testing Teacher
+  // first, then testing Parent with the same email later). Metadata
+  // is only used as a fallback if the profile row can't be read.
+  // ============================================================
+  Future<String?> _getUserRole(User user) async {
+    // 1. Query the profiles table first — most reliable, most current
+    try {
+      final data = await _supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (data != null && data['role'] != null) {
+        final dbRole = data['role'].toString().trim();
+        if (dbRole.isNotEmpty) {
+          return dbRole;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching role from profiles: $e');
+    }
+
+    // 2. Fallback: check auth metadata only if profile lookup failed
+    final String? metaRole = user.userMetadata?['role'] as String?;
+    if (metaRole != null && metaRole.trim().isNotEmpty) {
+      return metaRole.trim();
+    }
+
+    return null;
+  }
+
   void _listenToAuthChanges() {
-    _authSubscription = _supabase.auth.onAuthStateChange.listen((data) {
+    _authSubscription = _supabase.auth.onAuthStateChange.listen((data) async {
       final AuthChangeEvent event = data.event;
       final Session? session = data.session;
 
       if (event == AuthChangeEvent.signedIn && session != null) {
         final user = session.user;
-        final String? existingRole = user.userMetadata?['role'] as String?;
+        final String? existingRole = await _getUserRole(user);
 
         if (!mounted) return;
 
-        // Solution 1 Check:
-        // Existing user with role -> SuccessPage
-        // New user without role -> RoleSelectionPage
         if (existingRole != null && existingRole.isNotEmpty) {
           Navigator.pushReplacement(
             context,
@@ -100,17 +132,17 @@ class _LoginPageState extends State<LoginPage> {
         password: password,
       );
 
-      if (res.user == null) {
+      final user = res.user;
+      if (user == null) {
         throw const AuthException('Login failed. Please try again.');
       }
 
       if (!mounted) return;
 
-      // Check user's role from metadata
-      final String? role = res.user?.userMetadata?['role'] as String?;
+      // Check accurate role from profiles table (source of truth) or metadata
+      final String? role = await _getUserRole(user);
 
       if (role == null || role.isEmpty) {
-        // If no role set, prompt role selection
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -118,7 +150,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       } else {
-        // Navigate to the next page!
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -142,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // ============================================================
-  // GOOGLE LOGIN WITH INTELLIGENT ROLE DETECTION (SOLUTION 1)
+  // GOOGLE LOGIN
   // ============================================================
 
   Future<void> _googleLogin() async {
@@ -166,12 +197,9 @@ class _LoginPageState extends State<LoginPage> {
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        throw const AuthException(
-          'Could not retrieve Google ID token.',
-        );
+        throw const AuthException('Could not retrieve Google ID token.');
       }
 
-      // Sign in to Supabase using Google ID Token
       final AuthResponse response = await _supabase.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
@@ -181,8 +209,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
 
       if (response.user != null) {
-        final userMetadata = response.user!.userMetadata;
-        final String? existingRole = userMetadata?['role'] as String?;
+        final String? existingRole = await _getUserRole(response.user!);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -193,7 +220,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
 
-        // Solution 1 Check:
         if (existingRole != null && existingRole.isNotEmpty) {
           Navigator.pushReplacement(
             context,
@@ -213,18 +239,12 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Google sign-in error: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text('Google sign-in error: $e'), backgroundColor: Colors.redAccent),
       );
     } finally {
       if (mounted) setState(() => isLoading = false);
@@ -232,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // ============================================================
-  // GITHUB LOGIN WITH INTELLIGENT ROLE DETECTION (SOLUTION 1)
+  // GITHUB LOGIN
   // ============================================================
 
   Future<void> _githubLogin() async {
@@ -247,24 +267,15 @@ class _LoginPageState extends State<LoginPage> {
       if (!launched) {
         throw const AuthException('Could not launch GitHub sign-in.');
       }
-
-      // The _listenToAuthChanges stream will automatically capture the login
-      // and redirect to SuccessPage (if role exists) or RoleSelectionPage!
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('GitHub sign-in error: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text('GitHub sign-in error: $e'), backgroundColor: Colors.redAccent),
       );
     } finally {
       if (mounted) setState(() => isLoading = false);
@@ -283,22 +294,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 const SizedBox(height: 30),
-
-                // =========================
-                // BACK BUTTON
-                // =========================
-
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -309,13 +312,7 @@ class _LoginPageState extends State<LoginPage> {
                     size: 32,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
-                // =========================
-                // TITLE
-                // =========================
-
                 const Text(
                   'Welcome Back',
                   style: TextStyle(
@@ -324,13 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
-                // =========================
-                // SUBTITLE
-                // =========================
-
                 const Text(
                   'Continue your learning journey.',
                   style: TextStyle(
@@ -338,13 +329,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 25,
                   ),
                 ),
-
                 const SizedBox(height: 70),
-
-                // =========================
-                // EMAIL LABEL
-                // =========================
-
                 const Text(
                   'Email or Mobile Number',
                   style: TextStyle(
@@ -353,13 +338,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
-                // =========================
-                // EMAIL FIELD
-                // =========================
-
                 TextField(
                   controller: emailController,
                   style: const TextStyle(
@@ -372,18 +351,15 @@ class _LoginPageState extends State<LoginPage> {
                       color: Color(0xFFA6DDE2),
                       fontSize: 22,
                     ),
-
                     prefixIcon: const Icon(
                       Icons.person_outline,
                       color: navy,
                       size: 30,
                     ),
-
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 24,
                       horizontal: 20,
                     ),
-
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(
@@ -391,7 +367,6 @@ class _LoginPageState extends State<LoginPage> {
                         width: 2,
                       ),
                     ),
-
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(
@@ -401,13 +376,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 45),
-
-                // =========================
-                // PASSWORD LABEL
-                // =========================
-
                 const Text(
                   'Password',
                   style: TextStyle(
@@ -416,13 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
-                // =========================
-                // PASSWORD FIELD
-                // =========================
-
                 TextField(
                   controller: passwordController,
                   obscureText: obscurePassword,
@@ -436,13 +399,11 @@ class _LoginPageState extends State<LoginPage> {
                       color: Color(0xFFA6DDE2),
                       fontSize: 24,
                     ),
-
                     prefixIcon: const Icon(
                       Icons.lock_outline,
                       color: navy,
                       size: 30,
                     ),
-
                     suffixIcon: IconButton(
                       onPressed: () {
                         setState(() {
@@ -457,12 +418,10 @@ class _LoginPageState extends State<LoginPage> {
                         size: 30,
                       ),
                     ),
-
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 24,
                       horizontal: 20,
                     ),
-
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(
@@ -470,7 +429,6 @@ class _LoginPageState extends State<LoginPage> {
                         width: 2,
                       ),
                     ),
-
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(
@@ -480,13 +438,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 25),
-
-                // =========================
-                // FORGOT PASSWORD
-                // =========================
-
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -508,13 +460,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 25),
-
-                // =========================
-                // LOGIN BUTTON
-                // =========================
-
                 SizedBox(
                   width: double.infinity,
                   height: 92,
@@ -546,23 +492,16 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                   ),
                 ),
-
                 const SizedBox(height: 50),
-
-                // =========================
-                // OR DIVIDER
-                // =========================
-
                 Row(
-                  children: [
-                    const Expanded(
+                  children: const [
+                    Expanded(
                       child: Divider(
                         color: Color(0xFFE5E7EB),
                         thickness: 1,
                       ),
                     ),
-
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 18),
                       child: Text(
                         'OR',
@@ -572,8 +511,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-
-                    const Expanded(
+                    Expanded(
                       child: Divider(
                         color: Color(0xFFE5E7EB),
                         thickness: 1,
@@ -581,17 +519,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 40),
-
-                // =========================
-                // SOCIAL LOGIN BUTTONS
-                // =========================
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Google Button
                     _socialButton(
                       child: const Text(
                         'G',
@@ -603,8 +534,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       onTap: isLoading ? () {} : _googleLogin,
                     ),
-
-                    // GitHub Button
                     _socialButton(
                       child: const Icon(
                         Icons.code,
@@ -615,13 +544,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 60),
-
-                // =========================
-                // CREATE ACCOUNT
-                // =========================
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -635,16 +558,13 @@ class _LoginPageState extends State<LoginPage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-
                     const SizedBox(width: 5),
-
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const RoleSelectionPage(),
+                            builder: (context) => const RoleSelectionPage(),
                           ),
                         );
                       },
@@ -659,7 +579,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 25),
               ],
             ),
@@ -668,10 +587,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  // =========================
-  // SOCIAL BUTTON
-  // =========================
 
   Widget _socialButton({
     required Widget child,
@@ -690,9 +605,7 @@ class _LoginPageState extends State<LoginPage> {
             width: 1.5,
           ),
         ),
-        child: Center(
-          child: child,
-        ),
+        child: Center(child: child),
       ),
     );
   }

@@ -128,19 +128,27 @@ class _OtpVerificationPageState
       );
 
       // 3. Render directly to the user's dedicated screen based on their role!
-      Widget destination;
-      final roleLower = (widget.role.isNotEmpty ? widget.role : (user.userMetadata?['role'] ?? '')).toString().toLowerCase().trim();
+      final String rawRole = (widget.role.trim().isNotEmpty 
+              ? widget.role 
+              : (widget.profileData['role'] ?? user.userMetadata?['role'] ?? ''))
+          .toString()
+          .toLowerCase()
+          .trim();
 
-      if (roleLower.contains('teacher')) {
+      debugPrint('EduVerse Routing triggered with rawRole: "$rawRole"');
+
+      Widget destination;
+
+      if (rawRole.contains('teacher')) {
         destination = const TeacherPortalHub();
-      } else if (roleLower.contains('parent')) {
+      } else if (rawRole.contains('parent')) {
         destination = const ParentHomeDashboard();
-      } else if (roleLower.contains('admin')) {
-        destination = const AdminDashboard();
-      } else if (roleLower.contains('school')) {
+      } else if (rawRole.contains('school')) {
         destination = const SchoolDashboard();
+      } else if (rawRole.contains('admin')) {
+        destination = const AdminDashboard();
       } else {
-        // Student goes to onboarding profile setup
+        // ONLY genuine Students go to Onboarding!
         destination = const OnboardingStudentInformation();
       }
 

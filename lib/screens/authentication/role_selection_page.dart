@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'success_page.dart';
 import 'registration_page.dart';
+
 class RoleSelectionPage extends StatefulWidget {
   final Function(String selectedRole)? onRoleSelected;
 
@@ -49,11 +49,16 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
   ];
 
   void _continueToNextPage() {
-    final String chosenRole = roles[selectedRoleIndex]['title'] as String;
+    final String chosenRole = (roles[selectedRoleIndex]['title'] as String).trim();
+
+    // DEBUG: confirms exactly what role is chosen and which path is used
+    debugPrint('RoleSelectionPage -> chosenRole: "$chosenRole"');
 
     if (widget.onRoleSelected != null) {
+      debugPrint('RoleSelectionPage -> using onRoleSelected CALLBACK path (parent widget controls navigation from here)');
       widget.onRoleSelected!(chosenRole);
     } else {
+      debugPrint('RoleSelectionPage -> using DIRECT Navigator.push path to RegistrationPage');
       Navigator.push(
         context,
         MaterialPageRoute(
