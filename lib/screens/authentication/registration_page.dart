@@ -40,11 +40,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   String get _role => widget.role;
 
-  bool get _isStudent => _role.toLowerCase() == 'student';
-  bool get _isParent => _role.toLowerCase() == 'parent';
-  bool get _isTeacher => _role.toLowerCase() == 'teacher';
-  bool get _isSchool => _role.toLowerCase() == 'school';
-  bool get _isAdministrator => _role.toLowerCase() == 'administrator';
+  bool get _isStudent => _role.toLowerCase().contains('student');
+  bool get _isParent => _role.toLowerCase().contains('parent');
+  bool get _isTeacher => _role.toLowerCase().contains('teacher');
+  bool get _isSchool => _role.toLowerCase().contains('school');
+  bool get _isAdministrator => _role.toLowerCase().contains('admin');
 
   // =========================
   // SHARED CONTROLLERS
@@ -90,7 +90,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   void initState() {
     super.initState();
-    // Listen for OAuth deep link callbacks (specifically for GitHub login)
     _listenToAuthChanges();
   }
 
@@ -101,13 +100,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       if (event == AuthChangeEvent.signedIn && session != null) {
         final provider = session.user.appMetadata['provider'];
-        // ONLY redirect automatically if signed in via an OAuth provider (GitHub / Google)
         if (provider == 'github' || provider == 'google') {
           try {
             await _supabase.auth.updateUser(
               UserAttributes(
                 data: {
                   'role': _role,
+                  'full_name': nameController.text.trim().isNotEmpty 
+                      ? nameController.text.trim() 
+                      : (session.user.userMetadata?['full_name'] ?? ''),
                 },
               ),
             );
@@ -146,7 +147,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   // =========================
-  // TITLE
+  // TITLE & SUBTITLE
   // =========================
 
   String get _pageTitle {
@@ -156,10 +157,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_isAdministrator) return 'Admin Registration';
     return 'Join EduVerse AI';
   }
-
-  // =========================
-  // SUBTITLE
-  // =========================
 
   String get _pageSubtitle {
     if (_isParent) {
@@ -182,9 +179,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // ============================================================
 
   Future<void> _googleLogin() async {
-    setState(() {
-      isSubmitting = true;
-    });
+    setState(() => isSubmitting = true);
 
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -194,9 +189,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
-        setState(() {
-          isSubmitting = false;
-        });
+        setState(() => isSubmitting = false);
         return;
       }
 
@@ -206,12 +199,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        throw const AuthException(
-          'Could not retrieve Google ID token.',
-        );
+        throw const AuthException('Could not retrieve Google ID token.');
       }
 
-      // Sign in to Supabase using the Google ID Token
       final AuthResponse response = await _supabase.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
@@ -221,7 +211,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (!mounted) return;
 
       if (response.user != null) {
-        // Save selected role into user metadata
         await _supabase.auth.updateUser(
           UserAttributes(
             data: {
@@ -233,15 +222,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
         if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Signed in successfully as ${googleUser.displayName ?? googleUser.email}!',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -252,25 +232,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Google sign-in error: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text('Google sign-in error: $e'), backgroundColor: Colors.redAccent),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          isSubmitting = false;
-        });
-      }
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
@@ -279,9 +249,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // ============================================================
 
   Future<void> _githubLogin() async {
-    setState(() {
-      isSubmitting = true;
-    });
+    setState(() => isSubmitting = true);
 
     try {
       final bool launched = await _supabase.auth.signInWithOAuth(
@@ -295,25 +263,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('GitHub sign-in error: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text('GitHub sign-in error: $e'), backgroundColor: Colors.redAccent),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          isSubmitting = false;
-        });
-      }
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
@@ -344,21 +302,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
 
     if (picked != null) {
-      setState(() {
-        dateOfBirth = picked;
-      });
+      setState(() => dateOfBirth = picked);
     }
   }
 
-  // =========================
-  // FORMATTED DOB
-  // =========================
-
   String get _formattedDob {
-    if (dateOfBirth == null) {
-      return '';
-    }
-
+    if (dateOfBirth == null) return '';
     final d = dateOfBirth!;
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
@@ -370,75 +319,41 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String? _validateRoleFields() {
     final email = emailController.text.trim();
 
-    if (email.isEmpty) {
-      return 'Please enter your email';
-    }
-
-    if (!email.contains('@') || !email.contains('.')) {
-      return 'Please enter a valid email address';
-    }
+    if (email.isEmpty) return 'Please enter your email';
+    if (!email.contains('@') || !email.contains('.')) return 'Please enter a valid email address';
 
     if (_isStudent) {
-      if (nameController.text.trim().isEmpty) {
-        return 'Please enter your name';
-      }
-      if (schoolNameController.text.trim().isEmpty) {
-        return 'Please enter your school/college name';
-      }
-      if (dateOfBirth == null) {
-        return 'Please select your date of birth';
-      }
-      if (selectedBranch == null) {
-        return 'Please select your branch';
-      }
+      if (nameController.text.trim().isEmpty) return 'Please enter your name';
+      if (schoolNameController.text.trim().isEmpty) return 'Please enter your school/college name';
+      if (dateOfBirth == null) return 'Please select your date of birth';
+      if (selectedBranch == null) return 'Please select your branch';
     } else if (_isParent) {
-      if (nameController.text.trim().isEmpty) {
-        return 'Please enter your name';
-      }
-      if (childCodeController.text.trim().isEmpty) {
-        return 'Please enter your child\'s student code';
-      }
+      if (nameController.text.trim().isEmpty) return 'Please enter your name';
+      if (childCodeController.text.trim().isEmpty) return "Please enter your child's student code";
     } else if (_isTeacher) {
-      if (nameController.text.trim().isEmpty) {
-        return 'Please enter your name';
-      }
-      if (uniqueCodeController.text.trim().isEmpty) {
-        return 'Please enter the unique code';
-      }
+      if (nameController.text.trim().isEmpty) return 'Please enter your name';
+      if (uniqueCodeController.text.trim().isEmpty) return 'Please enter the unique code';
     } else if (_isSchool) {
-      if (schoolNameController.text.trim().isEmpty) {
-        return 'Please enter school name';
-      }
-      if (uniqueCodeController.text.trim().isEmpty) {
-        return 'Please enter the unique code';
-      }
+      if (schoolNameController.text.trim().isEmpty) return 'Please enter school name';
+      if (uniqueCodeController.text.trim().isEmpty) return 'Please enter the unique code';
     } else if (_isAdministrator) {
-      if (uniqueCodeController.text.trim().isEmpty) {
-        return 'Please enter the platform unique code';
-      }
-      if (nameController.text.trim().isEmpty) {
-        return 'Please enter your name';
-      }
+      if (uniqueCodeController.text.trim().isEmpty) return 'Please enter the platform unique code';
+      if (nameController.text.trim().isEmpty) return 'Please enter your name';
     } else {
-      if (nameController.text.trim().isEmpty) {
-        return 'Please enter your name';
-      }
+      if (nameController.text.trim().isEmpty) return 'Please enter your name';
     }
 
     return null;
   }
 
   // ============================================================
-  // CREATE ACCOUNT -> SENDS OTP & OPENS OTP VERIFICATION PAGE
+  // CREATE ACCOUNT -> ALWAYS SENDS OTP & ALWAYS OPENS OTP PAGE
   // ============================================================
 
   Future<void> _createAccount() async {
     final roleError = _validateRoleFields();
-
     if (roleError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(roleError)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(roleError)));
       return;
     }
 
@@ -446,31 +361,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final confirmPassword = confirmPasswordController.text;
 
     if (password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a password')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a password')));
       return;
     }
-
     if (password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 6 characters')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password must be at least 6 characters')));
       return;
     }
-
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
-
     if (!acceptedTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please accept the Terms and Privacy Policy')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please accept the Terms and Privacy Policy')));
       return;
     }
 
@@ -499,12 +402,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       },
     };
 
-    setState(() {
-      isSubmitting = true;
-    });
+    setState(() => isSubmitting = true);
 
     try {
-      // Send 6-digit OTP to the email
+      // 1. Sign up / initiate OTP with the user's metadata & password
       await _supabase.auth.signInWithOtp(
         email: email,
         shouldCreateUser: true,
@@ -521,12 +422,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       );
 
-      // NAVIGATE DIRECTLY TO THE OTP PAGE!
+      // 2. ALWAYS NAVIGATE TO THE OTP VERIFICATION PAGE!
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => OtpVerificationPage(
-            role: widget.role,
+            role: _role,
             email: email,
             profileData: extraProfileData,
           ),
@@ -535,25 +436,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Registration error: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text('Registration error: $e'), backgroundColor: Colors.redAccent),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          isSubmitting = false;
-        });
-      }
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
@@ -577,200 +468,142 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   _pageTitle,
                   style: const TextStyle(
                     color: navy,
-                    fontSize: 46,
+                    fontSize: 40,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 12),
                 Text(
                   _pageSubtitle,
                   style: const TextStyle(
                     color: subtitleBlue,
-                    fontSize: 24,
+                    fontSize: 18,
                     height: 1.45,
                   ),
                 ),
-                const SizedBox(height: 65),
-                ..._buildRoleFields(),
                 const SizedBox(height: 40),
+                ..._buildRoleFields(),
+                const SizedBox(height: 30),
                 _buildLabel('Password'),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _buildPasswordField(
                   controller: passwordController,
                   hintText: 'Create a strong password',
                   obscureText: obscurePassword,
-                  onToggle: () {
-                    setState(() {
-                      obscurePassword = !obscurePassword;
-                    });
-                  },
+                  onToggle: () => setState(() => obscurePassword = !obscurePassword),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 25),
                 _buildLabel('Confirm Password'),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _buildPasswordField(
                   controller: confirmPasswordController,
                   hintText: 'Repeat your password',
                   obscureText: obscureConfirmPassword,
-                  onToggle: () {
-                    setState(() {
-                      obscureConfirmPassword = !obscureConfirmPassword;
-                    });
-                  },
+                  onToggle: () => setState(() => obscureConfirmPassword = !obscureConfirmPassword),
                 ),
-                const SizedBox(height: 45),
+                const SizedBox(height: 30),
                 Row(
                   children: [
                     Checkbox(
                       value: acceptedTerms,
                       activeColor: brandRed,
                       shape: const CircleBorder(),
-                      onChanged: (value) {
-                        setState(() {
-                          acceptedTerms = value ?? false;
-                        });
-                      },
+                      onChanged: (value) => setState(() => acceptedTerms = value ?? false),
                     ),
                     const Expanded(
                       child: Text(
                         'I agree to the Terms and Privacy Policy',
-                        style: TextStyle(color: navy, fontSize: 20),
+                        style: TextStyle(color: navy, fontSize: 16),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 25),
                 SizedBox(
                   width: double.infinity,
-                  height: 92,
+                  height: 60,
                   child: ElevatedButton(
                     onPressed: isSubmitting ? null : _createAccount,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: brandRed,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: isSubmitting
                         ? const SizedBox(
-                            width: 26,
-                            height: 26,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 3,
-                            ),
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
                           )
-                        : const Text(
-                            'Create Account',
-                            style: TextStyle(
+                        : Text(
+                            'Create $_role Account',
+                            style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 55),
+                const SizedBox(height: 35),
                 Row(
                   children: const [
-                    Expanded(
-                      child: Divider(color: Color(0xFFE5E7EB), thickness: 1),
-                    ),
+                    Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: Text(
-                        'OR',
-                        style: TextStyle(color: navy, fontSize: 20),
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Text('OR', style: TextStyle(color: navy, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
-                    Expanded(
-                      child: Divider(color: Color(0xFFE5E7EB), thickness: 1),
-                    ),
+                    Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
                   ],
                 ),
-                const SizedBox(height: 45),
+                const SizedBox(height: 30),
                 Row(
                   children: [
                     Expanded(
                       child: _socialButton(
                         onTap: isSubmitting ? () {} : _googleLogin,
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'G',
-                              style: TextStyle(
-                                color: Color(0xFF4285F4),
-                                fontSize: 40,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 15),
-                            Text(
-                              'Google',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                          children: [
+                            Text('G', style: TextStyle(color: Color(0xFF4285F4), fontSize: 30, fontWeight: FontWeight.bold)),
+                            SizedBox(width: 10),
+                            Text('Google', style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _socialButton(
                         onTap: isSubmitting ? () {} : _githubLogin,
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.code, color: navy, size: 34),
-                            SizedBox(width: 15),
-                            Text(
-                              'GitHub',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                          children: [
+                            Icon(Icons.code, color: navy, size: 26),
+                            SizedBox(width: 10),
+                            Text('GitHub', style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Flexible(
-                      child: Text(
-                        'Already have an account?',
-                        style: TextStyle(color: subtitleBlue, fontSize: 20),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
+                    const Text('Already have an account?', style: TextStyle(color: subtitleBlue, fontSize: 16)),
+                    const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const LoginPage()),
                         );
                       },
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          color: brandRed,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: const Text('Login', style: TextStyle(color: brandRed, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -791,36 +624,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_isStudent) {
       return [
         _buildLabel('Full Name'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        const SizedBox(height: 20),
         _buildLabel('Email Address'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'email@example.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        const SizedBox(height: 20),
         _buildLabel('School / College Name'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: schoolNameController,
-          hintText: 'Enter your school or college name',
-          icon: Icons.school_outlined,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: schoolNameController, hintText: 'Enter your school or college name', icon: Icons.school_outlined),
+        const SizedBox(height: 20),
         _buildLabel('Date of Birth'),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         _buildDateField(),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
         _buildLabel('Branch'),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         _buildBranchDropdown(),
       ];
     }
@@ -828,157 +648,81 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_isParent) {
       return [
         _buildLabel('Full Name'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        const SizedBox(height: 20),
         _buildLabel('Email Address'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'email@example.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        const SizedBox(height: 20),
         _buildLabel("Child's Student Code"),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: childCodeController,
-          hintText: "Enter your child's student code",
-          icon: Icons.link,
-        ),
+        const SizedBox(height: 8),
+        _buildTextField(controller: childCodeController, hintText: "Enter your child's student code", icon: Icons.link),
       ];
     }
 
     if (_isTeacher) {
       return [
         _buildLabel('Teacher Name'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+        const SizedBox(height: 20),
         _buildLabel('School Email'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'you@school.edu',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: emailController, hintText: 'you@school.edu', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        const SizedBox(height: 20),
         _buildLabel('Unique Code'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: uniqueCodeController,
-          hintText: 'Code provided by school',
-          icon: Icons.vpn_key_outlined,
-        ),
+        const SizedBox(height: 8),
+        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by school', icon: Icons.vpn_key_outlined),
       ];
     }
 
     if (_isSchool) {
       return [
         _buildLabel('School Name'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: schoolNameController,
-          hintText: 'Enter school name',
-          icon: Icons.account_balance_outlined,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: schoolNameController, hintText: 'Enter school name', icon: Icons.account_balance_outlined),
+        const SizedBox(height: 20),
         _buildLabel('School Email'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'school@example.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: emailController, hintText: 'school@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        const SizedBox(height: 20),
         _buildLabel('Unique Code'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: uniqueCodeController,
-          hintText: 'Code provided by Administrator',
-          icon: Icons.vpn_key_outlined,
-        ),
+        const SizedBox(height: 8),
+        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by Administrator', icon: Icons.vpn_key_outlined),
       ];
     }
 
     if (_isAdministrator) {
       return [
         _buildLabel('Unique Code'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: uniqueCodeController,
-          hintText: 'Code provided by platform',
-          icon: Icons.vpn_key_outlined,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: uniqueCodeController, hintText: 'Code provided by platform', icon: Icons.vpn_key_outlined),
+        const SizedBox(height: 20),
         _buildLabel('Email Address'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: emailController,
-          hintText: 'you@company.com',
-          icon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 8),
+        _buildTextField(controller: emailController, hintText: 'you@company.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+        const SizedBox(height: 20),
         _buildLabel('Full Name'),
-        const SizedBox(height: 12),
-        _buildTextField(
-          controller: nameController,
-          hintText: 'Enter your full name',
-          icon: Icons.person_outline,
-        ),
+        const SizedBox(height: 8),
+        _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
       ];
     }
 
     return [
       _buildLabel('Full Name'),
-      const SizedBox(height: 12),
-      _buildTextField(
-        controller: nameController,
-        hintText: 'Enter your full name',
-        icon: Icons.person_outline,
-      ),
-      const SizedBox(height: 40),
+      const SizedBox(height: 8),
+      _buildTextField(controller: nameController, hintText: 'Enter your full name', icon: Icons.person_outline),
+      const SizedBox(height: 20),
       _buildLabel('Email Address'),
-      const SizedBox(height: 12),
-      _buildTextField(
-        controller: emailController,
-        hintText: 'email@example.com',
-        icon: Icons.email_outlined,
-        keyboardType: TextInputType.emailAddress,
-      ),
+      const SizedBox(height: 8),
+      _buildTextField(controller: emailController, hintText: 'email@example.com', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
     ];
   }
 
-  // ============================================================
-  // LABEL
-  // ============================================================
-
   Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: navy,
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-      ),
-    );
+    return Text(text, style: const TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w600));
   }
-
-  // ============================================================
-  // TEXT FIELD
-  // ============================================================
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -989,28 +733,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: const TextStyle(color: navy, fontSize: 20),
+      style: const TextStyle(color: navy, fontSize: 16),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: hintColor, fontSize: 22),
-        prefixIcon: Icon(icon, color: navy, size: 30),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: navy, width: 2),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: brandRed, width: 2),
-        ),
+        hintStyle: const TextStyle(color: hintColor, fontSize: 16),
+        prefixIcon: Icon(icon, color: navy, size: 24),
+        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: navy, width: 1.5)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: brandRed, width: 2)),
       ),
     );
   }
-
-  // ============================================================
-  // DATE FIELD
-  // ============================================================
 
   Widget _buildDateField() {
     return GestureDetector(
@@ -1018,72 +751,39 @@ class _RegistrationPageState extends State<RegistrationPage> {
       child: AbsorbPointer(
         child: TextField(
           controller: TextEditingController(text: _formattedDob),
-          style: const TextStyle(color: navy, fontSize: 20),
+          style: const TextStyle(color: navy, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'DD/MM/YYYY',
-            hintStyle: const TextStyle(color: hintColor, fontSize: 22),
-            prefixIcon:
-                const Icon(Icons.cake_outlined, color: navy, size: 30),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(color: navy, width: 2),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(color: brandRed, width: 2),
-            ),
+            hintStyle: const TextStyle(color: hintColor, fontSize: 16),
+            prefixIcon: const Icon(Icons.cake_outlined, color: navy, size: 24),
+            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: navy, width: 1.5)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: brandRed, width: 2)),
           ),
         ),
       ),
     );
   }
 
-  // ============================================================
-  // BRANCH DROPDOWN
-  // ============================================================
-
   Widget _buildBranchDropdown() {
     return DropdownButtonFormField<String>(
       value: selectedBranch,
       icon: const Icon(Icons.keyboard_arrow_down, color: navy),
-      style: const TextStyle(color: navy, fontSize: 20),
+      style: const TextStyle(color: navy, fontSize: 16),
       decoration: InputDecoration(
         hintText: 'Select your branch',
-        hintStyle: const TextStyle(color: hintColor, fontSize: 22),
-        prefixIcon:
-            const Icon(Icons.menu_book_outlined, color: navy, size: 30),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: navy, width: 2),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: brandRed, width: 2),
-        ),
+        hintStyle: const TextStyle(color: hintColor, fontSize: 16),
+        prefixIcon: const Icon(Icons.menu_book_outlined, color: navy, size: 24),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: navy, width: 1.5)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: brandRed, width: 2)),
       ),
       items: branches
-          .map(
-            (branch) => DropdownMenuItem<String>(
-              value: branch,
-              child: Text(branch),
-            ),
-          )
+          .map((branch) => DropdownMenuItem<String>(value: branch, child: Text(branch)))
           .toList(),
-      onChanged: (value) {
-        setState(() {
-          selectedBranch = value;
-        });
-      },
+      onChanged: (value) => setState(() => selectedBranch = value),
     );
   }
-
-  // ============================================================
-  // PASSWORD FIELD
-  // ============================================================
 
   Widget _buildPasswordField({
     required TextEditingController controller,
@@ -1094,36 +794,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return TextField(
       controller: controller,
       obscureText: obscureText,
-      style: const TextStyle(color: navy, fontSize: 20),
+      style: const TextStyle(color: navy, fontSize: 16),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: hintColor, fontSize: 22),
-        prefixIcon: const Icon(Icons.lock_outline, color: navy, size: 30),
+        hintStyle: const TextStyle(color: hintColor, fontSize: 16),
+        prefixIcon: const Icon(Icons.lock_outline, color: navy, size: 24),
         suffixIcon: IconButton(
           onPressed: onToggle,
-          icon: Icon(
-            obscureText ? Icons.visibility_off : Icons.visibility,
-            color: navy,
-            size: 30,
-          ),
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: navy, size: 24),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: navy, width: 2),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: brandRed, width: 2),
-        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: navy, width: 1.5)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: brandRed, width: 2)),
       ),
     );
   }
-
-  // ============================================================
-  // SOCIAL BUTTON
-  // ============================================================
 
   Widget _socialButton({
     required Widget child,
@@ -1132,14 +817,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 100,
+        height: 60,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: const Color(0xFFE9EDF0),
-            width: 1.5,
-          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE9EDF0), width: 1.5),
         ),
         child: Center(child: child),
       ),

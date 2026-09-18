@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'registration_page.dart';
 import 'success_page.dart';
+import 'registration_page.dart';
 class RoleSelectionPage extends StatefulWidget {
-  /// Optional callback for custom flow handling (e.g., Join EduVerse AI)
   final Function(String selectedRole)? onRoleSelected;
 
   const RoleSelectionPage({
@@ -15,21 +14,11 @@ class RoleSelectionPage extends StatefulWidget {
 }
 
 class _RoleSelectionPageState extends State<RoleSelectionPage> {
-  // =========================
-  // COLORS
-  // =========================
-
   static const Color brandRed = Color(0xFFEF3340);
   static const Color navy = Color(0xFF1D3B64);
   static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color shadowColor = Color(0xFFD5D9DD);
-  static const Color unselectedBorder = Color(0xFFE0E0E0);
 
-  int selectedRole = 0;
-
-  // =========================
-  // ROLE DATA
-  // =========================
+  int selectedRoleIndex = 0;
 
   final List<Map<String, dynamic>> roles = [
     {
@@ -59,236 +48,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
     },
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // =========================
-            // MAIN CONTENT
-            // =========================
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 35, 24, 25),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Who are you?',
-                        style: TextStyle(
-                          color: navy,
-                          fontSize: 40,
-                          fontWeight: FontWeight.w800,
-                          height: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      const Text(
-                        'Choose your role to personalize your experience.',
-                        style: TextStyle(
-                          color: subtitleBlue,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w400,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-
-                      // =========================
-                      // ROLE CARDS
-                      // =========================
-                      ...List.generate(
-                        roles.length,
-                        (index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: _buildRoleCard(
-                              index: index,
-                              title: roles[index]['title'],
-                              description: roles[index]['description'],
-                              icon: roles[index]['icon'],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // =========================
-            // BOTTOM CONTINUE SECTION
-            // =========================
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  top: BorderSide(
-                    color: Color(0xFFE8ECEF),
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _continueToNextPage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: brandRed,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================
-  // ROLE CARD
-  // =========================================================
-
-  Widget _buildRoleCard({
-    required int index,
-    required String title,
-    required String description,
-    required IconData icon,
-  }) {
-    final bool isSelected = selectedRole == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedRole = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: double.infinity,
-        constraints: const BoxConstraints(minHeight: 120),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isSelected ? brandRed : unselectedBorder,
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: isSelected
-              ? const [
-                  BoxShadow(
-                    color: shadowColor,
-                    offset: Offset(0, 6),
-                    blurRadius: 0,
-                  ),
-                ]
-              : [],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Icon Container
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: isSelected ? brandRed : const Color(0xFFF2F4F7),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Icon(
-                icon,
-                color: isSelected ? Colors.white : navy,
-                size: 32,
-              ),
-            ),
-            const SizedBox(width: 16),
-
-            // Content Text
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: navy,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: subtitleBlue,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      height: 1.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-
-            // Dynamic Check Indicator
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: isSelected ? brandRed : const Color(0xFFD0D5DD),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? brandRed : const Color(0xFFD0D5DD),
-                  width: 2,
-                ),
-              ),
-              child: isSelected
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 18,
-                    )
-                  : null,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================
-  // CONTINUE ACTION
-  // =========================================================
-
   void _continueToNextPage() {
-    final String chosenRole = roles[selectedRole]['title'] as String;
+    final String chosenRole = roles[selectedRoleIndex]['title'] as String;
 
     if (widget.onRoleSelected != null) {
       widget.onRoleSelected!(chosenRole);
@@ -300,5 +61,156 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
         ),
       );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 30, 24, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Who are you?',
+                      style: TextStyle(
+                        color: navy,
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Select your primary role to customize your EduVerse AI experience.',
+                      style: TextStyle(
+                        color: subtitleBlue,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    ...List.generate(roles.length, (index) {
+                      final item = roles[index];
+                      final bool isSelected = selectedRoleIndex == index;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedRoleIndex = index;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 14),
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFFFFF5F5) : Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: isSelected ? brandRed : const Color(0xFFE5E7EB),
+                              width: isSelected ? 2.2 : 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: isSelected ? brandRed : const Color(0xFFF3F4F6),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  item['icon'] as IconData,
+                                  color: isSelected ? Colors.white : navy,
+                                  size: 26,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item['title'] as String,
+                                      style: TextStyle(
+                                        color: navy,
+                                        fontSize: 18,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item['description'] as String,
+                                      style: const TextStyle(
+                                        color: subtitleBlue,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isSelected ? brandRed : Colors.grey.shade400,
+                                    width: 2,
+                                  ),
+                                  color: isSelected ? brandRed : Colors.transparent,
+                                ),
+                                child: isSelected
+                                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                                    : null,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _continueToNextPage,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: brandRed,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: Text(
+                    'Continue as ${roles[selectedRoleIndex]['title']}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../learning/student_dashboard.dart';
+import '../onboarding/onboarding_student_information.dart';
 import '../teacher/teacher_portal_hub.dart';
 import '../parent/parent_home_dashboard.dart';
 import '../admin/admin_dashboard.dart';
@@ -31,8 +31,8 @@ class SuccessPage extends StatelessWidget {
     } else if (normalizedRole.contains('school')) {
       destination = const SchoolDashboard();
     } else {
-      // Default: Student
-      destination = const StudentDashboard();
+      // Student has detailed information onboarding!
+      destination = const OnboardingStudentInformation();
     }
 
     Navigator.pushReplacement(
@@ -51,7 +51,7 @@ class SuccessPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 46),
             child: Column(
               children: [
-                const SizedBox(height: 100),
+                const SizedBox(height: 120),
                 Container(
                   width: 180,
                   height: 180,
@@ -77,18 +77,20 @@ class SuccessPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 Text(
-                  'Welcome, $role!',
+                  'Welcome to EduVerse AI, $role!',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: navy,
-                    fontSize: 34,
+                    fontSize: 32,
                     fontWeight: FontWeight.w700,
                     height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  "Your $role account is ready.\nTap Continue to enter your dashboard.",
+                  normalizedRoleIsStudent(role)
+                      ? "Your account has been verified! Let's personalize your student learning experience."
+                      : "Your $role account has been verified successfully. Let's get started.",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: subtitleBlue,
@@ -110,7 +112,7 @@ class SuccessPage extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Enter $role Dashboard',
+                      normalizedRoleIsStudent(role) ? 'Personalize Learning Profile' : 'Enter Dashboard',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -126,5 +128,9 @@ class SuccessPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool normalizedRoleIsStudent(String r) {
+    return r.toLowerCase().trim().contains('student');
   }
 }

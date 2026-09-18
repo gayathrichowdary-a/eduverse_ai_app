@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'success_page.dart';
+import '../onboarding/onboarding_student_information.dart';
+import '../teacher/teacher_portal_hub.dart';
+import '../parent/parent_home_dashboard.dart';
+import '../admin/admin_dashboard.dart';
+import '../school/school_dashboard.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String role;
@@ -123,13 +127,27 @@ class _OtpVerificationPageState
         ),
       );
 
-      // 3. Render directly to the user's personal page based on their role!
+      // 3. Render directly to the user's dedicated screen based on their role!
+      Widget destination;
+      final roleLower = (widget.role.isNotEmpty ? widget.role : (user.userMetadata?['role'] ?? '')).toString().toLowerCase().trim();
+
+      if (roleLower.contains('teacher')) {
+        destination = const TeacherPortalHub();
+      } else if (roleLower.contains('parent')) {
+        destination = const ParentHomeDashboard();
+      } else if (roleLower.contains('admin')) {
+        destination = const AdminDashboard();
+      } else if (roleLower.contains('school')) {
+        destination = const SchoolDashboard();
+      } else {
+        // Student goes to onboarding profile setup
+        destination = const OnboardingStudentInformation();
+      }
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => SuccessPage(
-            role: widget.role,
-          ),
+          builder: (context) => destination,
         ),
         (route) => false,
       );
