@@ -108,6 +108,12 @@ class _AIMediaStudioScreenState extends State<AIMediaStudioScreen> {
     activeLesson = courses[0];
   }
 
+  @override
+  void dispose() {
+    _customTopicController.dispose();
+    super.dispose();
+  }
+
   void _generateCustomAILesson() {
     final query = _customTopicController.text.trim();
     if (query.isEmpty) return;
@@ -184,6 +190,8 @@ class _AIMediaStudioScreenState extends State<AIMediaStudioScreen> {
     } catch (_) {
       activeAudioUrl = course['audio_url'];
     }
+
+    if (!mounted) return;
 
     setState(() {
       isPlayingAudio = false;
@@ -541,24 +549,30 @@ class _AIMediaStudioScreenState extends State<AIMediaStudioScreen> {
             const SizedBox(height: 14),
             Row(
               children: [
-                ElevatedButton.icon(
-                  onPressed: isPlayingAudio ? null : () => _playLessonAudio(course),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF214675),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: isPlayingAudio ? null : () => _playLessonAudio(course),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF214675),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    icon: const Icon(Icons.volume_up, size: 15),
+                    label: const Text('Listen (MP3)', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                   ),
-                  icon: const Icon(Icons.volume_up, size: 16),
-                  label: const Text('Listen (MP3)'),
                 ),
                 const SizedBox(width: 8),
-                OutlinedButton.icon(
-                  onPressed: () => _openVideoLesson(course),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _openVideoLesson(course),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    icon: const Icon(Icons.video_call, size: 15),
+                    label: const Text('Watch Video', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                   ),
-                  icon: const Icon(Icons.video_call, size: 16),
-                  label: const Text('Watch Video'),
                 ),
               ],
             )

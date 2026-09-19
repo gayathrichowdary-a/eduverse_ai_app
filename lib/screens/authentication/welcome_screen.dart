@@ -81,9 +81,9 @@ class WelcomeScreen extends StatelessWidget {
                   'Welcome to\nEduVerse AI',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 46,
-                    height: 1.15,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 32,
+                    height: 1.2,
+                    fontWeight: FontWeight.w800,
                     color: Color(0xFF1D3B64),
                   ),
                 ),

@@ -32,8 +32,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // GOOGLE OAUTH CLIENT ID
   // =========================
   static const String _webClientId =
-      '562258769343-djt08qk2cg68p997l0j2lnhg8kovv81v.apps.googleusercontent.com';
-
+'562258769343-djt08qk2cg68p997l0j2lnhg8kovv81v.apps.googleusercontent.com';
   // =========================
   // ROLE HELPERS
   // =========================

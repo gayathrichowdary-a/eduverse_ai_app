@@ -47,12 +47,12 @@ class OnboardingCodingTest extends StatefulWidget {
   final int cognitiveScore; // running score from the 3 prior questions
 
   const OnboardingCodingTest({
-    Key? key,
+    super.key,
     required this.skillLevel,
     this.branch,
     this.course,
     this.cognitiveScore = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingCodingTest> createState() => _OnboardingCodingTestState();
@@ -389,18 +389,23 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Continue to Conceptual Question',
-                        style: TextStyle(
-                          color: success ? Colors.white : subtitleBlue,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Text(
+                          'Continue to Conceptual Question',
+                          style: TextStyle(
+                            color: success ? Colors.white : subtitleBlue,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Icon(Icons.arrow_forward_rounded,
-                          color: success ? Colors.white : subtitleBlue,
-                          size: 20),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: success ? Colors.white : subtitleBlue,
+                        size: 18,
+                      ),
                     ],
                   ),
                 ),

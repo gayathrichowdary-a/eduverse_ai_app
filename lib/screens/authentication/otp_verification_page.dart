@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../onboarding/onboarding_student_information.dart';
-import '../teacher/teacher_portal_hub.dart';
-import '../parent/parent_home_dashboard.dart';
-import '../admin/admin_dashboard.dart';
-import '../school/school_dashboard.dart';
+import 'success_page.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String role;
@@ -19,17 +15,13 @@ class OtpVerificationPage extends StatefulWidget {
   });
 
   @override
-  State<OtpVerificationPage> createState() =>
-      _OtpVerificationPageState();
+  State<OtpVerificationPage> createState() => _OtpVerificationPageState();
 }
 
-class _OtpVerificationPageState
-    extends State<OtpVerificationPage> {
-
+class _OtpVerificationPageState extends State<OtpVerificationPage> {
   // =========================
   // COLORS
   // =========================
-
   static const Color brandRed = Color(0xFFEF3340);
   static const Color navy = Color(0xFF1D3B64);
   static const Color subtitleBlue = Color(0xFF4D86AD);
@@ -38,15 +30,13 @@ class _OtpVerificationPageState
   // =========================
   // OTP CONTROLLERS
   // =========================
-
   final List<TextEditingController> otpControllers =
       List.generate(6, (_) => TextEditingController());
 
   final List<FocusNode> otpFocusNodes =
       List.generate(6, (_) => FocusNode());
 
-  final SupabaseClient _supabase =
-      Supabase.instance.client;
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   bool isVerifying = false;
   bool isResending = false;
@@ -56,18 +46,15 @@ class _OtpVerificationPageState
     for (final controller in otpControllers) {
       controller.dispose();
     }
-
     for (final node in otpFocusNodes) {
       node.dispose();
     }
-
     super.dispose();
   }
 
   // =========================
-  // VERIFY OTP & RENDER TO PERSONAL PAGE
+  // VERIFY OTP & RENDER TO SUCCESS PAGE
   // =========================
-
   Future<void> _verifyOtp() async {
     final otp = otpControllers
         .map((controller) => controller.text.trim())
@@ -76,9 +63,7 @@ class _OtpVerificationPageState
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Please enter all 6 digits',
-          ),
+          content: Text('Please enter all 6 digits'),
         ),
       );
       return;
@@ -90,15 +75,13 @@ class _OtpVerificationPageState
 
     try {
       // 1. Verify the real email OTP in Supabase
-      final AuthResponse response =
-          await _supabase.auth.verifyOTP(
+      final AuthResponse response = await _supabase.auth.verifyOTP(
         email: widget.email,
         token: otp,
         type: OtpType.email,
       );
 
-      final User? user =
-          response.user ?? _supabase.auth.currentUser;
+      final User? user = response.user ?? _supabase.auth.currentUser;
 
       if (user == null) {
         throw const AuthException(
@@ -127,35 +110,11 @@ class _OtpVerificationPageState
         ),
       );
 
-      // 3. Render directly to the user's dedicated screen based on their role!
-      final String rawRole = (widget.role.trim().isNotEmpty 
-              ? widget.role 
-              : (widget.profileData['role'] ?? user.userMetadata?['role'] ?? ''))
-          .toString()
-          .toLowerCase()
-          .trim();
-
-      debugPrint('EduVerse Routing triggered with rawRole: "$rawRole"');
-
-      Widget destination;
-
-      if (rawRole.contains('teacher')) {
-        destination = const TeacherPortalHub();
-      } else if (rawRole.contains('parent')) {
-        destination = const ParentHomeDashboard();
-      } else if (rawRole.contains('school')) {
-        destination = const SchoolDashboard();
-      } else if (rawRole.contains('admin')) {
-        destination = const AdminDashboard();
-      } else {
-        // ONLY genuine Students go to Onboarding!
-        destination = const OnboardingStudentInformation();
-      }
-
+      // 3. Navigate to SuccessPage with the exact selected role!
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => destination,
+          builder: (context) => SuccessPage(role: widget.role),
         ),
         (route) => false,
       );
@@ -176,9 +135,7 @@ class _OtpVerificationPageState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Verification failed: $e',
-          ),
+          content: Text('Verification failed: $e'),
           backgroundColor: Colors.redAccent,
           duration: const Duration(seconds: 4),
         ),
@@ -197,7 +154,6 @@ class _OtpVerificationPageState
   // =========================
   // RESEND REAL EMAIL OTP
   // =========================
-
   Future<void> _resendOtp() async {
     if (isResending) return;
 
@@ -206,7 +162,6 @@ class _OtpVerificationPageState
     });
 
     try {
-      // Resend the 6-digit OTP code to email
       await _supabase.auth.signInWithOtp(
         email: widget.email,
         shouldCreateUser: false,
@@ -218,9 +173,7 @@ class _OtpVerificationPageState
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'A new 6-digit OTP has been sent to your email.',
-          ),
+          content: Text('A new 6-digit OTP has been sent to your email.'),
           backgroundColor: green,
           duration: Duration(seconds: 4),
         ),
@@ -240,9 +193,7 @@ class _OtpVerificationPageState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Could not resend OTP: $e',
-          ),
+          content: Text('Could not resend OTP: $e'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -255,103 +206,51 @@ class _OtpVerificationPageState
     }
   }
 
-  // =========================
-  // CLEAR OTP
-  // =========================
-
   void _clearOtp() {
     for (final controller in otpControllers) {
       controller.clear();
     }
 
     if (otpFocusNodes.isNotEmpty) {
-      FocusScope.of(context)
-          .requestFocus(otpFocusNodes[0]);
+      FocusScope.of(context).requestFocus(otpFocusNodes[0]);
     }
   }
 
-  // =========================
-  // OTP BOX INPUT
-  // =========================
-
-  void _onOtpChanged(
-    String value,
-    int index,
-  ) {
+  void _onOtpChanged(String value, int index) {
     if (value.isNotEmpty && index < 5) {
-      FocusScope.of(context).requestFocus(
-        otpFocusNodes[index + 1],
-      );
+      FocusScope.of(context).requestFocus(otpFocusNodes[index + 1]);
     }
 
     if (value.isEmpty && index > 0) {
-      FocusScope.of(context).requestFocus(
-        otpFocusNodes[index - 1],
-      );
+      FocusScope.of(context).requestFocus(otpFocusNodes[index - 1]);
     }
 
-    // Automatically verify when all 6 digits are entered
-    final otp = otpControllers
-        .map((controller) => controller.text)
-        .join();
-
+    final otp = otpControllers.map((controller) => controller.text).join();
     if (otp.length == 6 && !isVerifying) {
       _verifyOtp();
     }
   }
 
-  // =========================
-  // UI
-  // =========================
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SafeArea(
         child: Column(
           children: [
-
             // =========================
             // BACK BUTTON
             // =========================
-
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(
-                46,
-                20,
-                46,
-                0,
-              ),
-
-              child: Container(
-                width: double.infinity,
-                height: 140,
-
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color:
-                        const Color(0xFFE8ECEF),
-                    width: 1.5,
-                  ),
-                ),
-
-                child: Align(
-                  alignment:
-                      Alignment.centerLeft,
-
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: navy,
-                      size: 40,
-                    ),
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: navy,
+                    size: 28,
                   ),
                 ),
               ),
@@ -360,357 +259,184 @@ class _OtpVerificationPageState
             // =========================
             // MAIN CONTENT
             // =========================
-
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(
-                    horizontal: 46,
-                  ),
-
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: Column(
                     children: [
-
-                      const SizedBox(
-                        height: 120,
-                      ),
-
-                      // =========================
-                      // EMAIL ICON
-                      // =========================
-
+                      const SizedBox(height: 30),
                       Container(
-                        width: 152,
-                        height: 152,
-
-                        decoration:
-                            const BoxDecoration(
+                        width: 110,
+                        height: 110,
+                        decoration: const BoxDecoration(
                           color: green,
                           shape: BoxShape.circle,
                         ),
-
                         child: const Icon(
-                          Icons
-                              .mark_email_read_outlined,
+                          Icons.mark_email_read_outlined,
                           color: Colors.white,
-                          size: 88,
+                          size: 60,
                         ),
                       ),
-
-                      const SizedBox(
-                        height: 80,
-                      ),
-
-                      // =========================
-                      // TITLE
-                      // =========================
-
+                      const SizedBox(height: 30),
                       const Text(
                         'Verify Your Account',
-
-                        textAlign:
-                            TextAlign.center,
-
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: navy,
-                          fontSize: 42,
-                          fontWeight:
-                              FontWeight.w700,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-
-                      const SizedBox(
-                        height: 30,
-                      ),
-
-                      // =========================
-                      // SUBTITLE
-                      // =========================
-
+                      const SizedBox(height: 14),
                       Text(
                         'Enter the 6-digit code sent to\n${widget.email}',
-
-                        textAlign:
-                            TextAlign.center,
-
-                        style:
-                            const TextStyle(
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
                           color: subtitleBlue,
-                          fontSize: 24,
-                          height: 1.45,
+                          fontSize: 16,
+                          height: 1.4,
                         ),
                       ),
+                      const SizedBox(height: 36),
 
-                      const SizedBox(
-                        height: 60,
-                      ),
-
-                      // =========================
                       // OTP BOXES
-                      // =========================
-
                       Row(
-                        children:
-                            List.generate(
-                          6,
-                          (index) {
-                            return Expanded(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets
-                                        .symmetric(
-                                  horizontal: 4,
-                                ),
-
-                                child: SizedBox(
-                                  height: 70,
-
-                                  child:
-                                      TextField(
-                                    controller:
-                                        otpControllers[
-                                            index],
-
-                                    focusNode:
-                                        otpFocusNodes[
-                                            index],
-
-                                    keyboardType:
-                                        TextInputType
-                                            .number,
-
-                                    textAlign:
-                                        TextAlign.center,
-
-                                    maxLength: 1,
-
-                                    style:
-                                        const TextStyle(
-                                      color: navy,
-                                      fontSize: 28,
-                                      fontWeight:
-                                          FontWeight.bold,
+                        children: List.generate(6, (index) {
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 3),
+                              child: SizedBox(
+                                height: 56,
+                                child: TextField(
+                                  controller: otpControllers[index],
+                                  focusNode: otpFocusNodes[index],
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  maxLength: 1,
+                                  style: const TextStyle(
+                                    color: navy,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  onChanged: (value) => _onOtpChanged(value, index),
+                                  decoration: InputDecoration(
+                                    counterText: '',
+                                    filled: true,
+                                    fillColor: const Color(0xFFF8FAFB),
+                                    contentPadding: EdgeInsets.zero,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFE9EDF0),
+                                      ),
                                     ),
-
-                                    onChanged:
-                                        (value) {
-                                      _onOtpChanged(
-                                        value,
-                                        index,
-                                      );
-                                    },
-
-                                    decoration:
-                                        InputDecoration(
-                                      counterText:
-                                          '',
-
-                                      filled: true,
-
-                                      fillColor:
-                                          const Color(
-                                        0xFFF8FAFB,
-                                      ),
-
-                                      enabledBorder:
-                                          OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius
-                                                .circular(
-                                          20,
-                                        ),
-
-                                        borderSide:
-                                            const BorderSide(
-                                          color: Color(
-                                            0xFFE9EDF0,
-                                          ),
-                                        ),
-                                      ),
-
-                                      focusedBorder:
-                                          OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius
-                                                .circular(
-                                          20,
-                                        ),
-
-                                        borderSide:
-                                            const BorderSide(
-                                          color:
-                                              brandRed,
-                                          width: 2,
-                                        ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: brandRed,
+                                        width: 2,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        }),
                       ),
 
-                      const SizedBox(
-                        height: 65,
-                      ),
+                      const SizedBox(height: 36),
 
-                      // =========================
                       // VERIFY BUTTON
-                      // =========================
-
                       SizedBox(
                         width: double.infinity,
-                        height: 92,
-
-                        child:
-                            ElevatedButton(
-                          onPressed:
-                              isVerifying
-                                  ? null
-                                  : _verifyOtp,
-
-                          style:
-                              ElevatedButton
-                                  .styleFrom(
-                            backgroundColor:
-                                brandRed,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: isVerifying ? null : _verifyOtp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: brandRed,
                             elevation: 0,
-
-                            shape:
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius
-                                      .circular(
-                                50,
-                              ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
                           ),
-
                           child: isVerifying
                               ? const SizedBox(
-                                  width: 26,
-                                  height: 26,
-
-                                  child:
-                                      CircularProgressIndicator(
-                                    color:
-                                        Colors.white,
-                                    strokeWidth: 3,
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
                                   ),
                                 )
                               : const Text(
                                   'Verify',
-
-                                  style:
-                                      TextStyle(
-                                    color:
-                                        Colors.white,
-                                    fontSize: 24,
-                                    fontWeight:
-                                        FontWeight.w700,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 40,
-                      ),
+                      const SizedBox(height: 24),
 
-                      // =========================
                       // RESEND OTP
-                      // =========================
-
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment
-                                .center,
-
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-
-                          Flexible(
+                          const Flexible(
                             child: Text(
                               "Didn't receive the code?",
-
-                              style:
-                                  const TextStyle(
-                                color:
-                                    subtitleBlue,
-                                fontSize: 20,
+                              style: TextStyle(
+                                color: subtitleBlue,
+                                fontSize: 15,
                               ),
-
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-
-                          const SizedBox(
-                            width: 10,
-                          ),
-
+                          const SizedBox(width: 8),
                           TextButton(
-                            onPressed:
-                                isResending
-                                    ? null
-                                    : _resendOtp,
-
+                            onPressed: isResending ? null : _resendOtp,
                             child: isResending
                                 ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-
-                                    child:
-                                        CircularProgressIndicator(
-                                      strokeWidth:
-                                          2,
-                                      color:
-                                          brandRed,
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: brandRed,
                                     ),
                                   )
                                 : const Text(
                                     'Resend OTP',
-
-                                    style:
-                                        TextStyle(
-                                      color:
-                                          brandRed,
-                                      fontSize: 20,
-                                      fontWeight:
-                                          FontWeight
-                                              .w600,
+                                    style: TextStyle(
+                                      color: brandRed,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
             ),
 
-            // =========================
-            // BOTTOM TEXT
-            // =========================
-
             const Padding(
-              padding:
-                  EdgeInsets.only(
-                bottom: 35,
-              ),
-
+              padding: EdgeInsets.only(bottom: 20),
               child: Text(
                 'Secure verification powered by EduVerse AI',
-
                 style: TextStyle(
                   color: navy,
-                  fontSize: 20,
-                  fontWeight:
-                      FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
