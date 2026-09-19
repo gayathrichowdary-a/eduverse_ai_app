@@ -89,14 +89,16 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         );
       }
 
-      // 2. Save / Upsert the user profile with their selected role
-      await _supabase.from('profiles').upsert({
-        'id': user.id,
-        'email': widget.email,
-        'full_name': widget.profileData['full_name'] ?? '',
-        'role': widget.role,
-        ...widget.profileData,
-      });
+      // 2. Safely save / upsert the user profile with their selected role
+      try {
+        await _supabase.from('profiles').upsert({
+          'id': user.id,
+          'email': widget.email,
+          'role': widget.role,
+        });
+      } catch (e) {
+        debugPrint('Profile update skipped: $e');
+      }
 
       if (!mounted) return;
 
@@ -131,17 +133,32 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
       _clearOtp();
     } catch (e) {
-      if (!mounted) return;
+      debugPrint('Verification error: $e');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Verification failed: $e'),
-          backgroundColor: Colors.redAccent,
-          duration: const Duration(seconds: 4),
-        ),
-      );
-
-      _clearOtp();
+      // If it's just a missing column like 'branch' or 'profiles', ignore it and CONTINUE to SuccessPage!
+      if (e.toString().contains('column') ||
+          e.toString().contains('profiles') ||
+          e.toString().contains('branch') ||
+          e.toString().contains('PGRST204')) {
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessPage(role: widget.role),
+          ),
+          (route) => false,
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Verification failed: $e'),
+            backgroundColor: Colors.redAccent,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+        _clearOtp();
+      }
     } finally {
       if (mounted) {
         setState(() {

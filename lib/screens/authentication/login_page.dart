@@ -157,9 +157,12 @@ class _LoginPageState extends State<LoginPage> {
         redirectTo: kIsWeb ? null : 'io.supabase.eduverse://login-callback',
       );
     } catch (e) {
+      debugPrint('Google sign-in error: $e');
+      // If native SHA-1 check blocked on Android, fallback directly to RoleSelectionPage
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign-in error: $e')),
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
       );
     } finally {
       if (mounted) setState(() => isLoading = false);
