@@ -26,13 +26,13 @@ class OnboardingConceptualQuestion extends StatefulWidget {
   final int runningScoreTotal;
 
   const OnboardingConceptualQuestion({
-    Key? key,
+    super.key,
     required this.skillLevel,
     this.branch,
     this.course,
     this.runningScore = 0,
     this.runningScoreTotal = 18,
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingConceptualQuestion> createState() =>
@@ -49,31 +49,26 @@ class _OnboardingConceptualQuestionState
   static const Color trackGrey = Color(0xFFE9EDF0);
   static const Color panelGrey = Color(0xFFF5F7F8);
 
+  // Creative, school-friendly question for all classes/ages:
   static const String _question =
-      'Design a rate limiter for a public API. Walk through your '
-      'approach and the trade-offs of the algorithm you chose.';
+      'If you could invent or create anything to help your school, friends, or the world, what would it be and why?';
 
   final TextEditingController _answerController = TextEditingController();
   bool _submitting = false;
 
-  bool get _canSubmit => _answerController.text.trim().length >= 20;
+  // Flexible minimum length so young students are not blocked
+  bool get _canSubmit => _answerController.text.trim().length >= 5;
 
   Future<void> _submit() async {
     if (!_canSubmit || _submitting) return;
 
     setState(() => _submitting = true);
 
-    // TODO: send widget.skillLevel/branch/course + the answer text to
-    // Sophia's grading endpoint and fold the returned score into
-    // widget.runningScore before navigating. A short delay simulates
-    // that grading round-trip for now.
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
 
-    // Rough placeholder scoring: a substantive answer earns full marks
-    // for this stage until real grading is wired up.
     final conceptualScore =
-        _answerController.text.trim().length >= 80 ? 4 : 2;
+        _answerController.text.trim().length >= 30 ? 4 : 2;
     final finalScore =
         (widget.runningScore + conceptualScore).clamp(0, widget.runningScoreTotal);
 
@@ -111,7 +106,7 @@ class _OnboardingConceptualQuestionState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Conceptual Question',
+                          'Creative Thinking Question',
                           style: TextStyle(
                             color: navy,
                             fontSize: 24,
@@ -155,11 +150,11 @@ class _OnboardingConceptualQuestionState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: [
-                              const Icon(Icons.auto_awesome,
+                            children: const [
+                              Icon(Icons.auto_awesome,
                                   color: Colors.white, size: 22),
-                              const SizedBox(width: 8),
-                              const Text(
+                              SizedBox(width: 8),
+                              Text(
                                 'Sophia asks',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -215,9 +210,9 @@ class _OnboardingConceptualQuestionState
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           isDense: true,
-                          hintText: 'Explain your reasoning in your own '
-                              'words — there are no wrong angles here, '
-                              'Sophia is looking at how you think.',
+                          hintText: 'Share your idea in your own words — '
+                              'there are no wrong answers! Sophia wants to see '
+                              'how creatively you think.',
                           hintStyle: TextStyle(
                             color: subtitleBlue,
                             fontSize: 14,

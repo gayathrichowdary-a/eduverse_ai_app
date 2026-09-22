@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
 import 'onboarding_coding_test.dart';
-
 // ============================================================
 // MODEL
 // ============================================================
@@ -51,12 +49,12 @@ class OnboardingAssessmentInProgress extends StatefulWidget {
   final String? course;
 
   const OnboardingAssessmentInProgress({
-    Key? key,
+    super.key,
     this.initialTime = const Duration(minutes: 3, seconds: 0),
     this.skillLevel = 'Standard',
     this.branch,
     this.course,
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingAssessmentInProgress> createState() =>

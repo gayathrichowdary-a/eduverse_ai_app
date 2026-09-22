@@ -1,50 +1,11 @@
 import 'package:flutter/material.dart';
 import 'onboarding_conceptual_question.dart';
 
-// ============================================================
-// MODEL
-// ============================================================
-
-enum CompileResult { none, running, success, failure }
-
-/// A single sandbox coding problem for the onboarding assessment.
-class CodingTestProblem {
-  final String title;
-  final String prompt;
-  final String starterCode;
-  final List<String> requiredTokens; // naive "must compile" check
-  final String language;
-
-  const CodingTestProblem({
-    required this.title,
-    required this.prompt,
-    required this.starterCode,
-    required this.requiredTokens,
-    this.language = 'Python',
-  });
-}
-
-// ============================================================
-// SCREEN
-// ============================================================
-
-/// Dedicated sandbox coding-challenge stage of the Sophia assessment.
-///
-/// Per the spec this is a separate stage from the 3 cognitive/analytical
-/// MCQs: "After Three Question an Coding Test will be taken. In Coding
-/// test a Sandbox Environment will open and the Coding Problem will be
-/// asked and after the correct code then it will take you to the
-/// Conceptual Question part."
-///
-/// NOTE: `_compile` below runs a lightweight local check so the flow is
-/// demonstrable without a backend. Swap it for a real call to your
-/// multi-language code runner (see "Interactive DSA & Coding
-/// Environment" in the spec) when that service is wired up.
 class OnboardingCodingTest extends StatefulWidget {
   final String skillLevel;
   final String? branch;
   final String? course;
-  final int cognitiveScore; // running score from the 3 prior questions
+  final int cognitiveScore;
 
   const OnboardingCodingTest({
     super.key,
@@ -60,61 +21,28 @@ class OnboardingCodingTest extends StatefulWidget {
 
 class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
   // ================= COLORS =================
-
   static const Color navy = Color(0xFF14213D);
   static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color brandRed = Color(0xFFE8394A);
   static const Color mastGreen = Color(0xFF33B679);
   static const Color trackGrey = Color(0xFFE9EDF0);
-  static const Color panelGrey = Color(0xFFF5F7F8);
-  static const Color terminalBg = Color(0xFF14213D);
+  static const Color panelGrey = Color(0xFFF8FAFB);
 
-  static const CodingTestProblem _problem = CodingTestProblem(
-    title: 'Reverse a String',
-    prompt: 'Write a function reverseString(s) that takes a string and '
-        'returns it reversed, without using a built-in reverse method.',
-    starterCode: 'def reverseString(s):\n'
-        '    # your code here\n'
-        '    pass\n',
-    requiredTokens: ['def reverseString', 'return'],
-  );
+  int? _selectedOption;
+  bool _checked = false;
+  bool _isCorrect = false;
 
-  late final TextEditingController _codeController =
-      TextEditingController(text: _problem.starterCode);
+  // School-friendly, universally understandable visual puzzle
+  final String _question = "What number comes next in this pattern?";
+  final String _sequence = "3  ➔  6  ➔  9  ➔  12  ➔  ?";
+  final List<String> _options = ["14", "15", "16", "18"];
+  final int _correctIndex = 1; // 15
 
-  CompileResult _result = CompileResult.none;
-  String _output = '';
-
-  Future<void> _compile() async {
+  void _checkAnswer() {
+    if (_selectedOption == null) return;
     setState(() {
-      _result = CompileResult.running;
-      _output = '';
-    });
-
-    await Future.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-
-    final code = _codeController.text;
-
-    // Simple heuristic: the required function signature must be present
-    // and the body must actually do something beyond the starter `pass`.
-    final hasRequiredTokens =
-        _problem.requiredTokens.every((token) => code.contains(token));
-    final bodyChanged = code.trim() != _problem.starterCode.trim();
-    final looksImplemented =
-        hasRequiredTokens && bodyChanged && !code.contains('pass\n');
-
-    setState(() {
-      if (looksImplemented) {
-        _result = CompileResult.success;
-        _output = '✓ Compiled successfully\n✓ Test 1 passed: "hello" → '
-            '"olleh"\n✓ Test 2 passed: "LMS" → "SML"\n✓ All test cases '
-            'passed.';
-      } else {
-        _result = CompileResult.failure;
-        _output = '✗ Compilation finished but tests failed.\nMake sure '
-            'reverseString actually returns the reversed string.';
-      }
+      _checked = true;
+      _isCorrect = _selectedOption == _correctIndex;
     });
   }
 
@@ -126,23 +54,14 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
           skillLevel: widget.skillLevel,
           branch: widget.branch,
           course: widget.course,
-          runningScore: widget.cognitiveScore,
+          runningScore: widget.cognitiveScore + (_isCorrect ? 1 : 0),
         ),
       ),
     );
   }
 
   @override
-  void dispose() {
-    _codeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final success = _result == CompileResult.success;
-    final running = _result == CompileResult.running;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -151,7 +70,7 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
           children: [
             // ================= TOP BAR =================
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
               child: Row(
                 children: [
                   Expanded(
@@ -159,16 +78,16 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Coding Test',
+                          'Logic & Thinking Challenge',
                           style: TextStyle(
                             color: navy,
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${widget.skillLevel} Assessment • Sandbox',
+                          '${widget.skillLevel} Level • Problem Solving',
                           style: const TextStyle(
                             color: subtitleBlue,
                             fontSize: 14,
@@ -179,15 +98,15 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: panelGrey,
                       borderRadius: BorderRadius.circular(50),
+                      border: Border.all(color: trackGrey),
                     ),
-                    child: Text(
-                      _problem.language,
-                      style: const TextStyle(
+                    child: const Text(
+                      'Stage 2/3',
+                      style: TextStyle(
                         color: navy,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -203,18 +122,18 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= PROBLEM CARD =================
+                    // ================= QUESTION CARD =================
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: trackGrey, width: 1.2),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: navy, width: 1.4),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0x0F000000),
@@ -229,133 +148,208 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
                           Row(
                             children: [
                               Container(
-                                width: 40,
-                                height: 40,
+                                width: 44,
+                                height: 44,
                                 decoration: BoxDecoration(
                                   color: brandRed,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.code_rounded,
-                                    color: Colors.white, size: 20),
+                                child: const Icon(
+                                  Icons.psychology_outlined,
+                                  color: Colors.white,
+                                  size: 26,
+                                ),
                               ),
-                              const SizedBox(width: 12),
-                              Text(
-                                _problem.title,
-                                style: const TextStyle(
-                                  color: navy,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Text(
+                                  _question,
+                                  style: const TextStyle(
+                                    color: navy,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            _problem.prompt,
-                            style: const TextStyle(
-                              color: subtitleBlue,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              height: 1.4,
+                          const SizedBox(height: 24),
+
+                          // PATTERN DISPLAY
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            decoration: BoxDecoration(
+                              color: panelGrey,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: trackGrey),
+                            ),
+                            child: Center(
+                              child: Text(
+                                _sequence,
+                                style: const TextStyle(
+                                  color: navy,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
-                    // ================= CODE EDITOR =================
+                    // ================= OPTIONS =================
                     const Text(
-                      'Sandbox Environment',
+                      'Select the correct answer:',
                       style: TextStyle(
                         color: navy,
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: terminalBg,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: TextField(
-                        controller: _codeController,
-                        maxLines: 10,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontFamily: 'monospace',
-                          height: 1.5,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
-                    // ================= RUN BUTTON =================
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: OutlinedButton.icon(
-                        onPressed: running ? null : _compile,
-                        icon: running
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2.2, color: brandRed),
-                              )
-                            : const Icon(Icons.play_arrow_rounded,
-                                color: brandRed),
-                        label: Text(
-                          running ? 'Compiling…' : 'Run & Compile',
-                          style: const TextStyle(
-                            color: brandRed,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
+                    ...List.generate(_options.length, (index) {
+                      final isSelected = _selectedOption == index;
+                      final isThisCorrect = _checked && index == _correctIndex;
+                      final isThisWrong = _checked && isSelected && !_isCorrect;
+
+                      Color borderColor = trackGrey;
+                      Color bgColor = Colors.white;
+
+                      if (isThisCorrect) {
+                        borderColor = mastGreen;
+                        bgColor = const Color(0xFFE8F7EE);
+                      } else if (isThisWrong) {
+                        borderColor = brandRed;
+                        bgColor = const Color(0xFFFDEBEC);
+                      } else if (isSelected) {
+                        borderColor = brandRed;
+                        bgColor = const Color(0xFFFFF5F6);
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_checked) return;
+                            setState(() {
+                              _selectedOption = index;
+                            });
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            decoration: BoxDecoration(
+                              color: bgColor,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: borderColor,
+                                width: isSelected || isThisCorrect ? 2 : 1.2,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected ? brandRed : subtitleBlue,
+                                      width: 2,
+                                    ),
+                                    color: isSelected ? brandRed : Colors.transparent,
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(Icons.check, size: 18, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  _options[index],
+                                  style: const TextStyle(
+                                    color: navy,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: brandRed, width: 1.4),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                      );
+                    }),
+
+                    const SizedBox(height: 12),
+
+                    // CHECK ANSWER BUTTON
+                    if (!_checked)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: OutlinedButton(
+                          onPressed: _selectedOption != null ? _checkAnswer : null,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: _selectedOption != null ? brandRed : trackGrey,
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text(
+                            'Check Answer',
+                            style: TextStyle(
+                              color: _selectedOption != null ? brandRed : subtitleBlue,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    if (_result != CompileResult.none &&
-                        _result != CompileResult.running) ...[
-                      const SizedBox(height: 16),
+                    // FEEDBACK RESULT
+                    if (_checked) ...[
+                      const SizedBox(height: 12),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: success
-                              ? const Color(0xFFE6F6EE)
-                              : const Color(0xFFFCE3E6),
-                          borderRadius: BorderRadius.circular(16),
+                          color: _isCorrect ? const Color(0xFFE8F7EE) : const Color(0xFFFDEBEC),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: success ? mastGreen : brandRed,
+                            color: _isCorrect ? mastGreen : brandRed,
                             width: 1.2,
                           ),
                         ),
-                        child: Text(
-                          _output,
-                          style: TextStyle(
-                            color: success ? const Color(0xFF1F7A50) : brandRed,
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _isCorrect ? Icons.check_circle : Icons.cancel,
+                              color: _isCorrect ? mastGreen : brandRed,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _isCorrect
+                                    ? 'Great job! Pattern increases by +3 each step.'
+                                    : 'Good try! Pattern increases by +3 (12 + 3 = 15).',
+                                style: TextStyle(
+                                  color: _isCorrect ? const Color(0xFF1B6B45) : brandRed,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -364,9 +358,7 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
               ),
             ),
 
-            // =====================================================
-            // BOTTOM SECTION
-            // =====================================================
+            // ================= BOTTOM CONTINUE BUTTON =================
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
@@ -376,35 +368,32 @@ class _OnboardingCodingTestState extends State<OnboardingCodingTest> {
               ),
               child: SizedBox(
                 width: double.infinity,
-                height: 60,
+                height: 56,
                 child: ElevatedButton(
-                  onPressed: success ? _continue : null,
+                  onPressed: _checked ? _continue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: success ? brandRed : trackGrey,
+                    backgroundColor: _checked ? brandRed : trackGrey,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(35),
                     ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(
-                        child: Text(
-                          'Continue to Conceptual Question',
-                          style: TextStyle(
-                            color: success ? Colors.white : subtitleBlue,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        'Continue to Conceptual Question',
+                        style: TextStyle(
+                          color: _checked ? Colors.white : subtitleBlue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Icon(
                         Icons.arrow_forward_rounded,
-                        color: success ? Colors.white : subtitleBlue,
-                        size: 18,
+                        color: _checked ? Colors.white : subtitleBlue,
+                        size: 20,
                       ),
                     ],
                   ),

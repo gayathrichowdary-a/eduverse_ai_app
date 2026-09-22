@@ -32,7 +32,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // GOOGLE OAUTH CLIENT ID
   // =========================
   static const String _webClientId =
-'562258769343-djt08qk2cg68p997l0j2lnhg8kovv81v.apps.googleusercontent.com';
+      '562258769343-djt08qk2cg68p997l0j2lnhg8kovv81v.apps.googleusercontent.com';
+
   // =========================
   // ROLE HELPERS
   // =========================
@@ -63,16 +64,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final childCodeController = TextEditingController();
 
   DateTime? dateOfBirth;
-  String? selectedBranch;
-
-  static const List<String> branches = [
-    'Computer Science',
-    'AI & ML',
-    'AI & DSS',
-    'Information Technology',
-    'ECE',
-    'Data Science',
-  ];
 
   // =========================
   // STATE
@@ -105,8 +96,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
               UserAttributes(
                 data: {
                   'role': _role,
-                  'full_name': nameController.text.trim().isNotEmpty 
-                      ? nameController.text.trim() 
+                  'full_name': nameController.text.trim().isNotEmpty
+                      ? nameController.text.trim()
                       : (session.user.userMetadata?['full_name'] ?? ''),
                 },
               ),
@@ -115,8 +106,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
             await _supabase.from('profiles').upsert({
               'id': session.user.id,
               'email': session.user.email,
-              'full_name': nameController.text.trim().isNotEmpty 
-                  ? nameController.text.trim() 
+              'full_name': nameController.text.trim().isNotEmpty
+                  ? nameController.text.trim()
                   : (session.user.userMetadata?['full_name'] ?? ''),
               'role': _role,
             });
@@ -343,7 +334,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (nameController.text.trim().isEmpty) return 'Please enter your name';
       if (schoolNameController.text.trim().isEmpty) return 'Please enter your school/college name';
       if (dateOfBirth == null) return 'Please select your date of birth';
-      if (selectedBranch == null) return 'Please select your branch';
+      if (childCodeController.text.trim().isEmpty) return 'Please enter your child / student code';
     } else if (_isParent) {
       if (nameController.text.trim().isEmpty) return 'Please enter your name';
       if (childCodeController.text.trim().isEmpty) return "Please enter your child's student code";
@@ -402,7 +393,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (_isStudent) ...{
         'school_name': schoolNameController.text.trim(),
         'date_of_birth': dateOfBirth?.toIso8601String(),
-        'branch': selectedBranch,
+        'child_code': childCodeController.text.trim(),
       },
       if (_isParent) ...{
         'child_code': childCodeController.text.trim(),
@@ -656,9 +647,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
         const SizedBox(height: 8),
         _buildDateField(),
         const SizedBox(height: 20),
-        _buildLabel('Branch'),
+        _buildLabel('Child Code'),
         const SizedBox(height: 8),
-        _buildBranchDropdown(),
+        _buildTextField(controller: childCodeController, hintText: 'Enter your student / child code', icon: Icons.pin_outlined),
       ];
     }
 
@@ -779,26 +770,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildBranchDropdown() {
-    return DropdownButtonFormField<String>(
-      value: selectedBranch,
-      icon: const Icon(Icons.keyboard_arrow_down, color: navy),
-      style: const TextStyle(color: navy, fontSize: 16),
-      decoration: InputDecoration(
-        hintText: 'Select your branch',
-        hintStyle: const TextStyle(color: hintColor, fontSize: 16),
-        prefixIcon: const Icon(Icons.menu_book_outlined, color: navy, size: 24),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: navy, width: 1.5)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: brandRed, width: 2)),
-      ),
-      items: branches
-          .map((branch) => DropdownMenuItem<String>(value: branch, child: Text(branch)))
-          .toList(),
-      onChanged: (value) => setState(() => selectedBranch = value),
     );
   }
 

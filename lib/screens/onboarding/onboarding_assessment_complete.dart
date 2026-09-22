@@ -104,7 +104,7 @@ class AssessmentComplete extends StatelessWidget {
   final GlobalKey _shareCardKey = GlobalKey();
 
   AssessmentComplete({
-    Key? key,
+    super.key,
     this.studentName = 'Aryan',
     this.subjectLabel = 'Mathematics',
     this.unitLabel = 'Real Numbers',
@@ -144,7 +144,7 @@ class AssessmentComplete extends StatelessWidget {
     ],
     this.onReviewDetailedAnswers,
     this.onContinue,
-  }) : super(key: key);
+  });
 
   // ================= COLORS =================
 
@@ -351,7 +351,7 @@ class AssessmentComplete extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 20, vertical: 12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.22),
+                                      color: Colors.white.withValues(alpha: 0.22),
                                       borderRadius:
                                           BorderRadius.circular(50),
                                     ),
@@ -488,7 +488,7 @@ class AssessmentComplete extends StatelessWidget {
                               width: double.infinity,
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
-                                color: _tierColor.withOpacity(0.12),
+                                color: _tierColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20),
                                 border:
                                     Border.all(color: _tierColor, width: 1.4),
