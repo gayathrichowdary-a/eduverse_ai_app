@@ -30,10 +30,10 @@ class OnboardingProfileSetup extends StatefulWidget {
   final int totalSteps;
 
   const OnboardingProfileSetup({
-    Key? key,
+    super.key,
     this.currentStep = 1,
     this.totalSteps = 3,
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingProfileSetup> createState() =>
@@ -143,7 +143,7 @@ class _OnboardingProfileSetupState extends State<OnboardingProfileSetup> {
                         width: 140,
                         height: 140,
                         decoration: BoxDecoration(
-                          color: mustard.withOpacity(0.15),
+                          color: mustard.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.smart_toy_rounded,

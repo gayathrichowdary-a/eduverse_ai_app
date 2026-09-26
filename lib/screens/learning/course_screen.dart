@@ -33,7 +33,7 @@ class CoursesScreen extends StatelessWidget {
   final List<CourseListItem> courses;
 
   const CoursesScreen({
-    Key? key,
+    super.key,
     this.courses = const [
       CourseListItem(
         courseTitle: 'Chemical Bonds',
@@ -72,7 +72,7 @@ class CoursesScreen extends StatelessWidget {
         completedLessons: 0,
       ),
     ],
-  }) : super(key: key);
+  });
 
   static const Color navy = Color(0xFF14213D);
   static const Color subtitleBlue = Color(0xFF4D86AD);
@@ -126,7 +126,7 @@ class CoursesScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 itemCount: courses.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final course = courses[index];
                   final progress = course.totalLessons == 0

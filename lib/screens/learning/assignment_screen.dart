@@ -34,7 +34,7 @@ class AssignmentScreen extends StatefulWidget {
   final List<AssignmentItem> assignments;
 
   const AssignmentScreen({
-    Key? key,
+    super.key,
     this.assignments = const [
       AssignmentItem(
         title: 'Balancing Chemical Equations',
@@ -70,7 +70,7 @@ class AssignmentScreen extends StatefulWidget {
         icon: Icons.menu_book_rounded,
       ),
     ],
-  }) : super(key: key);
+  });
 
   @override
   State<AssignmentScreen> createState() => _AssignmentScreenState();
@@ -164,7 +164,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                 decoration: InputDecoration(
                   hintText: 'Add a note for your teacher (optional)',
                   filled: true,
-                  fillColor: trackGrey.withOpacity(0.5),
+                  fillColor: trackGrey.withValues(alpha: 0.5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -273,7 +273,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: _filters.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  separatorBuilder: (_, _) => const SizedBox(width: 10),
                   itemBuilder: (context, index) {
                     final f = _filters[index];
                     final selected = f == _filter;
@@ -310,7 +310,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
                 itemCount: _filtered.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final item = _filtered[index];
                   final isSubmittedLocally =
@@ -370,7 +370,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                                 color: (isSubmittedLocally
                                         ? mustard
                                         : _statusColor(item.status))
-                                    .withOpacity(0.15),
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(50),
                               ),
                               child: Text(

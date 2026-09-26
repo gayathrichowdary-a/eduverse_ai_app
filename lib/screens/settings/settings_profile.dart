@@ -283,7 +283,7 @@ class _InlineToggle extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1F355C))),
-          Switch(value: value, onChanged: onChanged, activeColor: Colors.white, activeTrackColor: const Color(0xFFE94A56)),
+          Switch(value: value, onChanged: onChanged, activeThumbColor: Colors.white, activeTrackColor: const Color(0xFFE94A56)),
         ],
       ),
     );

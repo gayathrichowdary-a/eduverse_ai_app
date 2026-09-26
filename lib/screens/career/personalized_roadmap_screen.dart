@@ -338,7 +338,7 @@ class _PersonalizedRoadmapScreenState
 
                           decoration: BoxDecoration(
                             color: _levelColor
-                                .withOpacity(0.12),
+                                .withValues(alpha: 0.12),
                             borderRadius:
                                 BorderRadius.circular(16),
                           ),
@@ -624,7 +624,7 @@ class _PersonalizedRoadmapScreenState
 
                   border: Border.all(
                     color: subtitleBlue
-                        .withOpacity(0.25),
+                        .withValues(alpha: 0.25),
                   ),
                 ),
 
@@ -751,7 +751,7 @@ class _PersonalizedRoadmapScreenState
 
                       decoration: BoxDecoration(
                         color: brandRed
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
 
@@ -912,7 +912,7 @@ class _PersonalizedRoadmapScreenState
 
                 decoration: BoxDecoration(
                   color: stageColor
-                      .withOpacity(0.12),
+                      .withValues(alpha: 0.12),
 
                   shape: BoxShape.circle,
 

@@ -122,7 +122,7 @@ class _GoalHabitTrackerState extends State<GoalHabitTracker> {
       ),
       child: Row(
         children: [
-          CircleAvatar(backgroundColor: color.withOpacity(0.1), child: Icon(icon, color: color)),
+          CircleAvatar(backgroundColor: color.withValues(alpha: 0.1), child: Icon(icon, color: color)),
           const SizedBox(width: 15),
           Expanded(
             child: Column(

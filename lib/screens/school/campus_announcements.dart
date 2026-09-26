@@ -171,7 +171,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<Priority>(
-                      value: priority,
+                      initialValue: priority,
                       decoration: _fieldDecoration('Priority'),
                       items: Priority.values
                           .map((p) => DropdownMenuItem(value: p, child: Text(p.label)))
@@ -193,7 +193,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                           selectedColor: navy,
                           checkmarkColor: yellow,
                           backgroundColor: Colors.white,
-                          side: BorderSide(color: navy.withOpacity(.5)),
+                          side: BorderSide(color: navy.withValues(alpha: .5)),
                           labelStyle: TextStyle(color: selected ? yellow : navy, fontSize: 12.5),
                           onSelected: (v) {
                             setSheetState(() {
@@ -210,7 +210,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                     const SizedBox(height: 8),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      activeColor: navy,
+                      activeThumbColor: navy,
                       title: const Text('Publish immediately'),
                       value: published,
                       onChanged: (v) => setSheetState(() => published = v),
@@ -380,7 +380,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: a.priority.color.withOpacity(.15),
+                                      color: a.priority.color.withValues(alpha: .15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -406,7 +406,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFF8F8F8),
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: navy.withOpacity(.25)),
+                                            border: Border.all(color: navy.withValues(alpha: .25)),
                                           ),
                                           child: Text(aud,
                                               style: const TextStyle(fontSize: 11, color: navy)),

@@ -30,7 +30,7 @@ class CareerDetailsScreen extends StatelessWidget {
               background: Image.network(
                 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000',
                 fit: BoxFit.cover,
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 colorBlendMode: BlendMode.darken,
               ),
             ),
@@ -151,7 +151,7 @@ class CareerDetailsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: navy.withOpacity(0.2)),
+        border: Border.all(color: navy.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(label, style: const TextStyle(color: navy, fontSize: 13, fontWeight: FontWeight.w500)),

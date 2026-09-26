@@ -395,7 +395,7 @@ class _ExamCompilerScreenState extends State<ExamCompilerScreen> {
             color: _ExamCompilerColors.card,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 16,
                 offset: const Offset(0, -4),
               ),
@@ -464,7 +464,7 @@ class _ExamCompilerScreenState extends State<ExamCompilerScreen> {
       ),
       child: Column(
         children: [
-          Icon(Icons.quiz_outlined, size: 40, color: _ExamCompilerColors.textSecondary.withOpacity(0.6)),
+          Icon(Icons.quiz_outlined, size: 40, color: _ExamCompilerColors.textSecondary.withValues(alpha: 0.6)),
           const SizedBox(height: 10),
           const Text(
             'No questions yet',
@@ -556,7 +556,7 @@ class _ExamCompilerScreenState extends State<ExamCompilerScreen> {
         Container(
           padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
-            color: _ExamCompilerColors.primary.withOpacity(0.1),
+            color: _ExamCompilerColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 19, color: _ExamCompilerColors.primary),
@@ -575,7 +575,7 @@ class _ExamCompilerScreenState extends State<ExamCompilerScreen> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: _ExamCompilerColors.primary,
+          activeThumbColor: _ExamCompilerColors.primary,
         ),
       ],
     );
@@ -626,7 +626,7 @@ class _QuestionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: question.type.color.withOpacity(0.12),
+                  color: question.type.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -674,7 +674,7 @@ class _QuestionCard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isCorrect ? _ExamCompilerColors.success.withOpacity(0.12) : _ExamCompilerColors.bg,
+                    color: isCorrect ? _ExamCompilerColors.success.withValues(alpha: 0.12) : _ExamCompilerColors.bg,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isCorrect ? _ExamCompilerColors.success : _ExamCompilerColors.border,
@@ -793,7 +793,7 @@ class _AddQuestionSheetState extends State<_AddQuestionSheet> {
                     label: Text(t.label),
                     selected: selected,
                     onSelected: (_) => setState(() => _type = t),
-                    selectedColor: t.color.withOpacity(0.15),
+                    selectedColor: t.color.withValues(alpha: 0.15),
                     labelStyle: TextStyle(
                       color: selected ? t.color : _ExamCompilerColors.textSecondary,
                       fontWeight: FontWeight.w600,

@@ -438,7 +438,7 @@ class SkillGapAnalysis extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -612,7 +612,7 @@ class SkillChartPainter extends CustomPainter {
     // ========================================================
 
     final studentPaint = Paint()
-      ..color = SkillGapAnalysis.brandRed.withOpacity(0.22)
+      ..color = SkillGapAnalysis.brandRed.withValues(alpha: 0.22)
       ..style = PaintingStyle.fill;
 
     final studentBorder = Paint()
@@ -649,7 +649,7 @@ class SkillChartPainter extends CustomPainter {
 
     final careerPaint = Paint()
       ..color = SkillGapAnalysis.careerRequirementColor
-          .withOpacity(0.35)
+          .withValues(alpha: 0.35)
       ..style = PaintingStyle.fill;
 
     final careerBorder = Paint()

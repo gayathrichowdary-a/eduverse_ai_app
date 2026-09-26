@@ -34,7 +34,7 @@ class ProjectsScreen extends StatefulWidget {
   final List<ProjectItem> projects;
 
   const ProjectsScreen({
-    Key? key,
+    super.key,
     this.projects = const [
       ProjectItem(
         title: 'Volcano Model Report',
@@ -64,7 +64,7 @@ class ProjectsScreen extends StatefulWidget {
         icon: Icons.functions,
       ),
     ],
-  }) : super(key: key);
+  });
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
@@ -141,7 +141,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                 itemCount: widget.projects.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final project = widget.projects[index];
                   return InkWell(
@@ -199,7 +199,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                     horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: _statusColor(project.status)
-                                      .withOpacity(0.15),
+                                      .withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                                 child: Text(

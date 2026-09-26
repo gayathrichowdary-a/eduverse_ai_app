@@ -364,7 +364,7 @@ class _SpeakingPracticeScreenState
             color: mentorBlue,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: navy.withOpacity(0.08),
+              color: navy.withValues(alpha: 0.08),
             ),
           ),
           child: Row(
@@ -698,7 +698,7 @@ class _SpeakingPracticeScreenState
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: brandRed.withOpacity(0.25),
+                        color: brandRed.withValues(alpha: 0.25),
                         blurRadius: 25,
                         spreadRadius: 8,
                       ),

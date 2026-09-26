@@ -203,7 +203,7 @@ class _PersonalizedEnglishPracticeState extends State<PersonalizedEnglishPractic
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
         border: Border.all(color: Colors.grey.shade100),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +214,7 @@ class _PersonalizedEnglishPracticeState extends State<PersonalizedEnglishPractic
               const Text("Current Session", style: TextStyle(color: subtitleBlue, fontWeight: FontWeight.bold, fontSize: 12)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(color: brandRed.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: brandRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                 child: const Text("Adaptive Level 4", style: TextStyle(color: brandRed, fontWeight: FontWeight.bold, fontSize: 10)),
               )
             ],

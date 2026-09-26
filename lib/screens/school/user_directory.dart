@@ -90,7 +90,7 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: navy)),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: role,
+                    initialValue: role,
                     decoration: _fieldDecoration('Role'),
                     items: const [
                       DropdownMenuItem(value: 'Student', child: Text('Student')),
@@ -421,8 +421,8 @@ class _UserList extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: user.active
-                              ? const Color(0xFF57B97A).withOpacity(.15)
-                              : Colors.grey.withOpacity(.15),
+                              ? const Color(0xFF57B97A).withValues(alpha: .15)
+                              : Colors.grey.withValues(alpha: .15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -436,7 +436,7 @@ class _UserList extends StatelessWidget {
                       ),
                       Switch(
                         value: user.active,
-                        activeColor: navy,
+                        activeThumbColor: navy,
                         onChanged: (_) => onToggleActive(user),
                       ),
                     ],

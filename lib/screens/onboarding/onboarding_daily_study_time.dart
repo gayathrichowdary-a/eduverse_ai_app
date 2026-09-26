@@ -212,7 +212,7 @@ class _OnboardingDailyStudyTimeState extends State<OnboardingDailyStudyTime> {
                         activeTrackColor: brandRed,
                         inactiveTrackColor: const Color(0xFFE2E8ED),
                         thumbColor: Colors.white,
-                        overlayColor: brandRed.withOpacity(0.15),
+                        overlayColor: brandRed.withValues(alpha: 0.15),
                         trackHeight: 3,
                         thumbShape: const RoundSliderThumbShape(
                           enabledThumbRadius: 14,
@@ -384,8 +384,8 @@ class _RobotIllustration extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFFFDE3D8).withOpacity(0.9),
-                    const Color(0xFFFDE3D8).withOpacity(0.2),
+                    const Color(0xFFFDE3D8).withValues(alpha: 0.9),
+                    const Color(0xFFFDE3D8).withValues(alpha: 0.2),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -465,7 +465,7 @@ class _RobotIllustration extends StatelessWidget {
                       height: 6,
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(i == 0 ? 0.9 : 0.4),
+                        color: Colors.white.withValues(alpha: i == 0 ? 0.9 : 0.4),
                         shape: BoxShape.circle,
                       ),
                     ),

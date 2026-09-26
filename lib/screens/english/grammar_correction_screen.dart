@@ -260,12 +260,12 @@ class _GrammarCorrectionScreenState
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: successGreen.withOpacity(0.35),
+          color: successGreen.withValues(alpha: 0.35),
           width: 1.4,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -278,7 +278,7 @@ class _GrammarCorrectionScreenState
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: successGreen.withOpacity(0.12),
+              color: successGreen.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
@@ -332,7 +332,7 @@ class _GrammarCorrectionScreenState
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: navy.withOpacity(0.12),
+          color: navy.withValues(alpha: 0.12),
           width: 1.2,
         ),
       ),

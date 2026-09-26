@@ -30,7 +30,7 @@ class OnboardingAiProcessing extends StatefulWidget {
   final List<ProcessingTag> tags;
 
   const OnboardingAiProcessing({
-    Key? key,
+    super.key,
     this.engineLabel = 'EduVerse AI Engine v2.0',
     this.headline = 'Analyzing your strengths...',
     this.subtitle = 'Building your personalized roadmap...',
@@ -52,7 +52,7 @@ class OnboardingAiProcessing extends StatefulWidget {
         label: 'Learning Pace',
       ),
     ],
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingAiProcessing> createState() =>

@@ -134,7 +134,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: r.riskLevel.color.withOpacity(.15),
+                      color: r.riskLevel.color.withValues(alpha: .15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text('${r.riskLevel.label} risk',
@@ -335,7 +335,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: r.riskLevel.color.withOpacity(.15),
+                                      color: r.riskLevel.color.withValues(alpha: .15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text('${r.riskLevel.label} risk',
@@ -357,7 +357,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: r.decision.color.withOpacity(.15),
+                                      color: r.decision.color.withValues(alpha: .15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(r.decision.label,

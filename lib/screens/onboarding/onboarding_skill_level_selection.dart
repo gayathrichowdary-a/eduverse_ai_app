@@ -43,10 +43,10 @@ class OnboardingSkillLevelSelection extends StatefulWidget {
   final String? course;
 
   const OnboardingSkillLevelSelection({
-    Key? key,
+    super.key,
     this.branch,
     this.course,
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingSkillLevelSelection> createState() =>

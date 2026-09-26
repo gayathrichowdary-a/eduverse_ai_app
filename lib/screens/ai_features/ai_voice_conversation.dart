@@ -147,7 +147,7 @@ class _AiVoiceConversationState extends State<AiVoiceConversation> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: brandRed.withOpacity(0.1),
+                    color: brandRed.withValues(alpha: 0.1),
                   ),
                   child: Container(
                     height: 100,
@@ -175,7 +175,7 @@ class _AiVoiceConversationState extends State<AiVoiceConversation> {
                   borderRadius: BorderRadius.circular(25),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     )
@@ -270,7 +270,7 @@ class _AiVoiceConversationState extends State<AiVoiceConversation> {
               const SizedBox(width: 8),
               Text(
                 "Sophia Active",
-                style: TextStyle(color: navy.withOpacity(0.7), fontWeight: FontWeight.w500),
+                style: TextStyle(color: navy.withValues(alpha: 0.7), fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -288,7 +288,7 @@ class _AiVoiceConversationState extends State<AiVoiceConversation> {
               children: [
                 const Icon(Icons.language, color: navy, size: 20),
                 const SizedBox(width: 4),
-                Icon(Icons.arrow_drop_down, color: navy.withOpacity(0.6)),
+                Icon(Icons.arrow_drop_down, color: navy.withValues(alpha: 0.6)),
               ],
             ),
           ),
@@ -327,10 +327,10 @@ class _AiVoiceConversationState extends State<AiVoiceConversation> {
               shape: BoxShape.circle,
               color: isRed
                   ? brandRed
-                  : (isActive ? navy.withOpacity(0.08) : Colors.white),
+                  : (isActive ? navy.withValues(alpha: 0.08) : Colors.white),
               border: isRed ? null : Border.all(color: Colors.grey.shade200),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)
+                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)
               ],
             ),
             child: Icon(icon, color: isRed ? Colors.white : navy),

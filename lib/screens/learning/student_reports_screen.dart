@@ -34,7 +34,7 @@ class StudentReportsScreen extends StatelessWidget {
   final List<SubjectPerformance> subjects;
 
   const StudentReportsScreen({
-    Key? key,
+    super.key,
     this.studentName = 'Arjun',
     this.overallScorePercent = 78,
     this.attendancePercent = 94,
@@ -73,7 +73,7 @@ class StudentReportsScreen extends StatelessWidget {
         trendUp: true,
       ),
     ],
-  }) : super(key: key);
+  });
 
   static const Color navy = Color(0xFF14213D);
   static const Color subtitleBlue = Color(0xFF4D86AD);

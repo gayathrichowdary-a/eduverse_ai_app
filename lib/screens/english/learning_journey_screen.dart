@@ -54,7 +54,7 @@ class LearningJourneyScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: lightPink.withOpacity(0.5),
+                color: lightPink.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Row(

@@ -492,7 +492,7 @@ class _PronunciationCoachScreenState
           border: Border.all(
             color: _isRecording
                 ? brandRed
-                : navy.withOpacity(0.15),
+                : navy.withValues(alpha: 0.15),
             width: 1.4,
           ),
         ),
@@ -608,7 +608,7 @@ class _PronunciationCoachScreenState
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: navy.withOpacity(0.10),
+          color: navy.withValues(alpha: 0.10),
           width: 1.2,
         ),
       ),
@@ -682,7 +682,7 @@ class _PronunciationCoachScreenState
         color: const Color(0xFFFFF7F7),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: brandRed.withOpacity(0.35),
+          color: brandRed.withValues(alpha: 0.35),
           width: 1.3,
         ),
       ),
@@ -762,7 +762,7 @@ class _PronunciationCoachScreenState
         color: insightBlue,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: lightBlue.withOpacity(0.35),
+          color: lightBlue.withValues(alpha: 0.35),
           width: 1.2,
         ),
       ),

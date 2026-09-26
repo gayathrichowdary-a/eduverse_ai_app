@@ -272,7 +272,7 @@ class _ProjectCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: project.status.color.withOpacity(0.18),
+                  color: project.status.color.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -540,7 +540,7 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                           return GestureDetector(
                             onTap: () => setState(() => _selectedLine = lineNo),
                             child: Container(
-                              color: isSelected ? Colors.white.withOpacity(0.10) : Colors.transparent,
+                              color: isSelected ? Colors.white.withValues(alpha: 0.10) : Colors.transparent,
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,7 +552,7 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                                       style: TextStyle(
                                         fontFamily: 'monospace',
                                         fontSize: 12,
-                                        color: Colors.white.withOpacity(0.4),
+                                        color: Colors.white.withValues(alpha: 0.4),
                                       ),
                                     ),
                                   ),

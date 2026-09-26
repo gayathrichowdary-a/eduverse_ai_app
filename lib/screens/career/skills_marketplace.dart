@@ -187,7 +187,7 @@ class _SkillsMarketplaceState extends State<SkillsMarketplace> {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: navy.withOpacity(0.08),
+                      color: navy.withValues(alpha: 0.08),
                       borderRadius:
                           BorderRadius.circular(16),
                     ),
@@ -533,7 +533,7 @@ class _SkillsMarketplaceState extends State<SkillsMarketplace> {
                     height: 48,
                     decoration: BoxDecoration(
                       color: Colors.white
-                          .withOpacity(0.12),
+                          .withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -838,7 +838,7 @@ class _SkillsMarketplaceState extends State<SkillsMarketplace> {
           boxShadow: [
             BoxShadow(
               color:
-                  Colors.black.withOpacity(0.03),
+                  Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset:
                   const Offset(0, 4),
@@ -859,7 +859,7 @@ class _SkillsMarketplaceState extends State<SkillsMarketplace> {
                   height: 52,
                   decoration: BoxDecoration(
                     color:
-                        navy.withOpacity(0.07),
+                        navy.withValues(alpha: 0.07),
                     borderRadius:
                         BorderRadius.circular(
                       15,

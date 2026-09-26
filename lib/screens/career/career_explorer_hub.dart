@@ -363,8 +363,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                                   selected,
                               selectedColor:
                                   brandRed
-                                      .withOpacity(
-                                0.15,
+                                      .withValues(
+                                alpha: 0.15,
                               ),
                               checkmarkColor:
                                   brandRed,
@@ -782,8 +782,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                             BoxDecoration(
                           color: Colors
                               .white
-                              .withOpacity(
-                            0.20,
+                              .withValues(
+                            alpha: 0.20,
                           ),
                           shape:
                               BoxShape
@@ -1062,8 +1062,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                         ),
                         backgroundColor:
                             brandRed
-                                .withOpacity(
-                          0.10,
+                                .withValues(
+                          alpha: 0.10,
                         ),
                         onDeleted: () {
                           setState(() {
@@ -1091,8 +1091,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                         ),
                         backgroundColor:
                             brandRed
-                                .withOpacity(
-                          0.10,
+                                .withValues(
+                          alpha: 0.10,
                         ),
                         onDeleted: () {
                           setState(() {
@@ -1117,8 +1117,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                         ),
                         backgroundColor:
                             brandRed
-                                .withOpacity(
-                          0.10,
+                                .withValues(
+                          alpha: 0.10,
                         ),
                         onDeleted: () {
                           setState(() {
@@ -1563,8 +1563,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
         border:
             Border.all(
           color:
-              navy.withOpacity(
-            0.10,
+              navy.withValues(
+            alpha: 0.10,
           ),
         ),
         boxShadow: const [
@@ -1661,8 +1661,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                     BoxDecoration(
                   color:
                       matchGreen
-                          .withOpacity(
-                    0.13,
+                          .withValues(
+                    alpha: 0.13,
                   ),
                   borderRadius:
                       BorderRadius
@@ -1841,8 +1841,8 @@ class _CareerExplorerHubState extends State<CareerExplorerHub> {
                 border:
                     Border.all(
                   color: navy
-                      .withOpacity(
-                    0.08,
+                      .withValues(
+                    alpha: 0.08,
                   ),
                 ),
               ),

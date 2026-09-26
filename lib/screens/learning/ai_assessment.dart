@@ -27,7 +27,7 @@ class AIAssessment extends StatefulWidget {
   final List<AssessmentQuestion> questions;
 
   const AIAssessment({
-    Key? key,
+    super.key,
     this.studentName = 'Arjun',
     this.questions = const [
       AssessmentQuestion(
@@ -66,7 +66,7 @@ class AIAssessment extends StatefulWidget {
         correctIndex: 0,
       ),
     ],
-  }) : super(key: key);
+  });
 
   @override
   State<AIAssessment> createState() => _AIAssessmentState();
@@ -178,7 +178,7 @@ class _AIAssessmentState extends State<AIAssessment> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: streakBlue.withOpacity(0.25),
+                  color: streakBlue.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -296,8 +296,8 @@ class _AIAssessmentState extends State<AIAssessment> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: (_selectedOption == _currentQuestion.correctIndex)
-                          ? mastGreen.withOpacity(0.12)
-                          : brandRed.withOpacity(0.08),
+                          ? mastGreen.withValues(alpha: 0.12)
+                          : brandRed.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(
@@ -515,17 +515,17 @@ class _OptionTile extends StatelessWidget {
         break;
       case _OptionState.selected:
         borderColor = brandRed;
-        bgColor = brandRed.withOpacity(0.06);
+        bgColor = brandRed.withValues(alpha: 0.06);
         break;
       case _OptionState.correct:
         borderColor = mastGreen;
-        bgColor = mastGreen.withOpacity(0.10);
+        bgColor = mastGreen.withValues(alpha: 0.10);
         trailingIcon = Icons.check_circle_rounded;
         trailingColor = mastGreen;
         break;
       case _OptionState.incorrect:
         borderColor = brandRed;
-        bgColor = brandRed.withOpacity(0.08);
+        bgColor = brandRed.withValues(alpha: 0.08);
         trailingIcon = Icons.cancel_rounded;
         trailingColor = brandRed;
         break;

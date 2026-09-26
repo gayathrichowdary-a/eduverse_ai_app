@@ -32,7 +32,7 @@ class CertificationScreen extends StatelessWidget {
   final List<CertificateItem> certificates;
 
   const CertificationScreen({
-    Key? key,
+    super.key,
     this.certificates = const [
       CertificateItem(
         title: 'Algebra Fundamentals',
@@ -67,7 +67,7 @@ class CertificationScreen extends StatelessWidget {
         progress: 0.3,
       ),
     ],
-  }) : super(key: key);
+  });
 
   static const Color navy = Color(0xFF14213D);
   static const Color subtitleBlue = Color(0xFF4D86AD);
@@ -210,7 +210,7 @@ class CertificationScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                 itemCount: certificates.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final cert = certificates[index];
                   return InkWell(
@@ -221,7 +221,7 @@ class CertificationScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: cert.earned ? Colors.white : trackGrey.withOpacity(0.4),
+                        color: cert.earned ? Colors.white : trackGrey.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: navy, width: 1.4),
                       ),
@@ -233,7 +233,7 @@ class CertificationScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: cert.earned
                                   ? cert.iconBackground
-                                  : cert.iconBackground.withOpacity(0.4),
+                                  : cert.iconBackground.withValues(alpha: 0.4),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(cert.icon, color: Colors.white, size: 24),

@@ -96,7 +96,7 @@ class TeacherAnalytics extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy.withOpacity(0.1)),
+          border: Border.all(color: navy.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

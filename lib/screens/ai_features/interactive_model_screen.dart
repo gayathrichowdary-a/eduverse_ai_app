@@ -291,7 +291,7 @@ class InteractiveModelScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: navy.withOpacity(0.1), width: 2),
+        border: Border.all(color: navy.withValues(alpha: 0.1), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'exam_coach_screen.dart';
 import '../settings/settings_profile.dart';
 import 'ai_explanation_screen.dart';   
 

@@ -293,7 +293,7 @@ class _InteractiveCanvasScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: brandRed,
                 disabledBackgroundColor:
-                    brandRed.withOpacity(0.6),
+                    brandRed.withValues(alpha: 0.6),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -581,7 +581,7 @@ class _InteractiveCanvasScreenState
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: navy.withOpacity(0.2),
+          color: navy.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),

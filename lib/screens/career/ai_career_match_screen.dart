@@ -136,9 +136,9 @@ class AiCareerMatchScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: navy.withOpacity(0.1)),
+        border: Border.all(color: navy.withValues(alpha: 0.1)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
         ]
       ),
       child: Column(
@@ -282,7 +282,7 @@ class _RefineMatchesSheetState extends State<_RefineMatchesSheet> {
               activeTrackColor: brandRed,
               inactiveTrackColor: Colors.grey.shade200,
               thumbColor: brandRed,
-              overlayColor: brandRed.withOpacity(0.2),
+              overlayColor: brandRed.withValues(alpha: 0.2),
               trackHeight: 3,
             ),
             child: Slider(

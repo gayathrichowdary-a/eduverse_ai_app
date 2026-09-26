@@ -46,7 +46,7 @@ class QuizScreen extends StatelessWidget {
   final List<QuizItem> quizzes;
 
   const QuizScreen({
-    Key? key,
+    super.key,
     this.quizzes = const [
       QuizItem(
         subject: 'Chemistry',
@@ -111,7 +111,7 @@ class QuizScreen extends StatelessWidget {
         ],
       ),
     ],
-  }) : super(key: key);
+  });
 
   static const Color navy = Color(0xFF14213D);
   static const Color subtitleBlue = Color(0xFF4D86AD);
@@ -150,7 +150,7 @@ class QuizScreen extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                 itemCount: quizzes.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final quiz = quizzes[index];
                   return InkWell(
@@ -347,7 +347,7 @@ class _QuizPlayScreenState extends State<_QuizPlayScreen> {
               Expanded(
                 child: ListView.separated(
                   itemCount: question.options.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final isSelected = _selectedOption == index;
                     final isCorrect = index == question.correctIndex;
@@ -358,10 +358,10 @@ class _QuizPlayScreenState extends State<_QuizPlayScreen> {
                     if (_selectedOption != null) {
                       if (isCorrect) {
                         borderColor = mastGreen;
-                        bg = mastGreen.withOpacity(0.1);
+                        bg = mastGreen.withValues(alpha: 0.1);
                       } else if (isSelected) {
                         borderColor = brandRed;
-                        bg = brandRed.withOpacity(0.08);
+                        bg = brandRed.withValues(alpha: 0.08);
                       }
                     }
 
@@ -437,7 +437,7 @@ class _QuizPlayScreenState extends State<_QuizPlayScreen> {
                 width: 110,
                 height: 110,
                 decoration: BoxDecoration(
-                  color: mastGreen.withOpacity(0.12),
+                  color: mastGreen.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                   border: Border.all(color: mastGreen, width: 2),
                 ),

@@ -38,7 +38,7 @@ class _EnglishLabDashboardState extends State<EnglishLabDashboard> {
   // CURRENT ENGLISH SKILL
   // ============================================================
 
-  String _currentFocus = 'Speaking Practice';
+  final String _currentFocus = 'Speaking Practice';
 
   // ============================================================
   // BUILD

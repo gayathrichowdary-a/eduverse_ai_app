@@ -49,7 +49,7 @@ class AssessmentSelection extends StatefulWidget {
   final String personalizedTestSubtitle;
 
   const AssessmentSelection({
-    Key? key,
+    super.key,
     this.completedCount = 12,
     this.avgScorePercent = 88,
     this.recommended = const [
@@ -84,7 +84,7 @@ class AssessmentSelection extends StatefulWidget {
     ],
     this.personalizedTestLabel = 'Personalized AI Test',
     this.personalizedTestSubtitle = 'Based on your weak topics in Algebra',
-  }) : super(key: key);
+  });
 
   @override
   State<AssessmentSelection> createState() => _AssessmentSelectionState();
@@ -375,7 +375,7 @@ class _AssessmentSelectionState extends State<AssessmentSelection> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.22),
+                                color: Colors.white.withValues(alpha: 0.22),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.auto_awesome,

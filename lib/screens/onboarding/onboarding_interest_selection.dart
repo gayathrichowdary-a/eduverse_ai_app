@@ -14,7 +14,7 @@ class InterestOption {
 }
 
 class OnboardingInterestSelection extends StatefulWidget {
-  const OnboardingInterestSelection({Key? key}) : super(key: key);
+  const OnboardingInterestSelection({super.key});
 
   @override
   State<OnboardingInterestSelection> createState() =>

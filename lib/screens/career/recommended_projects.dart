@@ -260,7 +260,7 @@ class _RecommendedProjectsState extends State<RecommendedProjects> {
                       width: 58,
                       height: 58,
                       decoration: BoxDecoration(
-                        color: navy.withOpacity(0.08),
+                        color: navy.withValues(alpha: 0.08),
                         borderRadius:
                             BorderRadius.circular(16),
                       ),
@@ -965,8 +965,8 @@ class _RecommendedProjectsState extends State<RecommendedProjects> {
           boxShadow: [
             BoxShadow(
               color:
-                  Colors.black.withOpacity(
-                0.035,
+                  Colors.black.withValues(
+                alpha: 0.035,
               ),
               blurRadius: 12,
               offset:
@@ -992,8 +992,8 @@ class _RecommendedProjectsState extends State<RecommendedProjects> {
                   decoration:
                       BoxDecoration(
                     color:
-                        navy.withOpacity(
-                      0.07,
+                        navy.withValues(
+                      alpha: 0.07,
                     ),
                     borderRadius:
                         BorderRadius.circular(

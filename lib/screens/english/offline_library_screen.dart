@@ -288,7 +288,7 @@ class _OfflineLibraryScreenState extends State<OfflineLibraryScreen> {
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? brandRed : brandRed.withOpacity(0.5),
+          color: isSelected ? brandRed : brandRed.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -336,7 +336,7 @@ class _OfflineLibraryScreenState extends State<OfflineLibraryScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? brandRed.withOpacity(0.05) : Colors.white,
+          color: isSelected ? brandRed.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(color: isSelected ? brandRed : navy, width: 2),
         ),
@@ -353,7 +353,7 @@ class _OfflineLibraryScreenState extends State<OfflineLibraryScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: item.iconColor.withOpacity(0.1),
+                color: item.iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(item.icon, color: item.iconColor, size: 28),

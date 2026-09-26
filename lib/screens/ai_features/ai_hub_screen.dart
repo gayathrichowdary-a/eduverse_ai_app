@@ -207,7 +207,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
                     "Sophia's ready to help",
                     style: TextStyle(
                       fontSize: 15,
-                      color: navy.withOpacity(0.65),
+                      color: navy.withValues(alpha: 0.65),
                     ),
                   ),
                 ],
@@ -238,7 +238,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -249,7 +249,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
         onSubmitted: _handleSearchSubmit,
         decoration: InputDecoration(
           hintText: 'Ask Sophia anything...',
-          hintStyle: TextStyle(color: navy.withOpacity(0.4)),
+          hintStyle: TextStyle(color: navy.withValues(alpha: 0.4)),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -360,7 +360,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: navy.withOpacity(0.55),
+                      color: navy.withValues(alpha: 0.55),
                       fontSize: 13,
                     ),
                   ),
@@ -434,7 +434,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(

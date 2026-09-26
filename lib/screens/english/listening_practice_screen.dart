@@ -370,7 +370,7 @@ class _ListeningPracticeScreenState extends State<ListeningPracticeScreen> {
         color: lightBlueBg,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: navy.withOpacity(0.08),
+          color: navy.withValues(alpha: 0.08),
         ),
       ),
       child: Column(
@@ -472,7 +472,7 @@ class _ListeningPracticeScreenState extends State<ListeningPracticeScreen> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: brandRed.withOpacity(0.15),
+            color: brandRed.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -680,7 +680,7 @@ class _ListeningPracticeScreenState extends State<ListeningPracticeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 12,
           ),
         ],
@@ -863,7 +863,7 @@ class _ListeningPracticeScreenState extends State<ListeningPracticeScreen> {
         color: const Color(0xFFFFF9E6),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: mustard.withOpacity(0.4),
+          color: mustard.withValues(alpha: 0.4),
         ),
       ),
       child: Column(

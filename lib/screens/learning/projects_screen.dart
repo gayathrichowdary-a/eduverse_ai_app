@@ -807,7 +807,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           boxShadow: [
             BoxShadow(
               color:
-                  Colors.black.withOpacity(0.04),
+                  Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -836,7 +836,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     color:
                         (project['iconColor']
                                 as Color)
-                            .withOpacity(0.12),
+                            .withValues(alpha: 0.12),
 
                     borderRadius:
                         BorderRadius.circular(16),

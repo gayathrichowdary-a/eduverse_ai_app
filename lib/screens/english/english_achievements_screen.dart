@@ -52,7 +52,7 @@ class _EnglishAchievementsScreenState extends State<EnglishAchievementsScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.15),
+                      color: Colors.amber.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.lightbulb_outline, color: Colors.amber, size: 22),
@@ -138,7 +138,7 @@ class _EnglishAchievementsScreenState extends State<EnglishAchievementsScreen> {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: navy.withOpacity(0.1)),
+                border: Border.all(color: navy.withValues(alpha: 0.1)),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
@@ -177,7 +177,7 @@ class _EnglishAchievementsScreenState extends State<EnglishAchievementsScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          color: isSelected ? brandRed.withOpacity(0.05) : Colors.transparent,
+          color: isSelected ? brandRed.withValues(alpha: 0.05) : Colors.transparent,
           border: Border.all(color: isSelected ? brandRed : Colors.transparent),
         ),
         child: Row(

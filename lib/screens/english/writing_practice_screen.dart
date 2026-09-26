@@ -57,7 +57,7 @@ class _WritingPracticeScreenState extends State<WritingPracticeScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: brandRed.withOpacity(0.1),
+                        color: brandRed.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -612,7 +612,7 @@ class _WritingPracticeScreenState extends State<WritingPracticeScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: navy.withOpacity(0.15),
+                color: navy.withValues(alpha: 0.15),
               ),
             ),
             child: Row(
@@ -757,7 +757,7 @@ class _WritingPracticeScreenState extends State<WritingPracticeScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25),
         border: Border.all(
-          color: navy.withOpacity(0.8),
+          color: navy.withValues(alpha: 0.8),
         ),
       ),
       child: const Column(
@@ -984,7 +984,7 @@ class _WritingPracticeScreenState extends State<WritingPracticeScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: brandRed,
             disabledBackgroundColor:
-                brandRed.withOpacity(0.6),
+                brandRed.withValues(alpha: 0.6),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),

@@ -46,11 +46,11 @@ class OnboardingDeviceAuthorization extends StatefulWidget {
   final String? course;
 
   const OnboardingDeviceAuthorization({
-    Key? key,
+    super.key,
     required this.skillLevel,
     this.branch,
     this.course,
-  }) : super(key: key);
+  });
 
   @override
   State<OnboardingDeviceAuthorization> createState() =>

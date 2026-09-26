@@ -316,7 +316,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          Divider(color: kRed.withOpacity(0.3), height: 1),
+          Divider(color: kRed.withValues(alpha: 0.3), height: 1),
           const SizedBox(height: 14),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -447,7 +447,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
               height: 56,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
               ),
               alignment: Alignment.center,
               child: const Icon(

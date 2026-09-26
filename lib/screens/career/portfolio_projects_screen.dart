@@ -85,7 +85,7 @@ class PortfolioProjectsScreen extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -122,7 +122,7 @@ class PortfolioProjectsScreen extends StatelessWidget {
                               height: 10,
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
@@ -144,7 +144,7 @@ class PortfolioProjectsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: const Icon(
@@ -170,7 +170,7 @@ class PortfolioProjectsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         border: isSelected ? null : Border.all(color: Colors.grey.shade100),
         boxShadow: isSelected ? null : [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5)
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 5)
         ],
       ),
       child: Row(

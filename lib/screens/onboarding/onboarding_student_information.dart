@@ -545,7 +545,7 @@ class _OnboardingStudentInformationState
         SizedBox(
           height: 80,
           child: DropdownButtonFormField<String>(
-            value: selectedGender,
+            initialValue: selectedGender,
             isExpanded: true,
             hint: const Text(
               'Gender',

@@ -53,7 +53,7 @@ class AiLearningHub extends StatefulWidget {
   final String careerInsightText;
 
   const AiLearningHub({
-    Key? key,
+    super.key,
     this.studentName = 'Arjun',
     this.points = 1250,
     this.tutorName = 'Aria: Your AI Tutor',
@@ -83,7 +83,7 @@ class AiLearningHub extends StatefulWidget {
     this.careerInsightLabel = 'Career Insight',
     this.careerInsightText =
         'Based on your Math scores, you might love Data Science!',
-  }) : super(key: key);
+  });
 
   @override
   State<AiLearningHub> createState() => _AiLearningHubState();
@@ -1138,7 +1138,7 @@ class _HubBottomNav extends StatelessWidget {
 
             final color = selected
                 ? brandRed
-                : navy.withOpacity(0.55);
+                : navy.withValues(alpha: 0.55);
 
             return InkWell(
               onTap: () => onTabTapped(item.tab),

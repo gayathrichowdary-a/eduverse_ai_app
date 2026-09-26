@@ -151,8 +151,8 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                             data: SliderTheme.of(context).copyWith(
                               activeTrackColor: navy,
                               thumbColor: navy,
-                              inactiveTrackColor: navy.withOpacity(.15),
-                              overlayColor: navy.withOpacity(.1),
+                              inactiveTrackColor: navy.withValues(alpha: .15),
+                              overlayColor: navy.withValues(alpha: .1),
                             ),
                             child: Slider(
                               value: _proctoringStrictness,
@@ -184,7 +184,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                         children: _authEntries.map((entry) {
                           return SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            activeColor: navy,
+                            activeThumbColor: navy,
                             title: Text(
                               entry.name,
                               style: const TextStyle(
@@ -211,7 +211,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownButtonFormField<String>(
-                            value: _aiVerbosity,
+                            initialValue: _aiVerbosity,
                             decoration: InputDecoration(
                               labelText: 'Response verbosity',
                               border: OutlineInputBorder(
@@ -236,7 +236,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                           ),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            activeColor: navy,
+                            activeThumbColor: navy,
                             title: const Text('Allow hints'),
                             value: _allowHints,
                             onChanged: (v) {
@@ -246,7 +246,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                           ),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            activeColor: navy,
+                            activeThumbColor: navy,
                             title: const Text('Allow step-by-step solutions'),
                             value: _allowStepByStep,
                             onChanged: (v) {
@@ -256,7 +256,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                           ),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            activeColor: navy,
+                            activeThumbColor: navy,
                             title: const Text('Restrict answers to syllabus scope'),
                             value: _restrictOffSyllabus,
                             onChanged: (v) {
@@ -316,9 +316,9 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: yellow.withOpacity(.18),
+                                color: yellow.withValues(alpha: .18),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: navy.withOpacity(.3)),
+                                border: Border.all(color: navy.withValues(alpha: .3)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +476,7 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );
@@ -504,7 +504,7 @@ class _SaveButton extends StatelessWidget {
         ),
         child: Icon(
           Icons.save_rounded,
-          color: enabled ? navy : navy.withOpacity(.3),
+          color: enabled ? navy : navy.withValues(alpha: .3),
           size: 20,
         ),
       ),

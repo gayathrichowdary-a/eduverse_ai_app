@@ -199,7 +199,7 @@ class _SettingTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: green,
+            activeThumbColor: green,
             activeTrackColor: navy,
           ),
         ],

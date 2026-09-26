@@ -300,7 +300,7 @@ class _MeetingCard extends StatelessWidget {
               if (meeting.isLive)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(color: _coral.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: _coral.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -449,7 +449,7 @@ class _LiveMeetingScreenState extends State<LiveMeetingScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             constraints: const BoxConstraints(maxWidth: 260),
                             decoration: BoxDecoration(
-                              color: m.sender.startsWith("You") ? _coral.withOpacity(0.12) : _bg,
+                              color: m.sender.startsWith("You") ? _coral.withValues(alpha: 0.12) : _bg,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -656,7 +656,7 @@ class _LiveMeetingScreenState extends State<LiveMeetingScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(color: _coral.withOpacity(0.25), borderRadius: BorderRadius.circular(20)),
+                    decoration: BoxDecoration(color: _coral.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(20)),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -723,7 +723,7 @@ class _LiveMeetingScreenState extends State<LiveMeetingScreen> {
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(color: _green.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: _green.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
                 child: const Row(
                   children: [
                     Icon(Icons.screen_share_rounded, color: _green, size: 16),
@@ -795,7 +795,7 @@ class _LiveMeetingScreenState extends State<LiveMeetingScreen> {
           Container(
             width: 46, height: 46,
             decoration: BoxDecoration(
-              color: active ? _yellow : Colors.white.withOpacity(0.08),
+              color: active ? _yellow : Colors.white.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: active ? _navy : Colors.white, size: 20),

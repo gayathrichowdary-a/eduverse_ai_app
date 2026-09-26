@@ -24,7 +24,7 @@ class BoardOption {
 }
 
 class OnboardingBoardSelection extends StatefulWidget {
-  const OnboardingBoardSelection({Key? key}) : super(key: key);
+  const OnboardingBoardSelection({super.key});
 
   @override
   State<OnboardingBoardSelection> createState() =>

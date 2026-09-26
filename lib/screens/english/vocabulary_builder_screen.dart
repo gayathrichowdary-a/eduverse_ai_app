@@ -147,7 +147,7 @@ class _VocabularyBuilderScreenState extends State<VocabularyBuilderScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: levelColor.withOpacity(0.15),
+                    color: levelColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -412,7 +412,7 @@ class _VocabularyBuilderScreenState extends State<VocabularyBuilderScreen> {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: brandRed.withOpacity(0.2),
+              color: brandRed.withValues(alpha: 0.2),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -474,7 +474,7 @@ class _VocabularyBuilderScreenState extends State<VocabularyBuilderScreen> {
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: levelColor.withOpacity(0.2),
+                color: levelColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

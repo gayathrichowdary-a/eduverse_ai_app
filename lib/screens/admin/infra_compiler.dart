@@ -74,7 +74,7 @@ class AdminCard extends StatelessWidget {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -97,7 +97,7 @@ class StatusPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -151,7 +151,7 @@ class _InfraCompilerScreenState extends State<InfraCompilerScreen> {
 
   InfraEnvironment _environment = InfraEnvironment.development;
   bool _obscureKey = true;
-  bool _isOnline = true;
+  final bool _isOnline = true;
   bool _saving = false;
 
   @override

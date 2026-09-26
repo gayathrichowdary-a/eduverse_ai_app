@@ -30,7 +30,7 @@ class AnnouncementsScreen extends StatefulWidget {
   final List<AnnouncementItem> announcements;
 
   const AnnouncementsScreen({
-    Key? key,
+    super.key,
     this.announcements = const [
       AnnouncementItem(
         title: 'Mid-term Exams Schedule Released',
@@ -63,7 +63,7 @@ class AnnouncementsScreen extends StatefulWidget {
         category: AnnouncementCategory.event,
       ),
     ],
-  }) : super(key: key);
+  });
 
   @override
   State<AnnouncementsScreen> createState() => _AnnouncementsScreenState();
@@ -129,7 +129,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: _categoryColor(item.category).withOpacity(0.15),
+                      color: _categoryColor(item.category).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: Text(
@@ -235,7 +235,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                 itemCount: widget.announcements.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final item = widget.announcements[index];
                   return InkWell(
