@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-// IMPORT ADDED
-import 'onboarding_interest_selection.dart'; 
+import 'onboarding_interest_selection.dart';
 
 class OnboardingLearningStyle extends StatefulWidget {
   const OnboardingLearningStyle({super.key});
@@ -10,81 +9,175 @@ class OnboardingLearningStyle extends StatefulWidget {
 }
 
 class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
-  final Color brandRed = const Color(0xFFE8394A);
-  final Color navy = const Color(0xFF14213D);
+  // Sir's Brand Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
-  // List of styles with icons and titles
   final List<Map<String, dynamic>> _styles = [
-    {'title': 'Watching', 'icon': Icons.play_circle_fill, 'sel': false},
-    {'title': 'Reading', 'icon': Icons.menu_book_rounded, 'sel': false},
-    {'title': 'Listening', 'icon': Icons.headphones, 'sel': false},
-    {'title': 'Writing', 'icon': Icons.edit_note_rounded, 'sel': false},
-    {'title': 'Hands-on', 'icon': Icons.science_rounded, 'sel': false},
-    {'title': 'Discussion', 'icon': Icons.forum_rounded, 'sel': false},
+    {'title': 'Watching', 'icon': Icons.play_circle_outline, 'sel': true},
+    {'title': 'Reading', 'icon': Icons.menu_book_outlined, 'sel': false},
+    {'title': 'Listening', 'icon': Icons.headphones_outlined, 'sel': false},
+    {'title': 'Writing', 'icon': Icons.edit_note_outlined, 'sel': false},
+    {'title': 'Hands-on', 'icon': Icons.science_outlined, 'sel': true},
+    {'title': 'Discussion', 'icon': Icons.forum_outlined, 'sel': false},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // BIG HEADER FOR STUDENTS
+                    // Title in Sir's exact typography
                     const Text(
-                      "How do you learn best?", 
-                      textAlign: TextAlign.center, 
+                      'How do you learn best?',
                       style: TextStyle(
-                        fontSize: 36, 
-                        fontWeight: FontWeight.w900, 
-                        color: Color(0xFF14213D)
-                      )
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: navy,
+                        letterSpacing: -0.3,
+                      ),
                     ),
-                    const SizedBox(height: 30),
-                    
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Choose the formats that make concepts click fastest for you.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: textMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Grid of Learning Styles
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, 
-                        mainAxisSpacing: 15, 
-                        crossAxisSpacing: 15,
-                        mainAxisExtent: 190, // HEIGHT INCREASED TO PREVENT TEXT SPLITTING
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        mainAxisExtent: 125,
                       ),
                       itemCount: _styles.length,
                       itemBuilder: (context, index) {
                         final item = _styles[index];
+                        final bool isSel = item['sel'] as bool;
                         return GestureDetector(
-                          onTap: () => setState(() => item['sel'] = !item['sel']),
-                          child: Container(
-                            padding: const EdgeInsets.all(15),
+                          onTap: () => setState(() => item['sel'] = !isSel),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: item['sel'] ? brandRed.withValues(alpha: 0.1) : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
+                              color: isSel ? const Color(0xFFFFF0F2) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: item['sel'] ? brandRed : Colors.grey.shade300, 
-                                width: 3
+                                color: isSel ? brandRed : cardBorder,
+                                width: isSel ? 2.0 : 1.0,
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isSel
+                                      ? brandRed.withOpacity(0.08)
+                                      : Colors.black.withOpacity(0.02),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            child: Stack(
                               children: [
-                                Icon(item['icon'], size: 50, color: brandRed),
-                                const SizedBox(height: 12),
-                                // FONT SIZE 24 - LARGE AND BOLD
-                                Text(
-                                  item['title'], 
-                                  textAlign: TextAlign.center, 
-                                  style: TextStyle(
-                                    fontSize: 24, 
-                                    fontWeight: FontWeight.bold, 
-                                    color: navy
-                                  )
+                                if (isSel)
+                                  const Align(
+                                    alignment: Alignment.topRight,
+                                    child: Icon(Icons.check_circle, color: brandRed, size: 18),
+                                  ),
+                                Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 44,
+                                        height: 44,
+                                        decoration: BoxDecoration(
+                                          color: isSel ? brandRed : const Color(0xFFF2F4F7),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Icon(
+                                          item['icon'] as IconData,
+                                          size: 22,
+                                          color: isSel ? Colors.white : navy,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        item['title'] as String,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: isSel ? brandRed : navy,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -97,19 +190,43 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
               ),
             ),
 
-            // NAVIGATION BUTTON
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: SizedBox(
+            // Bottom Continue Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF2F4F7), width: 1),
+                ),
+              ),
+              child: Container(
                 width: double.infinity,
-                height: 65,
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [brandRed, brandGradientEnd],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: brandRed.withOpacity(0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: brandRed, 
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   onPressed: () {
-                    // NAVIGATION ADDED HERE
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -121,15 +238,15 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Personalize my journey", 
+                        'Continue',
                         style: TextStyle(
-                          color: Colors.white, 
-                          fontSize: 20, 
-                          fontWeight: FontWeight.bold
-                        )
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      SizedBox(width: 10),
-                      Icon(Icons.arrow_forward, color: Colors.white),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, color: Colors.white, size: 18),
                     ],
                   ),
                 ),

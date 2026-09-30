@@ -10,346 +10,25 @@ class OnboardingDailyStudyTime extends StatefulWidget {
 }
 
 class _OnboardingDailyStudyTimeState extends State<OnboardingDailyStudyTime> {
-  // ================= COLORS =================
+  // Sir's Brand Design Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color tipBg = Color(0xFFEAF4FC);
-  static const Color tipText = Color(0xFF3B5877);
-
-  // Slider range in minutes: 15 -> 240 ("4h+")
   static const double _minMinutes = 15;
   static const double _maxMinutes = 240;
 
-  double _minutes = 150; // default 2h 30m, matches screenshot
+  double _minutes = 150; // default 2h 30m
 
   int get _hours => _minutes ~/ 60;
   int get _mins => (_minutes % 60).round();
 
-  /// Rough "days to mastery" estimate that scales with daily minutes,
-  /// purely cosmetic to match the screenshot's dynamic-feeling copy.
   int get _masteryDays {
     final days = (1800 / _minutes).round();
     return days.clamp(3, 60);
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // ================= EYEBROW =================
-
-              const Text(
-                'Daily Study Goal',
-                style: TextStyle(
-                  color: subtitleBlue,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // ================= TITLE =================
-
-              const Text(
-                'How much time can you\nstudy?',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: navy,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                  height: 1.25,
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // ================= ROBOT ILLUSTRATION =================
-
-              const _RobotIllustration(),
-
-              const SizedBox(height: 32),
-
-              // ================= CONSISTENCY TIP =================
-
-              Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(color: const Color(0xFFE9EDF0)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0F000000),
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.lightbulb, color: navy, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Consistency is better than intensity',
-                        style: TextStyle(
-                          color: subtitleBlue,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // ================= TARGET CARD =================
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x14000000),
-                      blurRadius: 20,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ---- Daily Target label ----
-                    const Center(
-                      child: Text(
-                        'Daily Target',
-                        style: TextStyle(
-                          color: subtitleBlue,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // ---- Big hrs/mins readout ----
-                    Center(
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '$_hours',
-                              style: const TextStyle(
-                                color: brandRed,
-                                fontSize: 44,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const TextSpan(
-                              text: ' hrs ',
-                              style: TextStyle(
-                                color: brandRed,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            TextSpan(
-                              text: '$_mins',
-                              style: const TextStyle(
-                                color: brandRed,
-                                fontSize: 44,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const TextSpan(
-                              text: ' mins',
-                              style: TextStyle(
-                                color: brandRed,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 26),
-
-                    // ---- Study Duration label ----
-                    const Text(
-                      'Study Duration',
-                      style: TextStyle(
-                        color: navy,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    // ---- Slider ----
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: brandRed,
-                        inactiveTrackColor: const Color(0xFFE2E8ED),
-                        thumbColor: Colors.white,
-                        overlayColor: brandRed.withValues(alpha: 0.15),
-                        trackHeight: 3,
-                        thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 14,
-                          elevation: 3,
-                        ),
-                      ),
-                      child: Slider(
-                        min: _minMinutes,
-                        max: _maxMinutes,
-                        value: _minutes.clamp(_minMinutes, _maxMinutes),
-                        onChanged: (value) {
-                          setState(() => _minutes = value);
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    // ---- Helper text ----
-                    const Text(
-                      'Adjust your daily commitment',
-                      style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 14,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // ---- Range labels ----
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '15m',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          '2h',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          '4h+',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // ---- Mastery estimate tip ----
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: tipBg,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.auto_awesome,
-                              color: navy, size: 20),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "At this pace, you'll master 'Quantum Physics' in $_masteryDays days.",
-                              style: const TextStyle(
-                                color: tipText,
-                                fontSize: 15,
-                                height: 1.35,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // ================= SET STUDY GOAL BUTTON =================
-
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _continue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: brandRed,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Set Study Goal',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Icon(Icons.arrow_forward, color: Colors.white, size: 20),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ============================================================
-  // CONTINUE
-  // ============================================================
 
   void _continue() {
     Navigator.push(
@@ -359,120 +38,399 @@ class _OnboardingDailyStudyTimeState extends State<OnboardingDailyStudyTime> {
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Eyebrow Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF0F2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'DAILY STUDY GOAL',
+                        style: TextStyle(
+                          color: brandRed,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Title
+                    const Text(
+                      'How much time can\nyou study daily?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: navy,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Robot Illustration (Compact)
+                    const _RobotIllustration(),
+                    const SizedBox(height: 16),
+
+                    // Consistency Tip Pill
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: cardBorder),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.lightbulb_outline, color: brandRed, size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            'Consistency is better than intensity',
+                            style: TextStyle(
+                              color: textMuted,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Target Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: cardBorder),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Center(
+                            child: Text(
+                              'Daily Target',
+                              style: TextStyle(
+                                color: textMuted,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+
+                          // Hours / Mins readout
+                          Center(
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '$_hours',
+                                    style: const TextStyle(
+                                      color: brandRed,
+                                      fontSize: 34,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const TextSpan(
+                                    text: ' hrs ',
+                                    style: TextStyle(
+                                      color: navy,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '$_mins',
+                                    style: const TextStyle(
+                                      color: brandRed,
+                                      fontSize: 34,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const TextSpan(
+                                    text: ' mins',
+                                    style: TextStyle(
+                                      color: navy,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Slider
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: brandRed,
+                              inactiveTrackColor: const Color(0xFFEAECF0),
+                              thumbColor: Colors.white,
+                              overlayColor: brandRed.withOpacity(0.12),
+                              trackHeight: 4,
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 12,
+                                elevation: 3,
+                              ),
+                            ),
+                            child: Slider(
+                              min: _minMinutes,
+                              max: _maxMinutes,
+                              value: _minutes.clamp(_minMinutes, _maxMinutes),
+                              onChanged: (value) {
+                                setState(() => _minutes = value);
+                              },
+                            ),
+                          ),
+
+                          // Range labels
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('15m', style: TextStyle(color: textMuted, fontSize: 12, fontWeight: FontWeight.w600)),
+                                Text('2h', style: TextStyle(color: textMuted, fontSize: 12, fontWeight: FontWeight.w600)),
+                                Text('4h+', style: TextStyle(color: textMuted, fontSize: 12, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Mastery estimate note
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF0F9FF),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFFB9E6FE)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.auto_awesome, color: Color(0xFF026AA2), size: 18),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    "At this pace, you'll complete your next master milestone in $_masteryDays days.",
+                                    style: const TextStyle(
+                                      color: Color(0xFF026AA2),
+                                      fontSize: 12,
+                                      height: 1.35,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Continue Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF2F4F7), width: 1),
+                ),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [brandRed, brandGradientEnd],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: brandRed.withOpacity(0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: _continue,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Set Study Goal',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-/// Robot avatar built entirely from widgets/shapes — no image asset
-/// required. Two soft overlapping gradient blobs sit behind a rounded
-/// icon "face" made of simple containers.
 class _RobotIllustration extends StatelessWidget {
   const _RobotIllustration();
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 260,
+    return Container(
+      width: 110,
+      height: 110,
+      decoration: const BoxDecoration(
+        color: Color(0xFFF4F5FC),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // ---- Peach blob (back, offset left) ----
-          Positioned(
-            left: 0,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFFDE3D8).withValues(alpha: 0.9),
-                    const Color(0xFFFDE3D8).withValues(alpha: 0.2),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-            ),
-          ),
-
-          // ---- Purple/blue blob (front, centered) ----
           Container(
-            width: 260,
-            height: 260,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFFC9CDF7),
+            width: 76,
+            height: 76,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF5B5FE0), Color(0xFF7C82F6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(22),
             ),
-          ),
-
-          // ---- Robot face ----
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // antenna
-              Container(
-                width: 3,
-                height: 18,
-                color: const Color(0xFF5B5FE0),
-              ),
-              // head
-              Container(
-                width: 120,
-                height: 100,
-                margin: const EdgeInsets.only(bottom: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6266E8),
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    Container(
-                      width: 20,
-                      height: 20,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // body
-              Container(
-                width: 150,
-                height: 130,
-                padding: const EdgeInsets.only(top: 14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6266E8),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    3,
-                    (i) => Container(
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: i == 0 ? 0.9 : 0.4),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
                   ),
                 ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 6,
+            child: Container(
+              width: 3,
+              height: 12,
+              decoration: BoxDecoration(
+                color: const Color(0xFF5B5FE0),
+                borderRadius: BorderRadius.circular(2),
               ),
-            ],
+            ),
           ),
         ],
       ),

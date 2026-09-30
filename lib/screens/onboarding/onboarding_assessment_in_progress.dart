@@ -1,19 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'onboarding_coding_test.dart';
-// ============================================================
-// MODEL
-// ============================================================
 
 class QuizQuestion {
   final String question;
   final List<String> options;
-
-  /// Index into [options] that is correct.
   final int correctAnswerIndex;
-
-  /// Sophia's (AI mentor) explanation shown after the student answers,
-  /// regardless of whether they got it right.
   final String explanation;
 
   const QuizQuestion({
@@ -24,26 +16,8 @@ class QuizQuestion {
   });
 }
 
-// ============================================================
-// ONBOARDING ASSESSMENT IN PROGRESS
-// ============================================================
-//
-// SCOPE CHANGE:
-// This screen used to hold a 45-question bank. It has been
-// shrunk to a fixed 3-question warm-up assessment. The coding
-// and conceptual-question stages that used to live inside this
-// flow are no longer handled here — they're their own screens
-// (onboarding_coding_test.dart / onboarding_conceptual_question.dart)
-// and are navigated to separately.
-// ============================================================
-
 class OnboardingAssessmentInProgress extends StatefulWidget {
-  /// Countdown duration for the whole assessment.
   final Duration initialTime;
-
-  /// Forwarded to OnboardingCodingTest, which requires a skillLevel.
-  /// Defaults to 'Standard' since callers built before the coding-test
-  /// stage existed don't pass one.
   final String skillLevel;
   final String? branch;
   final String? course;
@@ -61,32 +35,20 @@ class OnboardingAssessmentInProgress extends StatefulWidget {
       _OnboardingAssessmentInProgressState();
 }
 
-// ============================================================
-// STATE
-// ============================================================
-
 class _OnboardingAssessmentInProgressState
     extends State<OnboardingAssessmentInProgress> {
-  // ================= COLORS =================
-
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color mastGreen = Color(0xFF1F8A56);
-  static const Color trackGrey = Color(0xFFE9EDF0);
-  static const Color hintYellowBg = Color(0xFFFDECC8);
-  static const Color hintYellowIcon = Color(0xFFF4A100);
-  static const Color explanationBg = Color(0xFFE7E9FB);
-
-  // ============================================================
-  // FIXED 3-QUESTION BANK
-  // ============================================================
+  // Sir's Brand Design Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color mastGreen = Color(0xFF12B76A);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
   static const List<QuizQuestion> _questionBank = [
     QuizQuestion(
       question:
-          'Which of the following principles explains why a spinning ice '
-          'skater pulls their arms in to rotate faster?',
+          'Which principle explains why a spinning ice skater pulls their arms in to rotate faster?',
       options: [
         'Conservation of Linear Momentum',
         'Conservation of Angular Momentum',
@@ -95,56 +57,36 @@ class _OnboardingAssessmentInProgressState
       ],
       correctAnswerIndex: 1,
       explanation:
-          'Angular momentum stays constant when no outside force acts. '
-          'Pulling the arms in reduces the skater\'s radius, so their '
-          'rotation speed increases to balance it out.',
+          'Angular momentum stays constant when no net outside torque acts. Pulling the arms in reduces the skater\'s moment of inertia, so angular velocity increases.',
     ),
     QuizQuestion(
       question: 'What is the SI unit of electric current?',
       options: ['Volt', 'Ohm', 'Ampere', 'Watt'],
       correctAnswerIndex: 2,
       explanation:
-          'Current is measured in Amperes (A) — it tells us how much '
-          'charge flows past a point every second.',
+          'Current is measured in Amperes (A) — it measures the rate of charge flow past a given point.',
     ),
     QuizQuestion(
-      question: 'Which data structure uses FIFO (First In, First Out) order?',
+      question: 'Which data structure follows FIFO (First In, First Out) ordering?',
       options: ['Stack', 'Queue', 'Tree', 'Graph'],
       correctAnswerIndex: 1,
       explanation:
-          'A Queue adds items at the back and removes them from the '
-          'front, so the first item in is always the first one out.',
+          'A Queue adds elements at the tail and removes from the head, ensuring the earliest inserted element is dequeued first.',
     ),
   ];
 
-  // ============================================================
-  // STATE VARIABLES
-  // ============================================================
-
   int get _totalQuestions => _questionBank.length;
-
   int _currentIndex = 0;
-
   late List<int?> _selectedAnswers;
-
   late Timer _timer;
-
   late Duration _remaining;
-
-  // ============================================================
-  // INIT STATE
-  // ============================================================
 
   @override
   void initState() {
     super.initState();
-
     _currentIndex = 0;
-
     _selectedAnswers = List<int?>.filled(_totalQuestions, null);
-
     _remaining = widget.initialTime;
-
     _timer = Timer.periodic(const Duration(seconds: 1), _onTick);
   }
 
@@ -154,34 +96,21 @@ class _OnboardingAssessmentInProgressState
     super.dispose();
   }
 
-  // ============================================================
-  // TIMER
-  // ============================================================
-
   void _onTick(Timer timer) {
     if (_remaining.inSeconds <= 0) {
       timer.cancel();
       return;
     }
-
     setState(() {
       _remaining = _remaining - const Duration(seconds: 1);
     });
   }
 
-  // ============================================================
-  // CURRENT QUESTION
-  // ============================================================
-
   QuizQuestion get _currentQuestion => _questionBank[_currentIndex];
-
   bool get _hasAnswered => _selectedAnswers[_currentIndex] != null;
-
   bool get _isCorrect =>
       _selectedAnswers[_currentIndex] == _currentQuestion.correctAnswerIndex;
 
-  /// Running tally of correct answers across the 3-question bank, passed
-  /// on to OnboardingCodingTest as its starting cognitiveScore.
   int get _correctCount {
     var count = 0;
     for (var i = 0; i < _questionBank.length; i++) {
@@ -192,15 +121,7 @@ class _OnboardingAssessmentInProgressState
     return count;
   }
 
-  // ============================================================
-  // PROGRESS
-  // ============================================================
-
   double get _progress => (_currentIndex + 1) / _totalQuestions;
-
-  // ============================================================
-  // FORMATTED TIME
-  // ============================================================
 
   String get _formattedTime {
     final minutes =
@@ -210,38 +131,21 @@ class _OnboardingAssessmentInProgressState
     return '$minutes:$seconds';
   }
 
-  // ============================================================
-  // SELECT ANSWER
-  // ============================================================
-
   void _selectOption(int optionIndex) {
-    // Lock the answer in once chosen for this question — selecting
-    // reveals Sophia's explanation, so re-tapping shouldn't change it.
     if (_hasAnswered) return;
-
     setState(() {
       _selectedAnswers[_currentIndex] = optionIndex;
     });
   }
 
-  // ============================================================
-  // PREVIOUS QUESTION
-  // ============================================================
-
   void _goToPrevious() {
     if (_currentIndex == 0) return;
-
     setState(() {
       _currentIndex -= 1;
     });
   }
 
-  // ============================================================
-  // NEXT QUESTION
-  // ============================================================
-
   void _goToNext() {
-    // On the last question, hand off to the coding-test stage.
     if (_currentIndex >= _totalQuestions - 1) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -255,83 +159,72 @@ class _OnboardingAssessmentInProgressState
       );
       return;
     }
-
     setState(() {
       _currentIndex += 1;
     });
   }
 
-  // ============================================================
-  // HINT
-  // ============================================================
-
   void _showHint() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Hint feature will be available soon.'),
+        content: Text('Sophia AI Hint: Focus on rotational motion & physics conservation principles!'),
+        backgroundColor: navy,
       ),
     );
   }
-
-  // ============================================================
-  // BUILD
-  // ============================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: navy, size: 22),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        centerTitle: true,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF0F2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.timer_outlined, color: brandRed, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                _formattedTime,
+                style: const TextStyle(
+                  color: brandRed,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.outlined_flag_rounded, color: textMuted, size: 20),
+            onPressed: () {},
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= TOP BAR =================
-
-                    Row(
-                      children: [
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () => Navigator.of(context).maybePop(),
-                          icon: const Icon(Icons.close, color: navy, size: 26),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              _formattedTime,
-                              style: const TextStyle(
-                                color: brandRed,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () {
-                            // Flag question feature.
-                          },
-                          icon: const Icon(
-                            Icons.outlined_flag_rounded,
-                            color: subtitleBlue,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ================= QUESTION NUMBER =================
-
+                    // Question Counter & Progress
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -339,56 +232,46 @@ class _OnboardingAssessmentInProgressState
                           'Question ${_currentIndex + 1} of $_totalQuestions',
                           style: const TextStyle(
                             color: navy,
-                            fontSize: 17,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
-                          '${(_progress * 100).round()}%',
+                          '${(_progress * 100).round()}% Completed',
                           style: const TextStyle(
-                            color: subtitleBlue,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
+                            color: textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-
-                    const SizedBox(height: 10),
-
-                    // ================= PROGRESS BAR =================
+                    const SizedBox(height: 8),
 
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(6),
                       child: LinearProgressIndicator(
                         value: _progress,
-                        minHeight: 6,
-                        backgroundColor: trackGrey,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(brandRed),
+                        minHeight: 5,
+                        backgroundColor: const Color(0xFFF2F4F7),
+                        valueColor: const AlwaysStoppedAnimation<Color>(brandRed),
                       ),
                     ),
-
                     const SizedBox(height: 20),
 
-                    const Divider(color: trackGrey, height: 1),
-
-                    const SizedBox(height: 28),
-
-                    // ================= QUESTION CARD =================
-
+                    // Question Card
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: trackGrey, width: 1.4),
-                        boxShadow: const [
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: cardBorder),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x14000000),
-                            blurRadius: 12,
-                            offset: Offset(0, 6),
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -396,24 +279,22 @@ class _OnboardingAssessmentInProgressState
                         _currentQuestion.question,
                         style: const TextStyle(
                           color: navy,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          height: 1.3,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          height: 1.35,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 18),
 
-                    const SizedBox(height: 24),
-
-                    // ================= OPTIONS =================
-
+                    // Option Cards
                     ...List.generate(_currentQuestion.options.length, (i) {
                       final selected = _selectedAnswers[_currentIndex] == i;
                       final isCorrectOption =
                           i == _currentQuestion.correctAnswerIndex;
 
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.only(bottom: 10),
                         child: _OptionTile(
                           label: _currentQuestion.options[i],
                           selected: selected,
@@ -424,15 +305,18 @@ class _OnboardingAssessmentInProgressState
                       );
                     }),
 
-                    // ================= SOPHIA'S EXPLANATION =================
-
-                    if (_hasAnswered)
+                    // Sophia's Explanation Card
+                    if (_hasAnswered) ...[
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: explanationBg,
-                          borderRadius: BorderRadius.circular(16),
+                          color: _isCorrect ? const Color(0xFFF6FEF9) : const Color(0xFFFFF0F2),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: _isCorrect ? const Color(0xFFB4F3D0) : const Color(0xFFFECDCA),
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,9 +329,7 @@ class _OnboardingAssessmentInProgressState
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                _isCorrect
-                                    ? Icons.check
-                                    : Icons.close_rounded,
+                                _isCorrect ? Icons.check : Icons.close_rounded,
                                 color: Colors.white,
                                 size: 16,
                               ),
@@ -455,16 +337,13 @@ class _OnboardingAssessmentInProgressState
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _isCorrect
-                                        ? 'Correct! — Sophia'
-                                        : "Not quite — Sophia",
-                                    style: const TextStyle(
-                                      color: navy,
-                                      fontSize: 14,
+                                    _isCorrect ? 'Correct! — Sophia AI' : "Sophia's Explanation",
+                                    style: TextStyle(
+                                      color: _isCorrect ? const Color(0xFF027A48) : brandRed,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -472,10 +351,9 @@ class _OnboardingAssessmentInProgressState
                                   Text(
                                     _currentQuestion.explanation,
                                     style: const TextStyle(
-                                      color: subtitleBlue,
-                                      fontSize: 14,
+                                      color: Color(0xFF344054),
+                                      fontSize: 12,
                                       height: 1.35,
-                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
@@ -484,106 +362,121 @@ class _OnboardingAssessmentInProgressState
                           ],
                         ),
                       ),
+                    ],
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
 
-            // ================= BOTTOM SECTION =================
-
+            // Bottom Navigation Row
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: trackGrey, width: 1)),
+                border: Border(top: BorderSide(color: Color(0xFFF2F4F7), width: 1)),
               ),
               child: Row(
                 children: [
                   GestureDetector(
                     onTap: _showHint,
                     child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: const BoxDecoration(
-                        color: hintYellowBg,
-                        shape: BoxShape.circle,
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF9E6),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFFDECC8)),
                       ),
                       child: const Icon(
-                        Icons.lightbulb,
-                        color: hintYellowIcon,
-                        size: 26,
+                        Icons.lightbulb_outline,
+                        color: Color(0xFFF4A100),
+                        size: 22,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 4,
-                    child: SizedBox(
-                      height: 56,
-                      child: OutlinedButton(
-                        onPressed: _currentIndex == 0 ? null : _goToPrevious,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          side: const BorderSide(color: navy, width: 1.4),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                  const SizedBox(width: 10),
+
+                  if (_currentIndex > 0) ...[
+                    Expanded(
+                      flex: 4,
+                      child: SizedBox(
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: _goToPrevious,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: cardBorder),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'Previous',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                          child: const Text(
+                            'Previous',
+                            style: TextStyle(
+                              color: navy,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
+                    const SizedBox(width: 10),
+                  ],
+
                   Expanded(
-                    flex: 5,
-                    child: SizedBox(
-                      height: 56,
+                    flex: 6,
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        gradient: _hasAnswered
+                            ? const LinearGradient(
+                                colors: [brandRed, brandGradientEnd],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              )
+                            : null,
+                        color: _hasAnswered ? null : const Color(0xFFF2F4F7),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: _hasAnswered
+                            ? [
+                                BoxShadow(
+                                  color: brandRed.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ]
+                            : null,
+                      ),
                       child: ElevatedButton(
-                        // Require an answer before moving on, since the
-                        // explanation is part of the learning loop.
                         onPressed: _hasAnswered ? _goToNext : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: brandRed,
-                          disabledBackgroundColor: trackGrey,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          backgroundColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _currentIndex >= _totalQuestions - 1
-                                    ? 'Continue'
-                                    : 'Next Question',
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _currentIndex >= _totalQuestions - 1 ? 'Continue' : 'Next Question',
+                              style: TextStyle(
+                                color: _hasAnswered ? Colors.white : const Color(0xFF98A2B3),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
                               ),
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.arrow_forward_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: _hasAnswered ? Colors.white : const Color(0xFF98A2B3),
+                              size: 16,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -598,16 +491,9 @@ class _OnboardingAssessmentInProgressState
   }
 }
 
-// ============================================================
-// OPTION TILE
-// ============================================================
-
 class _OptionTile extends StatelessWidget {
   final String label;
   final bool selected;
-
-  /// True once the student has answered this question — used to
-  /// reveal correct/incorrect styling on all options.
   final bool revealed;
   final bool isCorrectOption;
   final VoidCallback onTap;
@@ -620,74 +506,98 @@ class _OptionTile extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color navy = Color(0xFF14213D);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color mastGreen = Color(0xFF1F8A56);
-  static const Color unselectedGrey = Color(0xFFC9D2D8);
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color mastGreen = Color(0xFF12B76A);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
-  Color get _indicatorColor {
-    if (!revealed) return selected ? brandRed : Colors.white;
-    if (isCorrectOption) return mastGreen;
-    if (selected) return brandRed;
+  Color get _bgColor {
+    if (!revealed) return selected ? const Color(0xFFFFF0F2) : Colors.white;
+    if (isCorrectOption) return const Color(0xFFF6FEF9);
+    if (selected) return const Color(0xFFFFF0F2);
     return Colors.white;
   }
 
   Color get _borderColor {
-    if (!revealed) return selected ? brandRed : unselectedGrey;
+    if (!revealed) return selected ? brandRed : cardBorder;
     if (isCorrectOption) return mastGreen;
     if (selected) return brandRed;
-    return unselectedGrey;
-  }
-
-  IconData? get _icon {
-    if (!revealed) return selected ? Icons.circle : null;
-    if (isCorrectOption) return Icons.check;
-    if (selected) return Icons.close_rounded;
-    return null;
+    return cardBorder;
   }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      // Lock answers once revealed — tapping does nothing after that.
+    return GestureDetector(
       onTap: revealed ? null : onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _indicatorColor,
-              border: Border.all(color: _borderColor, width: 2),
-            ),
-            child: _icon == null
-                ? null
-                : Center(
-                    child: Icon(
-                      _icon,
-                      color: (!revealed) ? Colors.white : Colors.white,
-                      size: _icon == Icons.circle ? 8 : 14,
-                    ),
-                  ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: _bgColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: _borderColor,
+            width: selected || (revealed && isCorrectOption) ? 1.8 : 1.0,
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: navy,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                decoration: revealed && !isCorrectOption && selected
-                    ? TextDecoration.none
-                    : TextDecoration.none,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: revealed && isCorrectOption
+                    ? mastGreen
+                    : (selected ? brandRed : Colors.transparent),
+                border: Border.all(
+                  color: revealed && isCorrectOption
+                      ? mastGreen
+                      : (selected ? brandRed : cardBorder),
+                  width: 2,
+                ),
+              ),
+              child: revealed && isCorrectOption
+                  ? const Icon(Icons.check, color: Colors.white, size: 14)
+                  : (selected && revealed && !isCorrectOption
+                      ? const Icon(Icons.close, color: Colors.white, size: 14)
+                      : (selected
+                          ? Center(
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : null)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: revealed && isCorrectOption
+                      ? const Color(0xFF027A48)
+                      : (selected && revealed && !isCorrectOption
+                          ? brandRed
+                          : (selected ? brandRed : navy)),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

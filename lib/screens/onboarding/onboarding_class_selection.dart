@@ -9,15 +9,14 @@ class OnboardingClassSelection extends StatefulWidget {
       _OnboardingClassSelectionState();
 }
 
-class _OnboardingClassSelectionState
-    extends State<OnboardingClassSelection> {
-  // ================= COLORS =================
-
+class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
+  // Sir's Brand Design Colors
   static const Color navy = Color(0xFF1D3B64);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color brandRed = Color(0xFFEF3340);
-
-  // ================= SELECTED CLASS =================
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color sectionHeaderColor = Color(0xFF344054);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
   String? selectedClass;
 
@@ -25,91 +24,84 @@ class _OnboardingClassSelectionState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: const Color(0xFFEAECF0)),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            // =====================================================
-            // SCROLLABLE CONTENT
-            // =====================================================
-
+            // ================= SCROLLABLE CONTENT =================
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-
-                padding: const EdgeInsets.fromLTRB(
-                  46,
-                  28,
-                  46,
-                  30,
-                ),
-
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
-                    // ================= BACK BUTTON =================
-
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: navy,
-                        size: 42,
-                      ),
-                    ),
-
-                    const SizedBox(height: 55),
-
-                    // ================= TITLE =================
-
+                    // Title in Sir's exact typography
                     const Text(
                       'Which class are you\nstudying?',
-
                       style: TextStyle(
                         color: navy,
-                        fontSize: 42,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
                         height: 1.25,
                       ),
                     ),
+                    const SizedBox(height: 8),
 
-                    const SizedBox(height: 20),
-
-                    // ================= SUBTITLE =================
-
+                    // Subtitle
                     const Text(
-                      'Personalizing your AI mentors based on your current\nacademic stage.',
-
+                      'Personalizing your AI mentors based on your current academic stage.',
                       style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 24,
-                        height: 1.8,
+                        color: textMuted,
+                        fontSize: 14,
+                        height: 1.4,
                       ),
                     ),
+                    const SizedBox(height: 24),
 
-                    const SizedBox(height: 38),
-
-                    // ================= FOUNDATIONAL =================
-
+                    // Foundational
                     const Text(
                       'Foundational',
-
                       style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 25,
-                        fontWeight: FontWeight.w600,
+                        color: sectionHeaderColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-
-                    const SizedBox(height: 25),
-
+                    const SizedBox(height: 12),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         Expanded(
                           child: _classCard(
@@ -118,9 +110,7 @@ class _OnboardingClassSelectionState
                             value: 'Primary',
                           ),
                         ),
-
-                        const SizedBox(width: 30),
-
+                        const SizedBox(width: 12),
                         Expanded(
                           child: _classCard(
                             title: 'Middle School',
@@ -130,26 +120,19 @@ class _OnboardingClassSelectionState
                         ),
                       ],
                     ),
+                    const SizedBox(height: 22),
 
-                    const SizedBox(height: 45),
-
-                    // ================= SCHOOLING =================
-
+                    // Schooling
                     const Text(
                       'Schooling',
-
                       style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 25,
-                        fontWeight: FontWeight.w600,
+                        color: sectionHeaderColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-
-                    const SizedBox(height: 25),
-
+                    const SizedBox(height: 12),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         Expanded(
                           child: _classCard(
@@ -158,9 +141,7 @@ class _OnboardingClassSelectionState
                             value: 'High School',
                           ),
                         ),
-
-                        const SizedBox(width: 30),
-
+                        const SizedBox(width: 10),
                         Expanded(
                           child: _classCard(
                             title: 'Intermediate',
@@ -168,9 +149,7 @@ class _OnboardingClassSelectionState
                             value: 'Intermediate',
                           ),
                         ),
-
-                        const SizedBox(width: 30),
-
+                        const SizedBox(width: 10),
                         Expanded(
                           child: _classCard(
                             title: 'Other',
@@ -180,26 +159,19 @@ class _OnboardingClassSelectionState
                         ),
                       ],
                     ),
+                    const SizedBox(height: 22),
 
-                    const SizedBox(height: 45),
-
-                    // ================= HIGHER EDUCATION =================
-
+                    // Higher Education
                     const Text(
                       'Higher Education',
-
                       style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 25,
-                        fontWeight: FontWeight.w600,
+                        color: sectionHeaderColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-
-                    const SizedBox(height: 25),
-
+                    const SizedBox(height: 12),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         Expanded(
                           child: _classCard(
@@ -208,114 +180,107 @@ class _OnboardingClassSelectionState
                             value: 'College',
                           ),
                         ),
-
-                        const SizedBox(width: 30),
-
+                        const SizedBox(width: 12),
                         Expanded(
                           child: _classCard(
                             title: 'Postgraduate',
-                            subtitle: 'Master’s degree',
+                            subtitle: "Master's degree",
                             value: 'Postgraduate',
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
 
-            // =====================================================
-            // BOTTOM SECTION
-            // =====================================================
-
+            // ================= BOTTOM SECTION =================
             Container(
               width: double.infinity,
-
-              padding: const EdgeInsets.fromLTRB(
-                46,
-                20,
-                46,
-                28,
-              ),
-
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
-
                 border: Border(
                   top: BorderSide(
-                    color: Color(0xFFE9EDF0),
+                    color: Color(0xFFF2F4F7),
                     width: 1,
                   ),
                 ),
               ),
-
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ================= CONTINUE BUTTON =================
-
-                  SizedBox(
+                  // Sir's Sleek Continue Button
+                  Container(
                     width: double.infinity,
-                    height: 92,
-
-                    child: ElevatedButton(
-                      onPressed: selectedClass == null
+                    height: 52,
+                    decoration: BoxDecoration(
+                      gradient: selectedClass == null
                           ? null
-                          : _continue,
-
+                          : const LinearGradient(
+                              colors: [brandRed, brandGradientEnd],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                      color: selectedClass == null ? const Color(0xFFF2F4F7) : null,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: selectedClass != null
+                          ? [
+                              BoxShadow(
+                                color: brandRed.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: selectedClass == null ? null : _continue,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: brandRed,
-
-                        disabledBackgroundColor:
-                            const Color(0xFFF3A1A7),
-
-                        elevation: 0,
-
+                        backgroundColor: Colors.transparent,
+                        disabledBackgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-
-                      child: const Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
-
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             'Continue',
-
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
+                              color: selectedClass == null
+                                  ? const Color(0xFF98A2B3)
+                                  : Colors.white,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-
-                          SizedBox(width: 18),
-
+                          const SizedBox(width: 8),
                           Icon(
                             Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 30,
+                            color: selectedClass == null
+                                ? const Color(0xFF98A2B3)
+                                : Colors.white,
+                            size: 18,
                           ),
                         ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
 
-                  const SizedBox(height: 28),
-
-                  // ================= SETTINGS TEXT =================
-
+                  // Settings Text
                   const Text(
                     'You can change this anytime in settings',
-
                     textAlign: TextAlign.center,
-
                     style: TextStyle(
-                      color: navy,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      color: textMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -327,10 +292,7 @@ class _OnboardingClassSelectionState
     );
   }
 
-  // ============================================================
-  // CLASS CARD
-  // ============================================================
-
+  // ================= CLASS CARD =================
   Widget _classCard({
     required String title,
     required String subtitle,
@@ -344,101 +306,64 @@ class _OnboardingClassSelectionState
           selectedClass = value;
         });
       },
-
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-
-        height: 190,
-
-        padding: const EdgeInsets.all(16),
-
+        duration: const Duration(milliseconds: 180),
+        height: 135,
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFFFFF1F2)
-              : Colors.white,
-
-          borderRadius: BorderRadius.circular(20),
-
+          color: isSelected ? const Color(0xFFFFF0F2) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected
-                ? brandRed
-                : const Color(0xFFE1E6EA),
-
-            width: isSelected ? 2.5 : 1.5,
+            color: isSelected ? brandRed : cardBorder,
+            width: isSelected ? 2.0 : 1.0,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? brandRed.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
-            // ================= CARD ICON =================
-
             Container(
-              width: 52,
-              height: 52,
-
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? brandRed
-                    : const Color(0xFFF1F5F7),
-
-                borderRadius: BorderRadius.circular(14),
+                color: isSelected ? brandRed : const Color(0xFFF2F4F7),
+                borderRadius: BorderRadius.circular(10),
               ),
-
               child: Icon(
                 Icons.school_outlined,
-
-                color: isSelected
-                    ? Colors.white
-                    : navy,
-
-                size: 28,
+                color: isSelected ? Colors.white : navy,
+                size: 20,
               ),
             ),
-
             const Spacer(),
-
-            // ================= TITLE =================
-
-            SizedBox(
-              width: double.infinity,
-
-              child: Text(
-                title,
-
-                maxLines: 2,
-
-                overflow: TextOverflow.ellipsis,
-
-                style: const TextStyle(
-                  color: navy,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                ),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isSelected ? brandRed : navy,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
               ),
             ),
-
-            const SizedBox(height: 5),
-
-            // ================= SUBTITLE =================
-
-            SizedBox(
-              width: double.infinity,
-
-              child: Text(
-                subtitle,
-
-                maxLines: 2,
-
-                overflow: TextOverflow.ellipsis,
-
-                style: const TextStyle(
-                  color: subtitleBlue,
-                  fontSize: 14,
-                  height: 1.2,
-                ),
+            const SizedBox(height: 3),
+            Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ],
@@ -447,13 +372,8 @@ class _OnboardingClassSelectionState
     );
   }
 
-  // ============================================================
-  // CONTINUE
-  // ============================================================
-
   void _continue() {
     FocusScope.of(context).unfocus();
-
     Navigator.push(
       context,
       MaterialPageRoute(

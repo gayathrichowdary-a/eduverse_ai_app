@@ -9,19 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../learning/student_dashboard.dart';
-// ============================================================
-// MODELS
-// ============================================================
 
-/// Score-tier roadmap unlocked by the assessment result.
-///
-/// Per the spec: "If you score less than 50 mark then you are eligible
-/// for beginner level roadmap and if you score more than 50 then you
-/// are eligible for intermediate level and if you are scoring more than
-/// 80 mark then you are eligible for advance roadmap."
-///
-/// Boundaries as implemented: <50% -> beginner, 50-80% inclusive ->
-/// intermediate, >80% -> advanced.
 enum RoadmapTier { beginner, intermediate, advanced }
 
 extension RoadmapTierX on RoadmapTier {
@@ -73,20 +61,16 @@ class NextStepItem {
   });
 }
 
-// ============================================================
-// SCREEN
-// ============================================================
-
 class AssessmentComplete extends StatelessWidget {
   final String studentName;
-  final String subjectLabel; // e.g. "Mathematics"
-  final String unitLabel; // e.g. "Real Numbers"
+  final String subjectLabel;
+  final String unitLabel;
   final int score;
   final int totalScore;
   final int accuracyPercent;
-  final String accuracyTrendLabel; // e.g. "+5%"
-  final String timeTaken; // e.g. "14m 20s"
-  final String timeTrendLabel; // e.g. "avg"
+  final String accuracyTrendLabel;
+  final String timeTaken;
+  final String timeTrendLabel;
   final int masteryPercent;
   final List<String> conceptsMastered;
   final List<String> needsReview;
@@ -98,9 +82,6 @@ class AssessmentComplete extends StatelessWidget {
   final VoidCallback? onReviewDetailedAnswers;
   final VoidCallback? onContinue;
 
-  // Key used to capture the hero + stats + mastery section as an image
-  // for sharing. NOT const-constructible, which is why the constructor
-  // below can no longer be const.
   final GlobalKey _shareCardKey = GlobalKey();
 
   AssessmentComplete({
@@ -122,8 +103,7 @@ class AssessmentComplete extends StatelessWidget {
       iconBackground: Color(0xFFF4A100),
       title: 'Conceptual Gap Found',
       description:
-          "You consistently struggle with contradiction proofs for "
-          "irrationality. Let's practice the logic.",
+          "You consistently struggle with contradiction proofs for irrationality. Let's practice the logic.",
     ),
     this.misconceptionLabel = 'Common Misconception Detected',
     this.commonMistakeText = 'Assumed √p is rational implies p is even',
@@ -131,13 +111,13 @@ class AssessmentComplete extends StatelessWidget {
     this.nextSteps = const [
       NextStepItem(
         icon: Icons.replay_rounded,
-        iconBackground: Color(0xFFE8394A),
+        iconBackground: Color(0xFFEF3340),
         title: 'Review Errors',
         duration: '5 mins',
       ),
       NextStepItem(
         icon: Icons.play_arrow_rounded,
-        iconBackground: Color(0xFF33B679),
+        iconBackground: Color(0xFF12B76A),
         title: 'Next Lesson',
         duration: '12 mins',
       ),
@@ -146,17 +126,14 @@ class AssessmentComplete extends StatelessWidget {
     this.onContinue,
   });
 
-  // ================= COLORS =================
-
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color mastGreen = Color(0xFF33B679);
-  static const Color trackGrey = Color(0xFFE9EDF0);
-  static const Color panelGrey = Color(0xFFF5F7F8);
-  static const Color tierGold = Color(0xFFF4A100);
-
-  // ================= SCORE-TIER ROUTING =================
+  // Sir's Brand Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color mastGreen = Color(0xFF12B76A);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
+  static const Color tierGold = Color(0xFFF79009);
 
   int get scorePercent =>
       totalScore == 0 ? 0 : ((score / totalScore) * 100).round();
@@ -168,7 +145,7 @@ class AssessmentComplete extends StatelessWidget {
       case RoadmapTier.beginner:
         return mastGreen;
       case RoadmapTier.intermediate:
-        return const Color(0xFF5B5FE0);
+        return const Color(0xFF0086C9);
       case RoadmapTier.advanced:
         return tierGold;
     }
@@ -185,36 +162,18 @@ class AssessmentComplete extends StatelessWidget {
     }
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature — hook this up to your next screen.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // ================= SHARE LOGIC =================
-
   Future<void> _shareResult(BuildContext context) async {
     try {
       final boundary = _shareCardKey.currentContext?.findRenderObject()
           as RenderRepaintBoundary?;
-
-      if (boundary == null) {
-        throw Exception('Share card not ready yet');
-      }
+      if (boundary == null) throw Exception('Share card not ready yet');
 
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
-
-      if (byteData == null) {
-        throw Exception('Could not encode image');
-      }
+      if (byteData == null) throw Exception('Could not encode image');
 
       final Uint8List pngBytes = byteData.buffer.asUint8List();
-
       final tempDir = await getTemporaryDirectory();
       final file = await File('${tempDir.path}/assessment_result.png')
           .writeAsBytes(pngBytes);
@@ -227,14 +186,6 @@ class AssessmentComplete extends StatelessWidget {
       );
     } catch (e) {
       debugPrint('Share failed: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not share result. Please try again.'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
     }
   }
 
@@ -242,71 +193,52 @@ class AssessmentComplete extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: navy, size: 22),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ================= TOP BAR =================
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.close, color: navy, size: 26),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Assessment Complete',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$subjectLabel • $unitLabel',
-                          style: const TextStyle(
-                            color: subtitleBlue,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () => _shareResult(context),
-                    icon: const Icon(Icons.share_rounded,
-                        color: subtitleBlue, size: 22),
-                  ),
-                ],
+            const Text(
+              'Assessment Complete',
+              style: TextStyle(
+                color: navy,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
               ),
             ),
-
-            const Divider(color: trackGrey, height: 1),
-
+            Text(
+              '$subjectLabel • $unitLabel',
+              style: const TextStyle(
+                color: textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined, color: textMuted, size: 20),
+            onPressed: () => _shareResult(context),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ============================================
-                    // SHAREABLE SECTION START
-                    // (Hero card + Stat cards + Mastery breakdown)
-                    // ============================================
                     RepaintBoundary(
                       key: _shareCardKey,
                       child: Container(
@@ -314,46 +246,79 @@ class AssessmentComplete extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // ================= HERO CARD =================
+                            // Hero Card
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(24),
+                              padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
-                                color: brandRed,
-                                borderRadius: BorderRadius.circular(24),
+                                gradient: const LinearGradient(
+                                  colors: [brandRed, brandGradientEnd],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: brandRed.withOpacity(0.28),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.auto_awesome,
-                                      color: Colors.white, size: 30),
-                                  const SizedBox(height: 16),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.auto_awesome,
+                                            color: Colors.white, size: 13),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'EVALUATION REPORT',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.4,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
                                   Text(
                                     'Excellent Progress, $studentName!',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 4),
                                   const Text(
-                                    "You've mastered most concepts in this unit.",
+                                    "You've mastered core concepts in this topic baseline.",
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      height: 1.35,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 16),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 12),
+                                        horizontal: 14, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.22),
-                                      borderRadius:
-                                          BorderRadius.circular(50),
+                                      color: Colors.white.withOpacity(0.22),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -362,7 +327,7 @@ class AssessmentComplete extends StatelessWidget {
                                           'Score: ',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 16,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -370,8 +335,8 @@ class AssessmentComplete extends StatelessWidget {
                                           '$score/$totalScore',
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w800,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ],
@@ -380,10 +345,9 @@ class AssessmentComplete extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            const SizedBox(height: 14),
 
-                            const SizedBox(height: 20),
-
-                            // ================= STAT CARDS =================
+                            // Stat Cards
                             Row(
                               children: [
                                 Expanded(
@@ -395,12 +359,11 @@ class AssessmentComplete extends StatelessWidget {
                                     trendLabel: accuracyTrendLabel,
                                   ),
                                 ),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: _StatCard(
                                     icon: Icons.timer_rounded,
-                                    iconBackground:
-                                        const Color(0xFF5B5FE0),
+                                    iconBackground: const Color(0xFF0086C9),
                                     value: timeTaken,
                                     label: 'Time Taken',
                                     trendLabel: timeTrendLabel,
@@ -408,53 +371,41 @@ class AssessmentComplete extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 14),
 
-                            const SizedBox(height: 20),
-
-                            // ================= MASTERY BREAKDOWN =================
+                            // Mastery Breakdown Card
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                    color: trackGrey, width: 1.2),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0x0F000000),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: cardBorder),
                               ),
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
                                     'Mastery Breakdown',
                                     style: TextStyle(
                                       color: navy,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w800,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 14),
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: 120,
-                                        height: 120,
+                                        width: 86,
+                                        height: 86,
                                         child: _MasteryDonut(
                                           masteryPercent: masteryPercent,
                                           masteryColor: mastGreen,
                                           gapColor: brandRed,
                                         ),
                                       ),
-                                      const SizedBox(width: 20),
+                                      const SizedBox(width: 18),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -466,7 +417,7 @@ class AssessmentComplete extends StatelessWidget {
                                               value:
                                                   conceptsMastered.join(', '),
                                             ),
-                                            const SizedBox(height: 16),
+                                            const SizedBox(height: 10),
                                             _LegendBlock(
                                               dotColor: brandRed,
                                               label: 'Needs Review',
@@ -480,32 +431,32 @@ class AssessmentComplete extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            const SizedBox(height: 14),
 
-                            const SizedBox(height: 20),
-
-                            // ================= ROADMAP TIER BANNER =================
+                            // Roadmap Tier Banner
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: _tierColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(20),
-                                border:
-                                    Border.all(color: _tierColor, width: 1.4),
+                                color: _tierColor.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: _tierColor.withOpacity(0.35),
+                                    width: 1.2),
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 52,
-                                    height: 52,
+                                    width: 44,
+                                    height: 44,
                                     decoration: BoxDecoration(
                                       color: _tierColor,
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(_tierIcon,
-                                        color: Colors.white, size: 26),
+                                        color: Colors.white, size: 22),
                                   ),
-                                  const SizedBox(width: 16),
+                                  const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -513,23 +464,19 @@ class AssessmentComplete extends StatelessWidget {
                                       children: [
                                         Text(
                                           '${tier.label} Roadmap Unlocked',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: navy,
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w800,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 2),
                                         Text(
-                                          'You scored $scorePercent% — '
-                                          'Sophia has personalized your '
-                                          'roadmap for the ${tier.label} '
-                                          'track.',
+                                          'You scored $scorePercent% — Sophia personalized your track.',
                                           style: const TextStyle(
-                                            color: subtitleBlue,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                            height: 1.35,
+                                            color: textMuted,
+                                            fontSize: 12,
+                                            height: 1.3,
                                           ),
                                         ),
                                       ],
@@ -542,76 +489,42 @@ class AssessmentComplete extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // ============================================
-                    // SHAREABLE SECTION END
-                    // ============================================
+                    const SizedBox(height: 20),
 
-                    const SizedBox(height: 28),
-
-                    // ================= AI MENTOR INSIGHTS =================
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'AI Mentor Insights',
-                            style: TextStyle(
-                              color: navy,
-                              fontSize: 19,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: brandRed,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Text(
-                            '3',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
+                    // AI Mentor Insights
+                    const Text(
+                      'AI Mentor Insights',
+                      style: TextStyle(
+                        color: navy,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
+                    const SizedBox(height: 12),
 
-                    const SizedBox(height: 16),
-
-                    // ---- Conceptual gap card ----
+                    // Conceptual gap card
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: trackGrey, width: 1.2),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0F000000),
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: cardBorder),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 48,
-                            height: 48,
+                            width: 38,
+                            height: 38,
                             decoration: BoxDecoration(
                               color: conceptualGapInsight.iconBackground,
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             child: Icon(conceptualGapInsight.icon,
-                                color: Colors.white, size: 24),
+                                color: Colors.white, size: 20),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,17 +533,16 @@ class AssessmentComplete extends StatelessWidget {
                                   conceptualGapInsight.title,
                                   style: const TextStyle(
                                     color: navy,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 4),
                                 Text(
                                   conceptualGapInsight.description,
                                   style: const TextStyle(
-                                    color: subtitleBlue,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                                    color: textMuted,
+                                    fontSize: 12,
                                     height: 1.35,
                                   ),
                                 ),
@@ -640,16 +552,16 @@ class AssessmentComplete extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 12),
 
-                    const SizedBox(height: 16),
-
-                    // ---- Common misconception panel ----
+                    // Common misconception card
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: panelGrey,
-                        borderRadius: BorderRadius.circular(18),
+                        color: const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: cardBorder),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -657,92 +569,62 @@ class AssessmentComplete extends StatelessWidget {
                           Text(
                             misconceptionLabel,
                             style: const TextStyle(
-                              color: subtitleBlue,
+                              color: navy,
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(height: 14),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFCE3E6),
-                              borderRadius: BorderRadius.circular(16),
-                              border:
-                                  Border.all(color: brandRed, width: 1.4),
-                            ),
-                            child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.error_rounded,
-                                        color: brandRed, size: 18),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Common Mistake',
-                                      style: const TextStyle(
-                                        color: brandRed,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.cancel_outlined,
+                                  color: brandRed, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
                                   commonMistakeText,
                                   style: const TextStyle(
-                                    color: navy,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
+                                    color: brandRed,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                const SizedBox(height: 14),
-                                const Divider(
-                                    color: Color(0x33E8394A), height: 1),
-                                const SizedBox(height: 14),
-                                Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(Icons.check_circle,
-                                        color: mastGreen, size: 18),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        correctConceptText,
-                                        style: const TextStyle(
-                                          color: navy,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              const Icon(Icons.check_circle_outline,
+                                  color: mastGreen, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  correctConceptText,
+                                  style: const TextStyle(
+                                    color: navy,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 20),
 
-                    const SizedBox(height: 28),
-
-                    // ================= RECOMMENDED NEXT STEPS =================
+                    // Recommended Next Steps
                     const Text(
                       'Recommended Next Steps',
                       style: TextStyle(
                         color: navy,
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
 
                     Row(
                       children: nextSteps
@@ -750,8 +632,7 @@ class AssessmentComplete extends StatelessWidget {
                             (step) => Expanded(
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                  right:
-                                      step == nextSteps.last ? 0 : 12,
+                                  right: step == nextSteps.last ? 0 : 10,
                                 ),
                                 child: _NextStepCard(item: step),
                               ),
@@ -759,82 +640,77 @@ class AssessmentComplete extends StatelessWidget {
                           )
                           .toList(),
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // ---- Review Detailed Answers ----
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: OutlinedButton(
-                        onPressed: onReviewDetailedAnswers ??
-                            () => _showComingSoon(
-                                context, 'Detailed answers review'),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: navy, width: 1.4),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                        child: const Text(
-                          'Review Detailed Answers',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ---- Unlock Gamify Roadmap (score-tier decision point) ----
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: onContinue ??
-                            () {
-                              // TODO: once StudentDashboard accepts a
-                              // roadmap-tier param, pass `tier` (and
-                              // `scorePercent`) through here so the Home
-                              // Hub actually renders the tier-matched
-                              // gamified roadmap instead of a default.
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const StudentDashboard(),
-                                ),
-                              );
-                            },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _tierColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Unlock ${tier.label} Roadmap',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward_rounded,
-                                color: Colors.white, size: 20),
-                          ],
-                        ),
-                      ),
-                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
+              ),
+            ),
+
+            // Bottom Continue Button
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border:
+                    Border(top: BorderSide(color: Color(0xFFF2F4F7), width: 1)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [brandRed, brandGradientEnd],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandRed.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: onContinue ??
+                          () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => const StudentDashboard(),
+                              ),
+                            );
+                          },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Unlock ${tier.label} Roadmap',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_rounded,
+                              color: Colors.white, size: 18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -843,10 +719,6 @@ class AssessmentComplete extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// STAT CARD
-// ============================================================
 
 class _StatCard extends StatelessWidget {
   final IconData icon;
@@ -863,61 +735,61 @@ class _StatCard extends StatelessWidget {
     required this.trendLabel,
   });
 
-  static const Color navy = AssessmentComplete.navy;
-  static const Color subtitleBlue = AssessmentComplete.subtitleBlue;
-  static const Color mastGreen = AssessmentComplete.mastGreen;
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
+  static const Color mastGreen = Color(0xFF12B76A);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: navy, width: 1.4),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 46,
-            height: 46,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: iconBackground,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
+            child: Icon(icon, color: Colors.white, size: 18),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             value,
             style: const TextStyle(
               color: navy,
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
             style: const TextStyle(
-              color: subtitleBlue,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+              color: textMuted,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.trending_up_rounded,
-                  color: mastGreen, size: 16),
+              const Icon(Icons.trending_up_rounded, color: mastGreen, size: 14),
               const SizedBox(width: 4),
               Text(
                 trendLabel,
                 style: const TextStyle(
                   color: mastGreen,
-                  fontSize: 13,
+                  fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -928,10 +800,6 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// LEGEND BLOCK
-// ============================================================
 
 class _LegendBlock extends StatelessWidget {
   final Color dotColor;
@@ -944,7 +812,8 @@ class _LegendBlock extends StatelessWidget {
     required this.value,
   });
 
-  static const Color navy = AssessmentComplete.navy;
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color textMuted = Color(0xFF667085);
 
   @override
   Widget build(BuildContext context) {
@@ -961,35 +830,30 @@ class _LegendBlock extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Text(
               label,
               style: const TextStyle(
-                color: navy,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
+                color: textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           value,
           style: const TextStyle(
             color: navy,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            height: 1.3,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
     );
   }
 }
-
-// ============================================================
-// MASTERY DONUT CHART
-// ============================================================
 
 class _MasteryDonut extends StatelessWidget {
   final int masteryPercent;
@@ -1017,16 +881,16 @@ class _MasteryDonut extends StatelessWidget {
             Text(
               '$masteryPercent%',
               style: const TextStyle(
-                color: AssessmentComplete.navy,
-                fontSize: 20,
+                color: Color(0xFF1D3B64),
+                fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
             ),
             const Text(
               'Mastery',
               style: TextStyle(
-                color: AssessmentComplete.subtitleBlue,
-                fontSize: 11,
+                color: Color(0xFF667085),
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1050,7 +914,7 @@ class _DonutPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final strokeWidth = size.width * 0.22;
+    final strokeWidth = size.width * 0.20;
     final rect = Offset.zero & size;
     final center = rect.center;
     final radius = (size.width - strokeWidth) / 2;
@@ -1071,7 +935,6 @@ class _DonutPainter extends CustomPainter {
     final sweepFull = 2 * math.pi;
     final sweepProgress = sweepFull * percent;
 
-    // remainder (background) full circle first
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
@@ -1080,7 +943,6 @@ class _DonutPainter extends CustomPainter {
       basePaint,
     );
 
-    // progress arc on top
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
@@ -1098,43 +960,38 @@ class _DonutPainter extends CustomPainter {
   }
 }
 
-// ============================================================
-// NEXT STEP CARD
-// ============================================================
-
 class _NextStepCard extends StatelessWidget {
   final NextStepItem item;
 
   const _NextStepCard({required this.item});
 
-  static const Color navy = AssessmentComplete.navy;
-  static const Color subtitleBlue = AssessmentComplete.subtitleBlue;
-  static const Color trackGrey = AssessmentComplete.trackGrey;
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: item.onTap,
-      borderRadius: BorderRadius.circular(18),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: trackGrey, width: 1.2),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: cardBorder),
         ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: item.iconBackground,
                 shape: BoxShape.circle,
               ),
-              child: Icon(item.icon, color: Colors.white, size: 20),
+              child: Icon(item.icon, color: Colors.white, size: 18),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1145,17 +1002,16 @@ class _NextStepCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: navy,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 2),
                   Text(
                     item.duration,
                     style: const TextStyle(
-                      color: subtitleBlue,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      color: textMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

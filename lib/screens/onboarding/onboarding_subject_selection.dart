@@ -1,20 +1,6 @@
 import 'package:flutter/material.dart';
 import 'onboarding_learning_goal.dart';
 
-/// ---------------------------------------------------------------------
-/// Colors used across this page (kept local so you can drop this file in
-/// as-is without depending on a separate theme file).
-/// ---------------------------------------------------------------------
-class _Palette {
-  static const Color red = Color(0xFFE8394A);
-  static const Color redDark = Color(0xFFD32E3F);
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleGrey = Color(0xFF6B7A8F);
-  static const Color hintTeal = Color(0xFFB9D6D6);
-  static const Color cardBorder = Color(0xFFE8394A);
-  static const Color background = Colors.white;
-}
-
 class Subject {
   final String name;
   final IconData icon;
@@ -39,6 +25,13 @@ class OnboardingSubjectSelection extends StatefulWidget {
 
 class _OnboardingSubjectSelectionState
     extends State<OnboardingSubjectSelection> {
+  // Sir's Brand Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
+
   final TextEditingController _searchController = TextEditingController();
 
   final List<Subject> _allSubjects = [
@@ -48,9 +41,9 @@ class _OnboardingSubjectSelectionState
     Subject(name: 'Social Studies', icon: Icons.public),
     Subject(name: 'Comp. Science', icon: Icons.terminal),
     Subject(name: 'Artificial Intel.', icon: Icons.smart_toy),
-    Subject(name: 'Biology', icon: Icons.help_outline),
+    Subject(name: 'Biology', icon: Icons.biotech_outlined),
     Subject(name: 'Physics', icon: Icons.architecture),
-    Subject(name: 'Medicine', icon: Icons.medical_services),
+    Subject(name: 'Medicine', icon: Icons.medical_services_outlined),
   ];
 
   List<Subject> _filteredSubjects = [];
@@ -85,9 +78,6 @@ class _OnboardingSubjectSelectionState
   }
 
   void _continue() {
-    final selected = _allSubjects.where((s) => s.selected).toList();
-    // TODO: pass `selected` forward once the next page needs it.
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -99,31 +89,109 @@ class _OnboardingSubjectSelectionState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _Palette.background,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
                     sliver: SliverToBoxAdapter(
-                      child: _Header(searchController: _searchController),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Choose Your Subjects',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: navy,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Select the subjects you want to master with your AI mentor.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.4,
+                              color: textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          TextField(
+                            controller: _searchController,
+                            style: const TextStyle(fontSize: 14, color: navy),
+                            decoration: InputDecoration(
+                              hintText: 'Search subjects...',
+                              hintStyle: const TextStyle(color: Color(0xFF98A2B3), fontSize: 14),
+                              prefixIcon: const Icon(Icons.search, color: textMuted, size: 20),
+                              filled: true,
+                              fillColor: const Color(0xFFF9FAFB),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: cardBorder),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: cardBorder),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: navy, width: 1.5),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
                     sliver: SliverGrid(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        // Fixed row height avoids any overflow (the
-                        // yellow/black striped error banner) regardless of
-                        // text scale factor.
-                        mainAxisExtent: 210,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        mainAxisExtent: 140,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -140,68 +208,65 @@ class _OnboardingSubjectSelectionState
                 ],
               ),
             ),
-            _ContinueButton(onPressed: _continue),
+
+            // Bottom Continue Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF2F4F7), width: 1),
+                ),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [brandRed, brandGradientEnd],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: brandRed.withOpacity(0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: _continue,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  final TextEditingController searchController;
-
-  const _Header({required this.searchController});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Choose Your Subjects',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
-            color: _Palette.navy,
-          ),
-        ),
-        const SizedBox(height: 12),
-        const Text(
-          'Select the subjects you want to master with your AI mentor.',
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.35,
-            color: _Palette.subtitleGrey,
-          ),
-        ),
-        const SizedBox(height: 20),
-        TextField(
-          controller: searchController,
-          style: const TextStyle(fontSize: 16, color: _Palette.navy),
-          decoration: InputDecoration(
-            hintText: 'Search subjects...',
-            hintStyle: const TextStyle(color: _Palette.hintTeal),
-            prefixIcon: const Icon(Icons.search, color: _Palette.hintTeal),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE2E8ED)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE2E8ED)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: _Palette.red, width: 1.5),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -210,54 +275,66 @@ class _SubjectCard extends StatelessWidget {
   final Subject subject;
   final VoidCallback onTap;
 
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color cardBorder = Color(0xFFE4E7EC);
+  static const Color textMuted = Color(0xFF667085);
+
   const _SubjectCard({required this.subject, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.all(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          color: subject.selected ? const Color(0xFFFFF0F2) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color:
-                subject.selected ? _Palette.cardBorder : const Color(0xFFE2E8ED),
-            width: 1.4,
+            color: subject.selected ? brandRed : cardBorder,
+            width: subject.selected ? 2.0 : 1.0,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: subject.selected
+                  ? brandRed.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
-                  decoration: const BoxDecoration(
-                    color: _Palette.red,
-                    shape: BoxShape.circle,
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: subject.selected ? brandRed : const Color(0xFFF2F4F7),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(subject.icon, color: Colors.white, size: 24),
+                  child: Icon(
+                    subject.icon,
+                    color: subject.selected ? Colors.white : navy,
+                    size: 20,
+                  ),
                 ),
-                AnimatedOpacity(
-                  opacity: subject.selected ? 1 : 0,
-                  duration: const Duration(milliseconds: 150),
-                  child: Container(
-                    width: 26,
-                    height: 26,
+                if (subject.selected)
+                  Container(
+                    width: 22,
+                    height: 22,
                     decoration: const BoxDecoration(
-                      color: _Palette.red,
+                      color: brandRed,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check,
-                        color: Colors.white, size: 16),
+                    child: const Icon(Icons.check, color: Colors.white, size: 14),
                   ),
-                ),
               ],
             ),
             const Spacer(),
@@ -265,67 +342,20 @@ class _SubjectCard extends StatelessWidget {
               subject.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 19,
+              style: TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: _Palette.navy,
+                color: subject.selected ? brandRed : navy,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               'Mastery: ${subject.masteryPercent}%',
               style: const TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w500,
-                color: _Palette.navy,
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+                color: textMuted,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ContinueButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  const _ContinueButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 12,
-            offset: Offset(0, -4),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _Palette.red,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.arrow_forward, size: 20),
-            SizedBox(width: 10),
-            Text(
-              'Continue to Dashboard',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
             ),
           ],
         ),

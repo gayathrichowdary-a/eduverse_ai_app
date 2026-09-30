@@ -14,11 +14,6 @@ class BoardOption {
     required this.name,
     required this.subtitle,
     required this.icon,
-    // FIX: this used to default to `true`, and none of the entries
-    // below overrode it — so every board card rendered as "selected"
-    // (red border + checkmark) on first load, for all 5 boards at
-    // once, instead of just one. Default is now `false`, and only
-    // one board (CBSE) is explicitly marked selected below.
     this.selected = false,
   });
 }
@@ -32,53 +27,49 @@ class OnboardingBoardSelection extends StatefulWidget {
 }
 
 class _OnboardingBoardSelectionState extends State<OnboardingBoardSelection> {
-  // ================= COLORS =================
-
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color cardSelectedBg = Color(0xFFF6E3E4);
-  static const Color infoBg = Color(0xFFE7E9FB);
-  static const Color infoText = Color(0xFF5B6B8C);
+  // Sir's Brand Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
   final List<BoardOption> _boards = [
     BoardOption(
       code: 'CBSE',
       name: 'CBSE',
       subtitle: 'Central Board of Secondary Education',
-      icon: Icons.school_rounded,
-      // Default selected board.
+      icon: Icons.school_outlined,
       selected: true,
     ),
     BoardOption(
       code: 'ICSE',
       name: 'ICSE',
       subtitle: 'Indian Certificate of Secondary Education',
-      icon: Icons.account_balance_rounded,
+      icon: Icons.account_balance_outlined,
     ),
     BoardOption(
       code: 'SSC',
-      name: 'SSC',
-      subtitle: 'State Board Curriculum',
-      icon: Icons.location_city_rounded,
+      name: 'State Board (SSC)',
+      subtitle: 'State Board Curriculum & Syllabus',
+      icon: Icons.location_city_outlined,
     ),
     BoardOption(
       code: 'IB',
       name: 'IB Board',
-      subtitle: 'International Baccalaureate',
-      icon: Icons.public_rounded,
+      subtitle: 'International Baccalaureate Curriculum',
+      icon: Icons.public_outlined,
     ),
     BoardOption(
       code: 'Cambridge',
-      name: 'Cambridge',
+      name: 'Cambridge International',
       subtitle: 'IGCSE & A Levels',
-      icon: Icons.language_rounded,
+      icon: Icons.language_outlined,
     ),
   ];
 
   void _selectBoard(BoardOption board) {
     setState(() {
-      // Single-select: choosing one board unselects the rest.
       for (final b in _boards) {
         b.selected = identical(b, board);
       }
@@ -86,12 +77,6 @@ class _OnboardingBoardSelectionState extends State<OnboardingBoardSelection> {
   }
 
   void _continue() {
-    final selected = _boards.firstWhere(
-      (b) => b.selected,
-      orElse: () => _boards.first,
-    );
-    // TODO: pass `selected` forward once the next page needs it.
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -102,103 +87,133 @@ class _OnboardingBoardSelectionState extends State<OnboardingBoardSelection> {
 
   void _exploreAsGuest() {
     Navigator.of(context).pushAndRemoveUntil(
-    MaterialPageRoute(
-      builder: (context) => const StudentDashboard(),
-    ),
-    (route) => false,
-  );
-    // TODO: hook up guest flow.
+      MaterialPageRoute(
+        builder: (context) => const StudentDashboard(),
+      ),
+      (route) => false,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(height: 5, color: brandRed),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= TITLE =================
-
+                    // Title in Sir's exact typography
                     const Text(
                       'Choose Your Board',
                       style: TextStyle(
                         color: navy,
-                        fontSize: 32,
+                        fontSize: 24,
                         fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
                       ),
                     ),
+                    const SizedBox(height: 8),
 
-                    const SizedBox(height: 12),
-
-                    // ================= SUBTITLE =================
-
+                    // Subtitle
                     const Text(
                       "We'll personalize your syllabus and AI mentor based on your curriculum.",
                       style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 16,
-                        height: 1.35,
+                        color: textMuted,
+                        fontSize: 14,
+                        height: 1.4,
                       ),
                     ),
+                    const SizedBox(height: 20),
 
-                    const SizedBox(height: 24),
-
-                    // ================= BOARD LIST =================
-
-                    ...List.generate(_boards.length, (index) {
-                      final board = _boards[index];
+                    // Board List
+                    ..._boards.map((board) {
                       return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: index == _boards.length - 1 ? 0 : 16,
-                        ),
+                        padding: const EdgeInsets.only(bottom: 10),
                         child: _BoardCard(
                           board: board,
                           onTap: () => _selectBoard(board),
                         ),
                       );
-                    }),
+                    }).toList(),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    // ================= INFO BANNER =================
-
+                    // Info Banner
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: infoBg,
-                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xFFF4F6FB),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFE4E7EC)),
                       ),
-                      child: Row(
+                      child: const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.lightbulb_outline,
-                              color: infoText,
-                              size: 16,
-                            ),
+                          Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF4D86AD),
+                            size: 18,
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
+                          SizedBox(width: 10),
+                          Expanded(
                             child: Text(
-                              'You can change your board later in settings if you switch schools.',
+                              'You can switch your board syllabus anytime later in your profile settings.',
                               style: TextStyle(
-                                color: infoText,
-                                fontSize: 14,
+                                color: Color(0xFF4D86AD),
+                                fontSize: 12,
                                 height: 1.35,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -207,68 +222,78 @@ class _OnboardingBoardSelectionState extends State<OnboardingBoardSelection> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
             ),
 
-            // =====================================================
-            // BOTTOM SECTION
-            // =====================================================
-
+            // Bottom Continue Section
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
-                  top: BorderSide(color: Color(0xFFE9EDF0), width: 1),
+                  top: BorderSide(color: Color(0xFFF2F4F7), width: 1),
                 ),
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
+                  Container(
                     width: double.infinity,
-                    height: 60,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [brandRed, brandGradientEnd],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandRed.withOpacity(0.35),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     child: ElevatedButton(
                       onPressed: _continue,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: brandRed,
-                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Continue to Grade Selection',
+                            'Continue to AI Assessment',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 17,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SizedBox(width: 10),
-                          Icon(Icons.arrow_forward,
-                              color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward, color: Colors.white, size: 18),
                         ],
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 16),
-
-                  // ================= EXPLORE AS GUEST =================
+                  const SizedBox(height: 12),
 
                   GestureDetector(
                     onTap: _exploreAsGuest,
                     child: const Text(
                       'Not sure? Explore as guest',
                       style: TextStyle(
-                        color: subtitleBlue,
-                        fontSize: 16,
+                        color: textMuted,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -287,46 +312,53 @@ class _BoardCard extends StatelessWidget {
   final BoardOption board;
   final VoidCallback onTap;
 
-  const _BoardCard({required this.board, required this.onTap});
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color cardBorder = Color(0xFFE4E7EC);
+  static const Color textMuted = Color(0xFF667085);
 
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color cardSelectedBg = Color(0xFFF6E3E4);
+  const _BoardCard({required this.board, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.all(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: board.selected ? cardSelectedBg : Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          color: board.selected ? const Color(0xFFFFF0F2) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: board.selected ? brandRed : const Color(0xFFE2E8ED),
-            width: 1.6,
+            color: board.selected ? brandRed : cardBorder,
+            width: board.selected ? 2.0 : 1.0,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: board.selected
+                  ? brandRed.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            // ================= ICON =================
-
             Container(
-              width: 56,
-              height: 56,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                color: brandRed,
-                borderRadius: BorderRadius.circular(16),
+                color: board.selected ? brandRed : const Color(0xFFF2F4F7),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(board.icon, color: Colors.white, size: 26),
+              child: Icon(
+                board.icon,
+                color: board.selected ? Colors.white : navy,
+                size: 20,
+              ),
             ),
-
             const SizedBox(width: 14),
-
-            // ================= TEXT =================
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,10 +368,10 @@ class _BoardCard extends StatelessWidget {
                     board.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: navy,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
+                    style: TextStyle(
+                      color: board.selected ? brandRed : navy,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -348,31 +380,28 @@ class _BoardCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: subtitleBlue,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      color: textMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(width: 10),
-
-            // ================= CHECK =================
-
+            const SizedBox(width: 8),
             Container(
-              width: 28,
-              height: 28,
+              width: 22,
+              height: 22,
               decoration: BoxDecoration(
                 color: board.selected ? brandRed : Colors.transparent,
                 shape: BoxShape.circle,
-                border: board.selected
-                    ? null
-                    : Border.all(color: const Color(0xFFE2E8ED)),
+                border: Border.all(
+                  color: board.selected ? brandRed : cardBorder,
+                  width: 2,
+                ),
               ),
               child: board.selected
-                  ? const Icon(Icons.check, color: Colors.white, size: 16)
+                  ? const Icon(Icons.check, color: Colors.white, size: 14)
                   : null,
             ),
           ],

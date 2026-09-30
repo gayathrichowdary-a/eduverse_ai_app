@@ -1,27 +1,10 @@
 import 'package:flutter/material.dart';
 import 'onboarding_assessment_complete.dart';
 
-// ============================================================
-// SCREEN
-// ============================================================
-
-/// Final "conceptual thinking" stage of the Sophia assessment — separate
-/// from the 3 cognitive/analytical MCQs and the coding test.
-///
-/// Per the spec: "After you compile you could proceed to the Conceptual
-/// Question part... After submitting the Conceptual Thinking Question
-/// answer, Sophia will show you your whole interview report" — which is
-/// [AssessmentComplete], where the <50 / 50-80 / >80 score-tier routing
-/// (Beginner / Intermediate / Advanced roadmap) happens.
 class OnboardingConceptualQuestion extends StatefulWidget {
   final String skillLevel;
   final String? branch;
   final String? course;
-
-  /// Score accumulated from the 3 cognitive questions + coding test,
-  /// out of [runningScoreTotal], so it can be combined with this
-  /// question's result before handing off to AssessmentComplete for
-  /// the final tier decision.
   final int runningScore;
   final int runningScoreTotal;
 
@@ -41,22 +24,19 @@ class OnboardingConceptualQuestion extends StatefulWidget {
 
 class _OnboardingConceptualQuestionState
     extends State<OnboardingConceptualQuestion> {
-  // ================= COLORS =================
+  // Sir's Brand Design Colors
+  static const Color navy = Color(0xFF1D3B64);
+  static const Color brandRed = Color(0xFFEF3340);
+  static const Color brandGradientEnd = Color(0xFFF12C68);
+  static const Color textMuted = Color(0xFF667085);
+  static const Color cardBorder = Color(0xFFE4E7EC);
 
-  static const Color navy = Color(0xFF14213D);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color trackGrey = Color(0xFFE9EDF0);
-  static const Color panelGrey = Color(0xFFF5F7F8);
-
-  // Creative, school-friendly question for all classes/ages:
   static const String _question =
-      'If you could invent or create anything to help your school, friends, or the world, what would it be and why?';
+      'If you could invent or build anything to solve a problem for your school, friends, or community, what would it be and why?';
 
   final TextEditingController _answerController = TextEditingController();
   bool _submitting = false;
 
-  // Flexible minimum length so young students are not blocked
   bool get _canSubmit => _answerController.text.trim().length >= 5;
 
   Future<void> _submit() async {
@@ -64,7 +44,7 @@ class _OnboardingConceptualQuestionState
 
     setState(() => _submitting = true);
 
-    await Future.delayed(const Duration(milliseconds: 900));
+    await Future.delayed(const Duration(milliseconds: 800));
     if (!mounted) return;
 
     final conceptualScore =
@@ -93,129 +73,179 @@ class _OnboardingConceptualQuestionState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
           children: [
-            // ================= TOP BAR =================
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-              child: Row(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Creative Thinking Question',
-                          style: TextStyle(
-                            color: navy,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${widget.skillLevel} Assessment • Final Step',
-                          style: const TextStyle(
-                            color: subtitleBlue,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                  const Text(
+                    'Creative Thinking Question',
+                    style: TextStyle(
+                      color: navy,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    '${widget.skillLevel} Assessment • Final Step',
+                    style: const TextStyle(
+                      color: textMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
-
-            const Divider(color: trackGrey, height: 1),
-
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF0F2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Stage 3/3',
+                style: TextStyle(
+                  color: brandRed,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= SOPHIA PROMPT CARD =================
+                    // Sophia Prompt Card
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: brandRed,
-                        borderRadius: BorderRadius.circular(22),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1D3B64), Color(0xFF2A5288)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: navy.withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: const [
-                              Icon(Icons.auto_awesome,
-                                  color: Colors.white, size: 22),
-                              SizedBox(width: 8),
-                              Text(
-                                'Sophia asks',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.auto_awesome, color: Colors.white, size: 14),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Sophia AI asks',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
                           const Text(
                             _question,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
                               height: 1.4,
                             ),
                           ),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'Your Answer',
-                      style: TextStyle(
-                        color: navy,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    // Label
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Your Answer',
+                          style: TextStyle(
+                            color: navy,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          '${_answerController.text.trim().length} chars',
+                          style: const TextStyle(
+                            color: textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
 
-                    // ================= ANSWER FIELD =================
+                    // Answer Field Container
                     Container(
                       decoration: BoxDecoration(
-                        color: panelGrey,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: trackGrey, width: 1.2),
+                        color: const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: cardBorder),
                       ),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(14),
                       child: TextField(
                         controller: _answerController,
-                        maxLines: 8,
+                        maxLines: 7,
                         onChanged: (_) => setState(() {}),
                         style: const TextStyle(
                           color: navy,
-                          fontSize: 15,
-                          height: 1.5,
+                          fontSize: 14,
+                          height: 1.45,
+                          fontWeight: FontWeight.w500,
                         ),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           isDense: true,
-                          hintText: 'Share your idea in your own words — '
-                              'there are no wrong answers! Sophia wants to see '
-                              'how creatively you think.',
+                          hintText:
+                              'Share your idea in your own words — there are no wrong answers! Sophia wants to see how you think and solve problems.',
                           hintStyle: TextStyle(
-                            color: subtitleBlue,
-                            fontSize: 14,
+                            color: Color(0xFF98A2B3),
+                            fontSize: 13,
+                            height: 1.4,
                           ),
                         ),
                       ),
@@ -225,34 +255,53 @@ class _OnboardingConceptualQuestionState
               ),
             ),
 
-            // =====================================================
-            // BOTTOM SECTION
-            // =====================================================
+            // Bottom Submit Button
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: trackGrey, width: 1)),
+                border: Border(top: BorderSide(color: Color(0xFFF2F4F7), width: 1)),
               ),
-              child: SizedBox(
+              child: Container(
                 width: double.infinity,
-                height: 60,
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: (_canSubmit && !_submitting)
+                      ? const LinearGradient(
+                          colors: [brandRed, brandGradientEnd],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        )
+                      : null,
+                  color: (_canSubmit && !_submitting) ? null : const Color(0xFFF2F4F7),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: (_canSubmit && !_submitting)
+                      ? [
+                          BoxShadow(
+                            color: brandRed.withOpacity(0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
                 child: ElevatedButton(
                   onPressed: (_canSubmit && !_submitting) ? _submit : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _canSubmit ? brandRed : trackGrey,
-                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    disabledBackgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: _submitting
                       ? const SizedBox(
-                          width: 22,
-                          height: 22,
+                          width: 20,
+                          height: 20,
                           child: CircularProgressIndicator(
-                            strokeWidth: 2.4,
+                            strokeWidth: 2,
                             color: Colors.white,
                           ),
                         )
@@ -262,17 +311,21 @@ class _OnboardingConceptualQuestionState
                             Text(
                               'Submit & View Report',
                               style: TextStyle(
-                                color:
-                                    _canSubmit ? Colors.white : subtitleBlue,
+                                color: (_canSubmit && !_submitting)
+                                    ? Colors.white
+                                    : const Color(0xFF98A2B3),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Icon(Icons.arrow_forward_rounded,
-                                color:
-                                    _canSubmit ? Colors.white : subtitleBlue,
-                                size: 20),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: (_canSubmit && !_submitting)
+                                  ? Colors.white
+                                  : const Color(0xFF98A2B3),
+                              size: 18,
+                            ),
                           ],
                         ),
                 ),

@@ -1,38 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'success_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
+import '../../../../state/locale_controller.dart';
+import '../../domain/auth_models.dart';
+import 'auth_success_screen.dart';
 
-class OtpVerificationPage extends StatefulWidget {
+class OtpVerificationScreen extends StatefulWidget {
   final String role;
   final String email;
   final Map<String, dynamic> profileData;
+  final LocaleController localeController;
 
-  const OtpVerificationPage({
+  const OtpVerificationScreen({
     super.key,
     required this.role,
     required this.email,
     required this.profileData,
+    required this.localeController,
   });
 
   @override
-  State<OtpVerificationPage> createState() => _OtpVerificationPageState();
+  State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
-class _OtpVerificationPageState extends State<OtpVerificationPage> {
-  // =========================
-  // COLORS
-  // =========================
+class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   static const Color brandRed = Color(0xFFEF3340);
   static const Color navy = Color(0xFF1D3B64);
   static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color green = Color(0xFF1D9445);
 
-  // =========================
-  // OTP CONTROLLERS
-  // =========================
   final List<TextEditingController> otpControllers =
       List.generate(6, (_) => TextEditingController());
-
   final List<FocusNode> otpFocusNodes =
       List.generate(6, (_) => FocusNode());
 
@@ -52,29 +49,34 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     super.dispose();
   }
 
-  // =========================
-  // VERIFY OTP & RENDER TO SUCCESS PAGE
-  // =========================
+  UserRole _resolveRole(String roleStr) {
+    switch (roleStr.toLowerCase()) {
+      case 'parent':
+        return UserRole.parent;
+      case 'teacher':
+        return UserRole.teacher;
+      case 'school':
+        return UserRole.school;
+      case 'admin':
+        return UserRole.admin;
+      default:
+        return UserRole.student;
+    }
+  }
+
   Future<void> _verifyOtp() async {
-    final otp = otpControllers
-        .map((controller) => controller.text.trim())
-        .join();
+    final otp = otpControllers.map((c) => c.text.trim()).join();
 
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter all 6 digits'),
-        ),
+        const SnackBar(content: Text('Please enter all 6 digits')),
       );
       return;
     }
 
-    setState(() {
-      isVerifying = true;
-    });
+    setState(() => isVerifying = true);
 
     try {
-      // 1. Verify the real email OTP in Supabase
       final AuthResponse response = await _supabase.auth.verifyOTP(
         email: widget.email,
         token: otp,
@@ -82,14 +84,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       );
 
       final User? user = response.user ?? _supabase.auth.currentUser;
-
       if (user == null) {
-        throw const AuthException(
-          'OTP verification failed. Please check the code and try again.',
-        );
+        throw const AuthException('Verification failed. Invalid OTP code.');
       }
 
-      // 2. Safely save / upsert the user profile with their selected role
+      // Upsert profile in Supabase
       try {
         await _supabase.from('profiles').upsert({
           'id': user.id,
@@ -97,129 +96,78 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
           'role': widget.role,
         });
       } catch (e) {
-        debugPrint('Profile update skipped: $e');
+        debugPrint('Profile update note: $e');
       }
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Verification successful! Welcome to your ${widget.role} account.',
-          ),
-          backgroundColor: green,
-          duration: const Duration(seconds: 3),
-        ),
+      final displayName = user.email?.split('@').first ?? 'User';
+
+      final authProfile = AuthProfile(
+        displayName: displayName,
+        identifier: widget.email,
       );
 
-      // 3. Navigate to SuccessPage with the exact selected role!
+      final authUser = AuthUser(
+        id: user.id,
+        name: displayName,
+        identifier: widget.email,
+        role: _resolveRole(widget.role),
+        profile: authProfile,
+      );
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => SuccessPage(role: widget.role),
+          builder: (context) => AuthSuccessScreen(
+            user: authUser,
+            localeController: widget.localeController,
+          ),
         ),
         (route) => false,
       );
     } on AuthException catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-          duration: const Duration(seconds: 4),
-        ),
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
       );
-
       _clearOtp();
     } catch (e) {
-      debugPrint('Verification error: $e');
-
-      // If it's just a missing column like 'branch' or 'profiles', ignore it and CONTINUE to SuccessPage!
-      if (e.toString().contains('column') ||
-          e.toString().contains('profiles') ||
-          e.toString().contains('branch') ||
-          e.toString().contains('PGRST204')) {
-        if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SuccessPage(role: widget.role),
-          ),
-          (route) => false,
-        );
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Verification failed: $e'),
-            backgroundColor: Colors.redAccent,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-        _clearOtp();
-      }
+      debugPrint('OTP verify error: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verification error: $e'), backgroundColor: Colors.redAccent),
+      );
+      _clearOtp();
     } finally {
-      if (mounted) {
-        setState(() {
-          isVerifying = false;
-        });
-      }
+      if (mounted) setState(() => isVerifying = false);
     }
   }
 
-  // =========================
-  // RESEND REAL EMAIL OTP
-  // =========================
   Future<void> _resendOtp() async {
     if (isResending) return;
-
-    setState(() {
-      isResending = true;
-    });
+    setState(() => isResending = true);
 
     try {
       await _supabase.auth.signInWithOtp(
         email: widget.email,
         shouldCreateUser: false,
       );
-
       if (!mounted) return;
-
       _clearOtp();
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('A new 6-digit OTP has been sent to your email.'),
           backgroundColor: green,
-          duration: Duration(seconds: 4),
-        ),
-      );
-    } on AuthException catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.redAccent,
-          duration: const Duration(seconds: 4),
         ),
       );
     } catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not resend OTP: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text('Could not resend OTP: $e'), backgroundColor: Colors.redAccent),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          isResending = false;
-        });
-      }
+      if (mounted) setState(() => isResending = false);
     }
   }
 
@@ -227,7 +175,6 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     for (final controller in otpControllers) {
       controller.clear();
     }
-
     if (otpFocusNodes.isNotEmpty) {
       FocusScope.of(context).requestFocus(otpFocusNodes[0]);
     }
@@ -237,12 +184,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     if (value.isNotEmpty && index < 5) {
       FocusScope.of(context).requestFocus(otpFocusNodes[index + 1]);
     }
-
     if (value.isEmpty && index > 0) {
       FocusScope.of(context).requestFocus(otpFocusNodes[index - 1]);
     }
-
-    final otp = otpControllers.map((controller) => controller.text).join();
+    final otp = otpControllers.map((c) => c.text).join();
     if (otp.length == 6 && !isVerifying) {
       _verifyOtp();
     }
@@ -255,27 +200,16 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // =========================
-            // BACK BUTTON
-            // =========================
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: navy,
-                    size: 28,
-                  ),
+                  icon: const Icon(Icons.arrow_back, color: navy, size: 28),
                 ),
               ),
             ),
-
-            // =========================
-            // MAIN CONTENT
-            // =========================
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -291,35 +225,21 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           color: green,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.mark_email_read_outlined,
-                          color: Colors.white,
-                          size: 60,
-                        ),
+                        child: const Icon(Icons.mark_email_read_outlined, color: Colors.white, size: 60),
                       ),
                       const SizedBox(height: 30),
                       const Text(
                         'Verify Your Account',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: navy,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: TextStyle(color: navy, fontSize: 28, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 14),
                       Text(
                         'Enter the 6-digit code sent to\n${widget.email}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: subtitleBlue,
-                          fontSize: 16,
-                          height: 1.4,
-                        ),
+                        style: const TextStyle(color: subtitleBlue, fontSize: 16, height: 1.4),
                       ),
                       const SizedBox(height: 36),
-
-                      // OTP BOXES
                       Row(
                         children: List.generate(6, (index) {
                           return Expanded(
@@ -333,11 +253,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
                                   maxLength: 1,
-                                  style: const TextStyle(
-                                    color: navy,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: const TextStyle(color: navy, fontSize: 22, fontWeight: FontWeight.bold),
                                   onChanged: (value) => _onOtpChanged(value, index),
                                   decoration: InputDecoration(
                                     counterText: '',
@@ -346,16 +262,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                     contentPadding: EdgeInsets.zero,
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: Color(0xFFE9EDF0),
-                                      ),
+                                      borderSide: const BorderSide(color: Color(0xFFE9EDF0)),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: brandRed,
-                                        width: 2,
-                                      ),
+                                      borderSide: const BorderSide(color: brandRed, width: 2),
                                     ),
                                   ),
                                 ),
@@ -364,10 +275,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           );
                         }),
                       ),
-
                       const SizedBox(height: 36),
-
-                      // VERIFY BUTTON
                       SizedBox(
                         width: double.infinity,
                         height: 56,
@@ -376,43 +284,28 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: brandRed,
                             elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
                           child: isVerifying
                               ? const SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                                 )
                               : const Text(
                                   'Verify',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
                                 ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
-                      // RESEND OTP
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Flexible(
                             child: Text(
                               "Didn't receive the code?",
-                              style: TextStyle(
-                                color: subtitleBlue,
-                                fontSize: 15,
-                              ),
+                              style: TextStyle(color: subtitleBlue, fontSize: 15),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -423,18 +316,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: brandRed,
-                                    ),
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: brandRed),
                                   )
                                 : const Text(
                                     'Resend OTP',
-                                    style: TextStyle(
-                                      color: brandRed,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: TextStyle(color: brandRed, fontSize: 15, fontWeight: FontWeight.w600),
                                   ),
                           ),
                         ],
@@ -445,16 +331,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                 ),
               ),
             ),
-
             const Padding(
               padding: EdgeInsets.only(bottom: 20),
               child: Text(
                 'Secure verification powered by EduVerse AI',
-                style: TextStyle(
-                  color: navy,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: navy, fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
           ],
