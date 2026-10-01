@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'onboarding_coding_test.dart';
+import 'onboarding_assessment_complete.dart';
 
 class QuizQuestion {
   final String question;
@@ -21,6 +21,10 @@ class OnboardingAssessmentInProgress extends StatefulWidget {
   final String skillLevel;
   final String? branch;
   final String? course;
+  final String? selectedClass;
+
+  /// Global holder so any previous screen can easily set the class
+  static String activeClassCategory = '6th–10th Class';
 
   const OnboardingAssessmentInProgress({
     super.key,
@@ -28,6 +32,7 @@ class OnboardingAssessmentInProgress extends StatefulWidget {
     this.skillLevel = 'Standard',
     this.branch,
     this.course,
+    this.selectedClass,
   });
 
   @override
@@ -37,7 +42,7 @@ class OnboardingAssessmentInProgress extends StatefulWidget {
 
 class _OnboardingAssessmentInProgressState
     extends State<OnboardingAssessmentInProgress> {
-  // Sir's Brand Design Colors
+  // Sir's Brand Colors
   static const Color navy = Color(0xFF1D3B64);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color brandGradientEnd = Color(0xFFF12C68);
@@ -45,416 +50,560 @@ class _OnboardingAssessmentInProgressState
   static const Color textMuted = Color(0xFF667085);
   static const Color cardBorder = Color(0xFFE4E7EC);
 
-  static const List<QuizQuestion> _questionBank = [
-    QuizQuestion(
-      question:
-          'Which principle explains why a spinning ice skater pulls their arms in to rotate faster?',
-      options: [
-        'Conservation of Linear Momentum',
-        'Conservation of Angular Momentum',
-        "Newton's Third Law of Motion",
-        'Centripetal Force Acceleration',
-      ],
-      correctAnswerIndex: 1,
-      explanation:
-          'Angular momentum stays constant when no net outside torque acts. Pulling the arms in reduces the skater\'s moment of inertia, so angular velocity increases.',
-    ),
-    QuizQuestion(
-      question: 'What is the SI unit of electric current?',
-      options: ['Volt', 'Ohm', 'Ampere', 'Watt'],
-      correctAnswerIndex: 2,
-      explanation:
-          'Current is measured in Amperes (A) — it measures the rate of charge flow past a given point.',
-    ),
-    QuizQuestion(
-      question: 'Which data structure follows FIFO (First In, First Out) ordering?',
-      options: ['Stack', 'Queue', 'Tree', 'Graph'],
-      correctAnswerIndex: 1,
-      explanation:
-          'A Queue adds elements at the tail and removes from the head, ensuring the earliest inserted element is dequeued first.',
-    ),
-  ];
+  // ============================================================
+  // QUESTION BANKS BY CLASS CATEGORY
+  // ============================================================
 
-  int get _totalQuestions => _questionBank.length;
+  static const Map<String, List<QuizQuestion>> _classQuestionBanks = {
+    // 1st–5th Class
+    '1st–5th Class': [
+      QuizQuestion(
+        question: 'What is 5 + 3?',
+        options: ['6', '7', '8', '9'],
+        correctAnswerIndex: 2, // 8
+        explanation: '5 plus 3 equals 8.',
+      ),
+      QuizQuestion(
+        question: 'Which animal is known as the “King of the Jungle”?',
+        options: ['Elephant', 'Lion', 'Tiger', 'Horse'],
+        correctAnswerIndex: 1, // Lion
+        explanation: 'The lion is traditionally called the King of the Jungle.',
+      ),
+      QuizQuestion(
+        question: 'How many days are there in one week?',
+        options: ['5', '6', '7', '8'],
+        correctAnswerIndex: 2, // 7
+        explanation: 'There are 7 days in a week.',
+      ),
+    ],
+
+    // 6th–10th Class
+    '6th–10th Class': [
+      QuizQuestion(
+        question: 'What is the value of 12 × 5?',
+        options: ['50', '60', '70', '80'],
+        correctAnswerIndex: 1, // 60
+        explanation: '12 multiplied by 5 equals 60.',
+      ),
+      QuizQuestion(
+        question: 'Which planet is known as the Red Planet?',
+        options: ['Earth', 'Venus', 'Mars', 'Jupiter'],
+        correctAnswerIndex: 2, // Mars
+        explanation: 'Mars is called the Red Planet due to iron oxide on its surface.',
+      ),
+      QuizQuestion(
+        question: 'What is the process by which plants make their food?',
+        options: ['Respiration', 'Digestion', 'Photosynthesis', 'Transpiration'],
+        correctAnswerIndex: 2, // Photosynthesis
+        explanation: 'Photosynthesis is the process plants use to convert sunlight into food.',
+      ),
+    ],
+
+    // 11th–12th Class
+    '11th–12th Class': [
+      QuizQuestion(
+        question: 'What is the SI unit of force?',
+        options: ['Joule', 'Watt', 'Newton', 'Pascal'],
+        correctAnswerIndex: 2, // Newton
+        explanation: 'The SI unit of force is the Newton (N).',
+      ),
+      QuizQuestion(
+        question: 'If the value of x is 5, what is the value of 2x² + 3?',
+        options: ['43', '50', '53', '58'],
+        correctAnswerIndex: 2, // 53
+        explanation: '2(5²) + 3 = 2(25) + 3 = 50 + 3 = 53.',
+      ),
+      QuizQuestion(
+        question: 'Which part of the cell contains genetic material?',
+        options: ['Cell wall', 'Nucleus', 'Cytoplasm', 'Ribosome'],
+        correctAnswerIndex: 1, // Nucleus
+        explanation: 'The cell nucleus contains DNA and genetic material.',
+      ),
+    ],
+
+    // Undergraduate / College Students
+    'Undergraduate / College Students': [
+      QuizQuestion(
+        question: 'Which data structure follows the LIFO principle?',
+        options: ['Queue', 'Stack', 'Array', 'Linked List'],
+        correctAnswerIndex: 1, // Stack
+        explanation: 'A Stack follows the Last-In, First-Out (LIFO) principle.',
+      ),
+      QuizQuestion(
+        question: 'What does CPU stand for?',
+        options: [
+          'Central Processing Unit',
+          'Computer Processing Utility',
+          'Central Program Unit',
+          'Computer Primary Unit',
+        ],
+        correctAnswerIndex: 0, // Central Processing Unit
+        explanation: 'CPU stands for Central Processing Unit.',
+      ),
+      QuizQuestion(
+        question: 'Which of the following is an example of an operating system?',
+        options: ['Python', 'MySQL', 'Linux', 'HTML'],
+        correctAnswerIndex: 2, // Linux
+        explanation: 'Linux is an operating system kernel.',
+      ),
+    ],
+
+    // Postgraduate / Higher Studies
+    'Postgraduate / Higher Studies': [
+      QuizQuestion(
+        question: 'What is the primary purpose of statistical analysis in research?',
+        options: [
+          'To design websites',
+          'To interpret and analyze data',
+          'To create computer hardware',
+          'To write programming languages',
+        ],
+        correctAnswerIndex: 1, // To interpret and analyze data
+        explanation: 'Statistical analysis helps researchers understand and interpret data.',
+      ),
+      QuizQuestion(
+        question: 'Which research method primarily uses numerical data for analysis?',
+        options: [
+          'Qualitative research',
+          'Quantitative research',
+          'Historical research',
+          'Narrative research',
+        ],
+        correctAnswerIndex: 1, // Quantitative research
+        explanation: 'Quantitative research measures variables numerically.',
+      ),
+      QuizQuestion(
+        question: 'What does AI stand for?',
+        options: [
+          'Automated Internet',
+          'Artificial Intelligence',
+          'Advanced Information',
+          'Applied Integration',
+        ],
+        correctAnswerIndex: 1, // Artificial Intelligence
+        explanation: 'AI stands for Artificial Intelligence.',
+      ),
+    ],
+
+    // MBA / Management Students
+    'MBA / Management Students': [
+      QuizQuestion(
+        question: 'What does ROI stand for?',
+        options: [
+          'Return on Investment',
+          'Rate of Income',
+          'Revenue on Investment',
+          'Return on Income',
+        ],
+        correctAnswerIndex: 0, // Return on Investment
+        explanation: 'ROI stands for Return on Investment.',
+      ),
+      QuizQuestion(
+        question: 'Which of the following is a part of the 4Ps of marketing?',
+        options: ['People', 'Product', 'Planning', 'Performance'],
+        correctAnswerIndex: 1, // Product
+        explanation: 'The 4Ps are Product, Price, Place, and Promotion.',
+      ),
+      QuizQuestion(
+        question: 'What is the main purpose of SWOT analysis?',
+        options: [
+          'To calculate employee salaries',
+          'To analyze strengths, weaknesses, opportunities, and threats',
+          'To prepare financial statements',
+          'To calculate market price',
+        ],
+        correctAnswerIndex: 1, // Strengths, weaknesses, etc.
+        explanation: 'SWOT evaluates Strengths, Weaknesses, Opportunities, and Threats.',
+      ),
+    ],
+  };
+
+  String _resolveCategory(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return OnboardingAssessmentInProgress.activeClassCategory;
+    }
+    final lower = raw.toLowerCase();
+
+    if (lower.contains('mba') ||
+        lower.contains('management') ||
+        lower.contains('bba') ||
+        lower.contains('business')) {
+      return 'MBA / Management Students';
+    }
+    if (lower.contains('post') ||
+        lower.contains('pg') ||
+        lower.contains('master') ||
+        lower.contains('m.tech') ||
+        lower.contains('phd') ||
+        lower.contains('research')) {
+      return 'Postgraduate / Higher Studies';
+    }
+    if (lower.contains('undergrad') ||
+        lower.contains('ug') ||
+        lower.contains('college') ||
+        lower.contains('b.tech') ||
+        lower.contains('b.sc') ||
+        lower.contains('b.com') ||
+        lower.contains('degree')) {
+      return 'Undergraduate / College Students';
+    }
+    if (lower.contains('11') ||
+        lower.contains('12') ||
+        lower.contains('senior') ||
+        lower.contains('inter')) {
+      return '11th–12th Class';
+    }
+    if (lower.contains('1') ||
+        lower.contains('2') ||
+        lower.contains('3') ||
+        lower.contains('4') ||
+        lower.contains('5') ||
+        lower.contains('primary') ||
+        lower.contains('foundational')) {
+      return '1st–5th Class';
+    }
+    return '6th–10th Class';
+  }
+
+  late final String _activeCategory;
+  late final List<QuizQuestion> _questions;
   int _currentIndex = 0;
-  late List<int?> _selectedAnswers;
-  late Timer _timer;
-  late Duration _remaining;
+  final Map<int, int> _selectedAnswers = {};
+
+  late int _remainingSeconds;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = 0;
-    _selectedAnswers = List<int?>.filled(_totalQuestions, null);
-    _remaining = widget.initialTime;
-    _timer = Timer.periodic(const Duration(seconds: 1), _onTick);
+    _activeCategory = _resolveCategory(widget.selectedClass);
+    _questions = _classQuestionBanks[_activeCategory] ??
+        _classQuestionBanks['6th–10th Class']!;
+
+    _remainingSeconds = widget.initialTime.inSeconds;
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        setState(() => _remainingSeconds--);
+      } else {
+        _timer?.cancel();
+        _submitAssessment();
+      }
+    });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
-  void _onTick(Timer timer) {
-    if (_remaining.inSeconds <= 0) {
-      timer.cancel();
-      return;
-    }
-    setState(() {
-      _remaining = _remaining - const Duration(seconds: 1);
-    });
-  }
-
-  QuizQuestion get _currentQuestion => _questionBank[_currentIndex];
-  bool get _hasAnswered => _selectedAnswers[_currentIndex] != null;
-  bool get _isCorrect =>
-      _selectedAnswers[_currentIndex] == _currentQuestion.correctAnswerIndex;
-
-  int get _correctCount {
-    var count = 0;
-    for (var i = 0; i < _questionBank.length; i++) {
-      if (_selectedAnswers[i] == _questionBank[i].correctAnswerIndex) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  double get _progress => (_currentIndex + 1) / _totalQuestions;
-
-  String get _formattedTime {
-    final minutes =
-        _remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds =
-        _remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+  String _formatDuration(int totalSeconds) {
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
   void _selectOption(int optionIndex) {
-    if (_hasAnswered) return;
     setState(() {
       _selectedAnswers[_currentIndex] = optionIndex;
     });
   }
 
-  void _goToPrevious() {
-    if (_currentIndex == 0) return;
-    setState(() {
-      _currentIndex -= 1;
-    });
-  }
-
-  void _goToNext() {
-    if (_currentIndex >= _totalQuestions - 1) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => OnboardingCodingTest(
-            skillLevel: widget.skillLevel,
-            branch: widget.branch,
-            course: widget.course,
-            cognitiveScore: _correctCount,
-          ),
-        ),
-      );
-      return;
+  void _nextQuestion() {
+    if (_currentIndex < _questions.length - 1) {
+      setState(() => _currentIndex++);
+    } else {
+      _submitAssessment();
     }
-    setState(() {
-      _currentIndex += 1;
-    });
   }
 
-  void _showHint() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Sophia AI Hint: Focus on rotational motion & physics conservation principles!'),
-        backgroundColor: navy,
+  void _prevQuestion() {
+    if (_currentIndex > 0) {
+      setState(() => _currentIndex--);
+    }
+  }
+
+  // ============================================================
+  // DIRECT TO ASSESSMENT COMPLETE (SKIPS CREATIVE QUESTION)
+  // ============================================================
+  void _submitAssessment() {
+    _timer?.cancel();
+
+    // Calculate score
+    int score = 0;
+    for (int i = 0; i < _questions.length; i++) {
+      if (_selectedAnswers[i] == _questions[i].correctAnswerIndex) {
+        score++;
+      }
+    }
+
+    final int total = _questions.length;
+    final int accuracy = ((score / total) * 100).round();
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AssessmentComplete(
+          score: score,
+          totalScore: total,
+          accuracyPercent: accuracy,
+          subjectLabel: _activeCategory,
+          unitLabel: 'Baseline Evaluation',
+          masteryPercent: accuracy,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentQ = _questions[_currentIndex];
+    final selectedOption = _selectedAnswers[_currentIndex];
+    final progress = (_currentIndex + 1) / _questions.length;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: navy, size: 22),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        centerTitle: true,
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF0F2),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.timer_outlined, color: brandRed, size: 16),
-              const SizedBox(width: 6),
-              Text(
-                _formattedTime,
-                style: const TextStyle(
-                  color: brandRed,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
+        automaticallyImplyLeading: false,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Assessment • $_activeCategory',
+              style: const TextStyle(
+                color: navy,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
               ),
-            ],
-          ),
+            ),
+            Text(
+              'Question ${_currentIndex + 1} of ${_questions.length}',
+              style: const TextStyle(
+                color: textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.outlined_flag_rounded, color: textMuted, size: 20),
-            onPressed: () {},
+          Container(
+            margin: const EdgeInsets.only(right: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF0F2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFECDCA)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.timer_outlined, color: brandRed, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  _formatDuration(_remainingSeconds),
+                  style: const TextStyle(
+                    color: brandRed,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: const Color(0xFFF2F4F7),
+              valueColor: const AlwaysStoppedAnimation<Color>(brandRed),
+              minHeight: 4,
+            ),
+
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Question Counter & Progress
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Question ${_currentIndex + 1} of $_totalQuestions',
-                          style: const TextStyle(
-                            color: navy,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          '${(_progress * 100).round()}% Completed',
-                          style: const TextStyle(
-                            color: textMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: _progress,
-                        minHeight: 5,
-                        backgroundColor: const Color(0xFFF2F4F7),
-                        valueColor: const AlwaysStoppedAnimation<Color>(brandRed),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Question Card
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color(0xFFF9FAFB),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: cardBorder),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       child: Text(
-                        _currentQuestion.question,
+                        currentQ.question,
                         style: const TextStyle(
                           color: navy,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          height: 1.35,
+                          height: 1.4,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
 
-                    // Option Cards
-                    ...List.generate(_currentQuestion.options.length, (i) {
-                      final selected = _selectedAnswers[_currentIndex] == i;
-                      final isCorrectOption =
-                          i == _currentQuestion.correctAnswerIndex;
+                    const SizedBox(height: 20),
+
+                    const Text(
+                      'Choose the correct answer:',
+                      style: TextStyle(
+                        color: textMuted,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    ...List.generate(currentQ.options.length, (index) {
+                      final optionText = currentQ.options[index];
+                      final isSelected = selectedOption == index;
+                      final optionLetters = ['A', 'B', 'C', 'D'];
 
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: _OptionTile(
-                          label: _currentQuestion.options[i],
-                          selected: selected,
-                          revealed: _hasAnswered,
-                          isCorrectOption: isCorrectOption,
-                          onTap: () => _selectOption(i),
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: InkWell(
+                          onTap: () => _selectOption(index),
+                          borderRadius: BorderRadius.circular(14),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFFFFF0F2)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isSelected ? brandRed : cardBorder,
+                                width: isSelected ? 1.8 : 1.2,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? brandRed
+                                        : const Color(0xFFF2F4F7),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      optionLetters[index],
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : navy,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Text(
+                                    optionText,
+                                    style: TextStyle(
+                                      color: isSelected ? brandRed : navy,
+                                      fontSize: 15,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: brandRed,
+                                    size: 20,
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     }),
-
-                    // Sophia's Explanation Card
-                    if (_hasAnswered) ...[
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: _isCorrect ? const Color(0xFFF6FEF9) : const Color(0xFFFFF0F2),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: _isCorrect ? const Color(0xFFB4F3D0) : const Color(0xFFFECDCA),
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: _isCorrect ? mastGreen : brandRed,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                _isCorrect ? Icons.check : Icons.close_rounded,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _isCorrect ? 'Correct! — Sophia AI' : "Sophia's Explanation",
-                                    style: TextStyle(
-                                      color: _isCorrect ? const Color(0xFF027A48) : brandRed,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    _currentQuestion.explanation,
-                                    style: const TextStyle(
-                                      color: Color(0xFF344054),
-                                      fontSize: 12,
-                                      height: 1.35,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
 
-            // Bottom Navigation Row
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFF2F4F7), width: 1)),
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF2F4F7), width: 1),
+                ),
               ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: _showHint,
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF9E6),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFFFDECC8)),
-                      ),
-                      child: const Icon(
-                        Icons.lightbulb_outline,
-                        color: Color(0xFFF4A100),
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-
                   if (_currentIndex > 0) ...[
-                    Expanded(
-                      flex: 4,
-                      child: SizedBox(
-                        height: 50,
-                        child: OutlinedButton(
-                          onPressed: _goToPrevious,
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: cardBorder),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: const Text(
-                            'Previous',
-                            style: TextStyle(
-                              color: navy,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                    OutlinedButton(
+                      onPressed: _prevQuestion,
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: cardBorder),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 14,
+                        ),
+                      ),
+                      child: const Text(
+                        'Previous',
+                        style: TextStyle(
+                          color: navy,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                   ],
-
                   Expanded(
-                    flex: 6,
                     child: Container(
                       height: 50,
                       decoration: BoxDecoration(
-                        gradient: _hasAnswered
-                            ? const LinearGradient(
-                                colors: [brandRed, brandGradientEnd],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              )
-                            : null,
-                        color: _hasAnswered ? null : const Color(0xFFF2F4F7),
+                        gradient: const LinearGradient(
+                          colors: [brandRed, brandGradientEnd],
+                        ),
                         borderRadius: BorderRadius.circular(14),
-                        boxShadow: _hasAnswered
-                            ? [
-                                BoxShadow(
-                                  color: brandRed.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ]
-                            : null,
+                        boxShadow: [
+                          BoxShadow(
+                            color: brandRed.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: ElevatedButton(
-                        onPressed: _hasAnswered ? _goToNext : null,
+                        onPressed: selectedOption != null ? _nextQuestion : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
-                          disabledBackgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.grey.shade300,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -463,18 +612,20 @@ class _OnboardingAssessmentInProgressState
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              _currentIndex >= _totalQuestions - 1 ? 'Continue' : 'Next Question',
-                              style: TextStyle(
-                                color: _hasAnswered ? Colors.white : const Color(0xFF98A2B3),
-                                fontSize: 15,
+                              _currentIndex == _questions.length - 1
+                                  ? 'View Evaluation Report'
+                                  : 'Next Question',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(width: 6),
-                            Icon(
+                            const SizedBox(width: 8),
+                            const Icon(
                               Icons.arrow_forward_rounded,
-                              color: _hasAnswered ? Colors.white : const Color(0xFF98A2B3),
-                              size: 16,
+                              color: Colors.white,
+                              size: 18,
                             ),
                           ],
                         ),
@@ -482,118 +633,6 @@ class _OnboardingAssessmentInProgressState
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _OptionTile extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final bool revealed;
-  final bool isCorrectOption;
-  final VoidCallback onTap;
-
-  const _OptionTile({
-    required this.label,
-    required this.selected,
-    required this.revealed,
-    required this.isCorrectOption,
-    required this.onTap,
-  });
-
-  static const Color navy = Color(0xFF1D3B64);
-  static const Color brandRed = Color(0xFFEF3340);
-  static const Color mastGreen = Color(0xFF12B76A);
-  static const Color cardBorder = Color(0xFFE4E7EC);
-
-  Color get _bgColor {
-    if (!revealed) return selected ? const Color(0xFFFFF0F2) : Colors.white;
-    if (isCorrectOption) return const Color(0xFFF6FEF9);
-    if (selected) return const Color(0xFFFFF0F2);
-    return Colors.white;
-  }
-
-  Color get _borderColor {
-    if (!revealed) return selected ? brandRed : cardBorder;
-    if (isCorrectOption) return mastGreen;
-    if (selected) return brandRed;
-    return cardBorder;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: revealed ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: _bgColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: _borderColor,
-            width: selected || (revealed && isCorrectOption) ? 1.8 : 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: revealed && isCorrectOption
-                    ? mastGreen
-                    : (selected ? brandRed : Colors.transparent),
-                border: Border.all(
-                  color: revealed && isCorrectOption
-                      ? mastGreen
-                      : (selected ? brandRed : cardBorder),
-                  width: 2,
-                ),
-              ),
-              child: revealed && isCorrectOption
-                  ? const Icon(Icons.check, color: Colors.white, size: 14)
-                  : (selected && revealed && !isCorrectOption
-                      ? const Icon(Icons.close, color: Colors.white, size: 14)
-                      : (selected
-                          ? Center(
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
-                          : null)),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: revealed && isCorrectOption
-                      ? const Color(0xFF027A48)
-                      : (selected && revealed && !isCorrectOption
-                          ? brandRed
-                          : (selected ? brandRed : navy)),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
             ),
           ],

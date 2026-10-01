@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'onboarding_subject_selection.dart';
+import 'onboarding_assessment_in_progress.dart';
 
 class OnboardingClassSelection extends StatefulWidget {
   const OnboardingClassSelection({super.key});
@@ -107,7 +108,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Primary',
                             subtitle: 'Classes 1–5',
-                            value: 'Primary',
+                            value: '1st–5th Class',
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -115,7 +116,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Middle School',
                             subtitle: 'Classes 6–8',
-                            value: 'Middle School',
+                            value: '6th–10th Class',
                           ),
                         ),
                       ],
@@ -138,7 +139,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'High School',
                             subtitle: 'Classes 9–10',
-                            value: 'High School',
+                            value: '6th–10th Class',
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -146,7 +147,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Intermediate',
                             subtitle: 'Classes 11–12',
-                            value: 'Intermediate',
+                            value: '11th–12th Class',
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -154,7 +155,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Other',
                             subtitle: 'Other schooling',
-                            value: 'Other Schooling',
+                            value: '6th–10th Class',
                           ),
                         ),
                       ],
@@ -176,16 +177,24 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                         Expanded(
                           child: _classCard(
                             title: 'College',
-                            subtitle: 'Undergraduate',
-                            value: 'College',
+                            subtitle: 'Undergraduate (UG)',
+                            value: 'Undergraduate / College Students',
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: _classCard(
                             title: 'Postgraduate',
-                            subtitle: "Master's degree",
-                            value: 'Postgraduate',
+                            subtitle: "Master's degree (PG)",
+                            value: 'Postgraduate / Higher Studies',
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _classCard(
+                            title: 'Management',
+                            subtitle: 'MBA / Business',
+                            value: 'MBA / Management Students',
                           ),
                         ),
                       ],
@@ -212,7 +221,6 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Sir's Sleek Continue Button
                   Container(
                     width: double.infinity,
                     height: 52,
@@ -273,7 +281,6 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Settings Text
                   const Text(
                     'You can change this anytime in settings',
                     textAlign: TextAlign.center,
@@ -350,7 +357,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: isSelected ? brandRed : navy,
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w700,
                 height: 1.2,
               ),
@@ -374,6 +381,10 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
 
   void _continue() {
     FocusScope.of(context).unfocus();
+    if (selectedClass != null) {
+      // Passes the selected category forward to the quiz screen
+      OnboardingAssessmentInProgress.activeClassCategory = selectedClass!;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
