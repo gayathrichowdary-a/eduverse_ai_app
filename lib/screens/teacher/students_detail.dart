@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class StudentsDetail extends StatelessWidget {
   const StudentsDetail({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -16,12 +25,13 @@ class StudentsDetail extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -33,14 +43,12 @@ class StudentsDetail extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -50,8 +58,8 @@ class StudentsDetail extends StatelessWidget {
                     "Students Needing Help",
                     style: TextStyle(
                       fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ],
@@ -70,7 +78,7 @@ class StudentsDetail extends StatelessWidget {
                         name: "Arjun Mehta",
                         topic: "Quadratic Equations",
                         percent: 42,
-                        percentColor: Color(0xFFE94A56),
+                        percentColor: Color(0xFFF12C68),
                         lastActive: "15 mins ago",
                         recommendation:
                             "Struggling with factoring. Recommend 1-on-1 session on the discriminant formula.",
@@ -90,7 +98,7 @@ class StudentsDetail extends StatelessWidget {
                         name: "Rohan Das",
                         topic: "World War II",
                         percent: 38,
-                        percentColor: Color(0xFFE94A56),
+                        percentColor: Color(0xFFF12C68),
                         lastActive: "Yesterday",
                         recommendation:
                             "Low engagement on timeline-based questions. Try a visual timeline exercise.",
@@ -134,10 +142,8 @@ class _StudentDetailCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +155,7 @@ class _StudentDetailCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFEDEDED),
+                  color: Color(0xFFF0EEFB),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -177,7 +183,7 @@ class _StudentDetailCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -185,7 +191,7 @@ class _StudentDetailCard extends StatelessWidget {
                       "Topic: $topic",
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.grey,
+                        color: Color(0xFF7B8798),
                       ),
                     ),
                   ],
@@ -209,7 +215,7 @@ class _StudentDetailCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: percent / 100,
               minHeight: 6,
-              backgroundColor: const Color(0xFFEFEFEF),
+              backgroundColor: const Color(0xFFEDEBF7),
               valueColor: AlwaysStoppedAnimation<Color>(percentColor),
             ),
           ),
@@ -218,11 +224,11 @@ class _StudentDetailCard extends StatelessWidget {
 
           Row(
             children: [
-              const Icon(Icons.access_time, size: 14, color: Colors.grey),
+              const Icon(Icons.access_time, size: 14, color: Color(0xFF7B8798)),
               const SizedBox(width: 6),
               Text(
                 "Last active: $lastActive",
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF7B8798)),
               ),
             ],
           ),
@@ -233,14 +239,14 @@ class _StudentDetailCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF7FF),
+              color: const Color(0xFFF0EEFB),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Icon(Icons.lightbulb_outline,
-                    size: 16, color: Color(0xFF1F355C)),
+                    size: 16, color: Color(0xFF0B2F63)),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -248,7 +254,7 @@ class _StudentDetailCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 12,
                       height: 1.4,
-                      color: Color(0xFF1F355C),
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ),

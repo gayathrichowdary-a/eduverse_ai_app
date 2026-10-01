@@ -3,6 +3,15 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:flutter/material.dart';
+
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
 Future<void> generateAndOpenPdf(BuildContext context) async {
   final pdf = pw.Document();
 
@@ -82,7 +91,7 @@ class FullReportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -92,12 +101,13 @@ class FullReportScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -109,14 +119,12 @@ class FullReportScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -131,7 +139,7 @@ class FullReportScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F355C),
+                            color: Color(0xFF0B2F63),
                           ),
                         ),
                         SizedBox(height: 2),
@@ -139,8 +147,8 @@ class FullReportScreen extends StatelessWidget {
                           "Full Report",
                           style: TextStyle(
                             fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F355C),
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0B2F63),
                           ),
                         ),
                       ],
@@ -153,7 +161,7 @@ class FullReportScreen extends StatelessWidget {
   child: Container(
     padding: const EdgeInsets.all(8),
     decoration: BoxDecoration(
-      color: const Color(0xFFE94A56),
+      color: const Color(0xFFF12C68),
       borderRadius: BorderRadius.circular(10),
     ),
     child: const Icon(
@@ -184,7 +192,7 @@ class FullReportScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -230,7 +238,7 @@ class FullReportScreen extends StatelessWidget {
                           const SizedBox(width: 14),
                           Expanded(
                             child: _ReportStatCard(
-                              iconColor: const Color(0xFFE94A56),
+                              iconColor: const Color(0xFFF12C68),
                               icon: Icons.code,
                               subject: "Coding",
                               value: "95%",
@@ -249,7 +257,7 @@ class FullReportScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -261,19 +269,17 @@ class FullReportScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: Column(
                           children: [
                             _ReportRow(label: "Overall Attendance", value: "96%"),
-                            const Divider(height: 24, color: Color(0xFFEFEFEF)),
+                            const Divider(height: 24, color: Color(0xFFEDEBF7)),
                             _ReportRow(label: "Quizzes Taken", value: "24"),
-                            const Divider(height: 24, color: Color(0xFFEFEFEF)),
+                            const Divider(height: 24, color: Color(0xFFEDEBF7)),
                             _ReportRow(label: "Avg. Quiz Score", value: "A-"),
-                            const Divider(height: 24, color: Color(0xFFEFEFEF)),
+                            const Divider(height: 24, color: Color(0xFFEDEBF7)),
                             _ReportRow(label: "Class Rank", value: "#4 of 42"),
                           ],
                         ),
@@ -288,7 +294,7 @@ class FullReportScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -300,10 +306,8 @@ class FullReportScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +342,7 @@ class FullReportScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -350,10 +354,8 @@ class FullReportScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: Row(
                           children: [
@@ -366,7 +368,7 @@ class FullReportScreen extends StatelessWidget {
                               ),
                               child: const Icon(
                                 Icons.rocket_launch_outlined,
-                                color: Color(0xFFE94A56),
+                                color: Color(0xFFF12C68),
                                 size: 24,
                               ),
                             ),
@@ -390,7 +392,7 @@ class FullReportScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF1F355C),
+                                      color: Color(0xFF0B2F63),
                                     ),
                                   ),
                                   SizedBox(height: 2),
@@ -445,10 +447,8 @@ class _ReportStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,7 +477,7 @@ class _ReportStatCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1F355C),
+              color: Color(0xFF0B2F63),
             ),
           ),
           const SizedBox(height: 2),
@@ -518,7 +518,7 @@ class _ReportRow extends StatelessWidget {
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1F355C),
+            color: Color(0xFF0B2F63),
           ),
         ),
       ],
@@ -550,7 +550,7 @@ class _WellbeingBar extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1F355C),
+                color: Color(0xFF0B2F63),
               ),
             ),
             Text(
@@ -569,7 +569,7 @@ class _WellbeingBar extends StatelessWidget {
           child: LinearProgressIndicator(
             value: percent / 100,
             minHeight: 8,
-            backgroundColor: const Color(0xFFEFEFEF),
+            backgroundColor: const Color(0xFFEDEBF7),
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),

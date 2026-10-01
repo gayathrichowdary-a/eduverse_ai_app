@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -16,12 +25,13 @@ class NotificationsScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -33,14 +43,12 @@ class NotificationsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -50,8 +58,8 @@ class NotificationsScreen extends StatelessWidget {
                     "Notifications",
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ],
@@ -82,7 +90,7 @@ class NotificationsScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       const _NotificationCard(
                         icon: Icons.warning_rounded,
-                        iconBackground: Color(0xFFE94A56),
+                        iconBackground: Color(0xFFF12C68),
                         title: "Low Focus Detected",
                         subtitle: "Extended time spent on Social Media app",
                         time: "1 hour ago",
@@ -118,7 +126,7 @@ class NotificationsScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       const _NotificationCard(
                         icon: Icons.message_outlined,
-                        iconBackground: Color(0xFF1F355C),
+                        iconBackground: Color(0xFF0B2F63),
                         title: "Message from Teacher",
                         subtitle:
                             "\"Arjun did great in today's group project!\"",
@@ -127,7 +135,7 @@ class NotificationsScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       const _NotificationCard(
                         icon: Icons.trending_down,
-                        iconBackground: Color(0xFFE94A56),
+                        iconBackground: Color(0xFFF12C68),
                         title: "Score Drop Alert",
                         subtitle: "Chemistry quiz score fell to 55%",
                         time: "Monday, 10:05 AM",
@@ -159,7 +167,7 @@ class _DateHeader extends StatelessWidget {
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: Color(0xFF1F355C),
+        color: Color(0xFF0B2F63),
       ),
     );
   }
@@ -188,10 +196,8 @@ class _NotificationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +224,7 @@ class _NotificationCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1F355C),
+                    color: Color(0xFF0B2F63),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -226,7 +232,7 @@ class _NotificationCard extends StatelessWidget {
                   subtitle,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: Color(0xFF7B8798),
                   ),
                 ),
                 const SizedBox(height: 6),

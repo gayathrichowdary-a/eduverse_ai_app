@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class SchoolDashboard extends StatelessWidget {
   const SchoolDashboard({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color yellow = Color(0xFFFFD52E);
 
   void _showComingSoon(BuildContext context, String feature) {
@@ -20,7 +29,7 @@ class SchoolDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -31,13 +40,14 @@ class SchoolDashboard extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-                decoration: const BoxDecoration(
-                  color: yellow,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
                   ),
-                ),
+                boxShadow: _softShadow,
+              ),
                 child: Row(
                   children: [
                     Container(
@@ -46,7 +56,8 @@ class SchoolDashboard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(26),
-                        border: Border.all(color: navy, width: 2),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(Icons.business_rounded, color: navy),
                     ),
@@ -59,7 +70,7 @@ class SchoolDashboard extends StatelessWidget {
                             "School Dashboard",
                             style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w800,
                               color: navy,
                             ),
                           ),
@@ -132,7 +143,7 @@ class SchoolDashboard extends StatelessWidget {
                     const SizedBox(height: 14),
                     _SchoolModuleTile(
                       icon: Icons.trending_up_rounded,
-                      color: const Color(0xFFE94A56),
+                      color: const Color(0xFFF12C68),
                       title: "Teacher Performance",
                       subtitle: "Review teacher effectiveness scores",
                       onTap: () => _showComingSoon(context, "Teacher Performance"),
@@ -171,7 +182,7 @@ class _SchoolStatCard extends StatelessWidget {
 
   const _SchoolStatCard({required this.label, required this.value});
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +191,7 @@ class _SchoolStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: navy, width: 1.4),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -223,7 +234,7 @@ class _SchoolModuleTile extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +247,8 @@ class _SchoolModuleTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy, width: 2),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
         ),
         child: Row(
           children: [
@@ -266,7 +278,7 @@ class _SchoolModuleTile extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF7B8798)),
                   ),
                 ],
               ),

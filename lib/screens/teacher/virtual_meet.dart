@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// virtual_meet.dart
 /// Teacher module — online classes & extracurricular meetings.
 ///   1. VirtualMeet         -> upcoming classes list, create meeting
@@ -14,10 +23,10 @@ import 'package:flutter/material.dart';
 /// with the kNavy/kYellow/etc. constants already declared in
 /// agile_board_ide.dart when both files are imported into the same hub.
 
-const Color _navy = Color(0xFF1F355C);
+const Color _navy = Color(0xFF0B2F63);
 const Color _yellow = Color(0xFFFFD52E);
-const Color _bg = Color(0xFFF8F8F8);
-const Color _coral = Color(0xFFE94A56);
+const Color _bg = Color(0xFFF6F5FD);
+const Color _coral = Color(0xFFF12C68);
 const Color _green = Color(0xFF57B97A);
 const Color _blue = Color(0xFF58C7F3);
 
@@ -190,9 +199,10 @@ class _VirtualMeetState extends State<VirtualMeet> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: _yellow,
-                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(28), bottomRight: Radius.circular(28)),
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(28), bottomRight: Radius.circular(28)),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -203,13 +213,14 @@ class _VirtualMeetState extends State<VirtualMeet> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(color: _navy, width: 2),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(Icons.arrow_back, color: _navy, size: 20),
                     ),
                   ),
                   const SizedBox(width: 14),
-                  const Text("Virtual Meet", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _navy)),
+                  const Text("Virtual Meet", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: _navy)),
                 ],
               ),
             ),
@@ -287,7 +298,8 @@ class _MeetingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _navy, width: 2),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +355,7 @@ class _MeetingCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onReschedule,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: _navy, width: 2),
+                    side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),

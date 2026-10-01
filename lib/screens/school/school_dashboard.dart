@@ -8,12 +8,54 @@ import 'control_compliance.dart';
 import 'user_directory.dart';
 import 'campus_announcements.dart';
 import 'audit_proctoring.dart';
+import '../authentication/role_selection_page.dart';
 
 class SchoolDashboard extends StatelessWidget {
   const SchoolDashboard({super.key});
 
   static const Color navy = Color(0xFF1F355C);
   static const Color yellow = Color(0xFFFFD52E);
+  static const Color red = Color(0xFFEF3340);
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
+
+  Future<void> _confirmLogout(BuildContext context) async {
+    final bool? shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text(
+          "Log out?",
+          style: TextStyle(color: navy, fontWeight: FontWeight.bold),
+        ),
+        content: const Text("Are you sure you want to log out?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text("Cancel", style: TextStyle(color: navy)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text(
+              "Log out",
+              style: TextStyle(color: red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true && context.mounted) {
+      // TODO: clear your saved token/session here
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
+        (route) => false,
+      );
+    }
+  }
 
   // ============================================================
   // NAVIGATION
@@ -169,6 +211,27 @@ class SchoolDashboard extends StatelessWidget {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    // RIGHT: logout button
+                    GestureDetector(
+                      onTap: () => _confirmLogout(context),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(21),
+                          border: Border.all(color: navy, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.logout_rounded,
+                          color: navy,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ],

@@ -4,16 +4,16 @@ class TeacherAnalytics extends StatelessWidget {
   const TeacherAnalytics({super.key});
 
   // Colors
-  static const Color navy = Color(0xFF14213D);
-  static const Color brandRed = Color(0xFFE8394A);
-  static const Color subtitleBlue = Color(0xFF4D86AD);
+  static const Color navy = Color(0xFF0B2F63); // CHANGED
+  static const Color brandRed = Color(0xFFF12C68); // CHANGED
+  static const Color subtitleBlue = Color(0xFF7B8798); // CHANGED
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF6F5FD), // CHANGED: lavender bg
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF6F5FD), // CHANGED
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: navy),
@@ -21,7 +21,7 @@ class TeacherAnalytics extends StatelessWidget {
         ),
         title: const Text(
           "Analytics", // Correct Spelling: A-N-A-L-Y-T-I-C-S
-          style: TextStyle(color: navy, fontWeight: FontWeight.bold),
+          style: TextStyle(color: navy, fontWeight: FontWeight.w800, fontSize: 22), // CHANGED
         ),
       ),
       body: SingleChildScrollView(
@@ -65,7 +65,7 @@ class TeacherAnalytics extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F4F8),
+                color: const Color(0xFFF0EEFB), // CHANGED
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -95,13 +95,21 @@ class TeacherAnalytics extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
+          color: Colors.white, // CHANGED
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy.withValues(alpha: 0.1)),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+          boxShadow: [
+            BoxShadow(
+              color: navy.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: subtitleBlue, fontSize: 12)),
+            Text(title, style: const TextStyle(color: subtitleBlue, fontSize: 12.5)),
             const SizedBox(height: 10),
             // value.toString() converts the integer to text safely
             Text(

@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class GapsDetail extends StatelessWidget {
   const GapsDetail({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -16,12 +25,13 @@ class GapsDetail extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -33,14 +43,12 @@ class GapsDetail extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -50,8 +58,8 @@ class GapsDetail extends StatelessWidget {
                     "Learning Gaps",
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ],
@@ -68,7 +76,7 @@ class GapsDetail extends StatelessWidget {
                     children: const [
                       _SubjectGapCard(
                         subject: "Math",
-                        color: Color(0xFFE94A56),
+                        color: Color(0xFFF12C68),
                         weakTopics: [
                           _TopicGap(
                             topic: "Quadratic Equations",
@@ -175,10 +183,8 @@ class _SubjectGapCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +206,7 @@ class _SubjectGapCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F355C),
+                  color: Color(0xFF0B2F63),
                 ),
               ),
             ],
@@ -223,7 +229,7 @@ class _SubjectGapCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F355C),
+                            color: Color(0xFF0B2F63),
                           ),
                         ),
                       ),
@@ -233,8 +239,8 @@ class _SubjectGapCard extends StatelessWidget {
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: t.masteryPercent < 50
-                              ? const Color(0xFFE94A56)
-                              : const Color(0xFF1F355C),
+                              ? const Color(0xFFF12C68)
+                              : const Color(0xFF0B2F63),
                         ),
                       ),
                     ],
@@ -245,7 +251,7 @@ class _SubjectGapCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: t.masteryPercent / 100,
                       minHeight: 6,
-                      backgroundColor: const Color(0xFFEFEFEF),
+                      backgroundColor: const Color(0xFFEDEBF7),
                       valueColor: AlwaysStoppedAnimation<Color>(color),
                     ),
                   ),
@@ -254,7 +260,7 @@ class _SubjectGapCard extends StatelessWidget {
                     "${t.studentsAffected} students affected",
                     style: const TextStyle(
                       fontSize: 11,
-                      color: Colors.grey,
+                      color: Color(0xFF7B8798),
                     ),
                   ),
                 ],

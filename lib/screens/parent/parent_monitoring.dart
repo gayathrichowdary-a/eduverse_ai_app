@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'ai_chat_screen.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class ParentMonitoring extends StatelessWidget {
   const ParentMonitoring({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -18,14 +27,15 @@ class ParentMonitoring extends StatelessWidget {
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFD52E),
-                  borderRadius: BorderRadius.only(
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
+                decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
                   ),
-                ),
+                boxShadow: _softShadow,
+              ),
 
                 child: Column(
                   children: [
@@ -33,24 +43,21 @@ class ParentMonitoring extends StatelessWidget {
                     Row(
                       children: [
 
-                        Container(
-                          width: 58,
-                          height: 58,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(29),
-                            border: Border.all(
-                              color: const Color(0xFF1F355C),
-                              width: 2,
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context), // back to Parent Home Dashboard
+                          child: Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(21),
+                              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.5),
+                              boxShadow: _softShadow,
                             ),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "AR",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.grey,
-                              ),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Color(0xFF0B2F63),
+                              size: 20,
                             ),
                           ),
                         ),
@@ -65,9 +72,9 @@ class ParentMonitoring extends StatelessWidget {
                               Text(
                                 "Arjun's Progress",
                                 style: TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 24, // CHANGED: 28 -> 24
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F355C),
+                                  color: Color(0xFF0B2F63),
                                 ),
                               ),
 
@@ -86,27 +93,10 @@ class ParentMonitoring extends StatelessWidget {
                           ),
                         ),
 
-                        Container(
-                          width: 58,
-                          height: 58,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(29),
-                            border: Border.all(
-                              color: const Color(0xFF1F355C),
-                              width: 2,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.notifications,
-                            color: Colors.red,
-                          ),
-                        ),
-
                       ],
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 14),
 
                     Row(
                       children: [
@@ -119,7 +109,7 @@ class ParentMonitoring extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(width: 18),
+                        const SizedBox(width: 14),
 
                         Expanded(
                           child: _StatCard(
@@ -143,14 +133,12 @@ class ParentMonitoring extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: const Color(0xFF1F355C),
-                      width: 2,
-                    ),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                   ),
 
                   child: Column(
@@ -164,19 +152,19 @@ class ParentMonitoring extends StatelessWidget {
                           const Text(
                             "Academic Growth",
                             style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F355C),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0B2F63),
                             ),
                           ),
 
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 8,
+                              horizontal: 12,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFD52E),
+                              color: const Color(0xFFF0EEFB),
                               borderRadius:
                                   BorderRadius.circular(20),
                             ),
@@ -185,11 +173,17 @@ class ParentMonitoring extends StatelessWidget {
                                 Text(
                                   "Weekly",
                                   style: TextStyle(
+                                    fontSize: 13,
                                     fontWeight: FontWeight.bold,
+                                    color: Color(0xFF4F46E5),
                                   ),
                                 ),
-                                SizedBox(width: 6),
-                                Icon(Icons.keyboard_arrow_down),
+                                SizedBox(width: 4),
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 18,
+                                  color: Color(0xFF4F46E5),
+                                ),
                               ],
                             ),
                           ),
@@ -197,134 +191,134 @@ class ParentMonitoring extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
-                      SizedBox(
-                        height: 180,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-
-                            PieChart(
-                              PieChartData(
-                                startDegreeOffset: -78,
-                                centerSpaceRadius: 45,
-                                sectionsSpace: 4,
-                                sections: [
-                                  PieChartSectionData(
-                                    value: 10,
-                                    color: const Color(0xFF57B97A),
-                                    radius: 18,
-                                    showTitle: false,
-                                  ),
-                                  PieChartSectionData(
-                                    value: 45,
-                                    color: const Color(0xFFE83B4F),
-                                    radius: 18,
-                                    showTitle: false,
-                                  ),
-                                  PieChartSectionData(
-                                    value: 30,
-                                    color: const Color(0xFFFFC928),
-                                    radius: 18,
-                                    showTitle: false,
-                                  ),
-                                  PieChartSectionData(
-                                    value: 15,
-                                    color: const Color(0xFF58C7F3),
-                                    radius: 18,
-                                    showTitle: false,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-
-                                Text(
-                                  "82%",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1F355C),
-                                  ),
-                                ),
-
-                                Text(
-                                  "Overall",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-
-                              ],
-                            ),
-
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Column(
+                      Row(
                         children: [
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
+                          // Donut chart
+                          SizedBox(
+                            width: 132,
+                            height: 132,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
 
-                              _LegendItem(
-                                color: const Color(0xFFE84A5F),
-                                title: "Math",
-                                percent: "45%",
-                              ),
+                                PieChart(
+                                  PieChartData(
+                                    startDegreeOffset: -78,
+                                    centerSpaceRadius: 38,
+                                    sectionsSpace: 3,
+                                    sections: [
+                                      PieChartSectionData(
+                                        value: 10,
+                                        color: const Color(0xFF57B97A),
+                                        radius: 14,
+                                        showTitle: false,
+                                      ),
+                                      PieChartSectionData(
+                                        value: 45,
+                                        color: const Color(0xFFE83B4F),
+                                        radius: 14,
+                                        showTitle: false,
+                                      ),
+                                      PieChartSectionData(
+                                        value: 30,
+                                        color: const Color(0xFFFFC928),
+                                        radius: 14,
+                                        showTitle: false,
+                                      ),
+                                      PieChartSectionData(
+                                        value: 15,
+                                        color: const Color(0xFF58C7F3),
+                                        radius: 14,
+                                        showTitle: false,
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
-                              const SizedBox(width: 14),
+                                const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
 
-                              _LegendItem(
-                                color: const Color(0xFFF7C948),
-                                title: "Science",
-                                percent: "30%",
-                              ),
+                                    Text(
+                                      "82%",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF0B2F63),
+                                      ),
+                                    ),
 
-                              const SizedBox(width: 14),
+                                    Text(
+                                      "Overall",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF7B8798),
+                                      ),
+                                    ),
 
-                              _LegendItem(
-                                color: const Color(0xFF58C7F3),
-                                title: "English",
-                                percent: "15%",
-                              ),
-                            ],
+                                  ],
+                                ),
+
+                              ],
+                            ),
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(width: 20),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
+                          // Legend (vertical, next to the chart)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
 
-                              _LegendItem(
-                                color: const Color(0xFF52B86A),
-                                title: "Coding",
-                                percent: "10%",
-                              ),
+                                _LegendItem(
+                                  color: const Color(0xFFE83B4F),
+                                  title: "Math",
+                                  percent: "45%",
+                                ),
 
-                            ],
+                                const SizedBox(height: 10),
+
+                                _LegendItem(
+                                  color: const Color(0xFFFFC928),
+                                  title: "Science",
+                                  percent: "30%",
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                _LegendItem(
+                                  color: const Color(0xFF58C7F3),
+                                  title: "English",
+                                  percent: "15%",
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                _LegendItem(
+                                  color: const Color(0xFF57B97A),
+                                  title: "Coding",
+                                  percent: "10%",
+                                ),
+
+                              ],
+                            ),
                           ),
 
                         ],
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 14),
 
                       const Divider(
                         thickness: 1,
-                        color: Color(0xFFE5E5E5),
+                        color: Color(0xFFEDEBF7),
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 10),
 
                       Row(
                         children: [
@@ -336,19 +330,19 @@ class ParentMonitoring extends StatelessWidget {
                                 Text(
                                   "Quiz Avg",
                                   style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
+                                    color: Color(0xFF7B8798),
+                                    fontSize: 12,
                                   ),
                                 ),
 
-                                SizedBox(height: 6),
+                                SizedBox(height: 4),
 
                                 Text(
                                   "A-",
                                   style: TextStyle(
-                                    fontSize: 28,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1F355C),
+                                    color: Color(0xFF0B2F63),
                                   ),
                                 ),
 
@@ -358,7 +352,7 @@ class ParentMonitoring extends StatelessWidget {
 
                           Container(
                             width: 1,
-                            height: 60,
+                            height: 44,
                             color: Colors.grey.shade300,
                           ),
 
@@ -369,19 +363,19 @@ class ParentMonitoring extends StatelessWidget {
                                 Text(
                                   "Rank",
                                   style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
+                                    color: Color(0xFF7B8798),
+                                    fontSize: 12,
                                   ),
                                 ),
 
-                                SizedBox(height: 6),
+                                SizedBox(height: 4),
 
                                 Text(
                                   "#4",
                                   style: TextStyle(
-                                    fontSize: 28,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1F355C),
+                                    color: Color(0xFF0B2F63),
                                   ),
                                 ),
 
@@ -411,8 +405,8 @@ class ParentMonitoring extends StatelessWidget {
                       "Milestones & Alerts",
                       style: TextStyle(
                         fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F355C),
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0B2F63),
                       ),
                     ),
 
@@ -429,7 +423,7 @@ class ParentMonitoring extends StatelessWidget {
 
                     const MilestoneCard(
                       icon: Icons.warning_rounded,
-                      iconBackground: Color(0xFFE94A56),
+                      iconBackground: Color(0xFFF12C68),
                       title: "Low Focus: Social Media",
                       time: "1 hour ago",
                     ),
@@ -457,12 +451,10 @@ class ParentMonitoring extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF7FF),
+                    color: const Color(0xFFF0EEFB),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFF1F355C),
-                      width: 2,
-                    ),
+                    border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,14 +463,14 @@ class ParentMonitoring extends StatelessWidget {
                       Row(
                         children: const [
                           Icon(Icons.auto_awesome,
-                              color: Color(0xFF1F355C), size: 20),
+                              color: Color(0xFF0B2F63), size: 20),
                           SizedBox(width: 8),
                           Text(
                             "AI Mentor Insight",
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F355C),
+                              color: Color(0xFF0B2F63),
                             ),
                           ),
                         ],
@@ -513,7 +505,7 @@ class ParentMonitoring extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1F355C),
+                            backgroundColor: const Color(0xFF0B2F63),
                             foregroundColor: Colors.white,
                             elevation: 0,
                             padding:
@@ -559,42 +551,41 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
+          const SizedBox(height: 10),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Color(0xFF5E6D7A),
             ),
           ),
+          const SizedBox(height: 2),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 30,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1F355C),
+              color: Color(0xFF0B2F63),
             ),
           ),
         ],
@@ -633,7 +624,7 @@ class _LegendItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1F355C),
+            color: Color(0xFF0B2F63),
           ),
         ),
       ],
@@ -665,10 +656,8 @@ class MilestoneCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Row(
         children: [
@@ -699,7 +688,7 @@ class MilestoneCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1F355C),
+                    color: Color(0xFF0B2F63),
                   ),
                 ),
 
@@ -709,7 +698,7 @@ class MilestoneCard extends StatelessWidget {
                   time,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: Color(0xFF7B8798),
                   ),
                 ),
 
@@ -719,7 +708,7 @@ class MilestoneCard extends StatelessWidget {
 
           const Icon(
             Icons.chevron_right,
-            color: Color(0xFF1F355C),
+            color: Color(0xFF0B2F63),
           ),
         ],
       ),

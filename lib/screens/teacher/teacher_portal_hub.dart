@@ -8,17 +8,89 @@ import 'exam_compiler.dart';
 import 'agile_board_ide.dart';
 import 'virtual_meet.dart';
 import '../learning/ai_media_studio_screen.dart';
+import '../authentication/role_selection_page.dart';
 
 class TeacherPortalHub extends StatelessWidget {
   const TeacherPortalHub({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63); // CHANGED: matches video navy
+  static const Color yellow = Color(0xFFFFD52E); // no longer used in the UI
+  static const Color red = Color(0xFFEF3340);
+
+  // NEW: colors taken from the video
+  static const Color pageBg = Color(0xFFF6F5FD);
+  static const Color softBorder = Color(0xFFE6E2F7);
+  static const Color gradStart = Color(0xFF4F46E5);
+  static const Color gradEnd = Color(0xFFF12C68);
+
+  Future<void> _confirmLogout(BuildContext context) async {
+    final bool? shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white, // CHANGED
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20), // CHANGED
+        ),
+        title: const Text(
+          "Log out?",
+          style: TextStyle(color: navy, fontWeight: FontWeight.bold),
+        ),
+        content: const Text("Are you sure you want to log out?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text("Cancel", style: TextStyle(color: navy)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text(
+              "Log out",
+              style: TextStyle(color: red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true && context.mounted) {
+      // TODO: clear your saved token/session here
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
+        (route) => false,
+      );
+    }
+  }
+
+  // NEW: small round header button (back / logout) in the video style
+  Widget _circleButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(21),
+          border: Border.all(color: softBorder, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: navy.withValues(alpha: 0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: navy, size: 20),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: pageBg, // CHANGED: lavender bg
       body: SafeArea(
         child: Column(
           children: [
@@ -28,36 +100,41 @@ class TeacherPortalHub extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: yellow,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: navy.withValues(alpha: 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
-                  GestureDetector(
+                  // LEFT: back button
+                  _circleButton(
+                    icon: Icons.arrow_back,
                     onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(21),
-                        border: Border.all(color: navy, width: 2),
-                      ),
-                      child: const Icon(Icons.arrow_back, color: navy, size: 20),
-                    ),
                   ),
                   const SizedBox(width: 14),
                   const Text(
                     "Teacher Portal",
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800, // CHANGED: bold -> w800
                       color: navy,
                     ),
+                  ),
+                  const Spacer(),
+                  // RIGHT: logout button
+                  _circleButton(
+                    icon: Icons.logout_rounded,
+                    onTap: () => _confirmLogout(context),
                   ),
                 ],
               ),
@@ -69,27 +146,50 @@ class TeacherPortalHub extends StatelessWidget {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 16), // CHANGED: 18 -> 16
                 child: Column(
                   children: [
                     // AI Media Studio Launcher
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AIMediaStudioScreen()),
-                          );
-                        },
-                        icon: const Icon(Icons.auto_awesome),
-                        label: const Text('Manage & Synthesize AI Curricula'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF214675),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 0,
+                      child: DecoratedBox(
+                        // CHANGED: gradient pill like the Sign In button
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          gradient: const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [gradStart, gradEnd],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: gradEnd.withValues(alpha: 0.25),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AIMediaStudioScreen()),
+                            );
+                          },
+                          icon: const Icon(Icons.auto_awesome),
+                          label: const Text('Manage & Synthesize AI Curricula'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent, // CHANGED
+                            shadowColor: Colors.transparent, // CHANGED
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ), // CHANGED
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            elevation: 0,
+                          ),
                         ),
                       ),
                     ),
@@ -226,7 +326,7 @@ class _TeacherModuleTile extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63); // CHANGED
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +339,15 @@ class _TeacherModuleTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy, width: 2),
+          // CHANGED: thick navy border -> thin soft border + shadow
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: navy.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -270,14 +378,18 @@ class _TeacherModuleTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
+                      fontSize: 12.5, // CHANGED: 12 -> 12.5
+                      color: Color(0xFF7B8798), // CHANGED: grey -> blue-grey
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: navy),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Color(0xFF9AA3B5), // CHANGED: softer chevron
+              size: 24,
+            ),
           ],
         ),
       ),

@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class AssignPractice extends StatefulWidget {
   const AssignPractice({super.key});
 
@@ -28,7 +37,7 @@ class _AssignPracticeState extends State<AssignPractice> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -38,12 +47,13 @@ class _AssignPracticeState extends State<AssignPractice> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -55,14 +65,12 @@ class _AssignPracticeState extends State<AssignPractice> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -72,8 +80,8 @@ class _AssignPracticeState extends State<AssignPractice> {
                     "Assign Practice",
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ],
@@ -97,7 +105,7 @@ class _AssignPracticeState extends State<AssignPractice> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -112,21 +120,19 @@ class _AssignPracticeState extends State<AssignPractice> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: selectedTopic,
                             isExpanded: true,
                             icon: const Icon(Icons.keyboard_arrow_down,
-                                color: Color(0xFF1F355C)),
+                                color: Color(0xFF0B2F63)),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1F355C),
+                              color: Color(0xFF0B2F63),
                             ),
                             items: topics.map((t) {
                               return DropdownMenuItem(
@@ -155,7 +161,7 @@ class _AssignPracticeState extends State<AssignPractice> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F355C),
+                              color: Color(0xFF0B2F63),
                             ),
                           ),
                           Text(
@@ -182,10 +188,8 @@ class _AssignPracticeState extends State<AssignPractice> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: const Color(0xFF1F355C),
-                                width: 2,
-                              ),
+                              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                             ),
                             child: CheckboxListTile(
                               value: students[name],
@@ -196,14 +200,14 @@ class _AssignPracticeState extends State<AssignPractice> {
                               },
                               controlAffinity:
                                   ListTileControlAffinity.leading,
-                              activeColor: const Color(0xFFE94A56),
+                              activeColor: const Color(0xFFF12C68),
                               contentPadding: EdgeInsets.zero,
                               title: Text(
                                 name,
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF1F355C),
+                                  color: Color(0xFF0B2F63),
                                 ),
                               ),
                             ),
@@ -257,12 +261,12 @@ class _AssignPracticeState extends State<AssignPractice> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE94A56),
+                    backgroundColor: const Color(0xFFF12C68),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(30), // CHANGED
                     ),
                   ),
                   child: const Text(

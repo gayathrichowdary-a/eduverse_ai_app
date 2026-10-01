@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
 
@@ -36,7 +45,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         totalMarked == 0 ? 0 : (presentCount / totalMarked) * 100;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -46,12 +55,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -63,14 +73,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -80,8 +88,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     "Attendance",
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ],
@@ -106,10 +114,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: Row(
                           children: [
@@ -135,7 +141,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   style: const TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1F355C),
+                                    color: Color(0xFF0B2F63),
                                   ),
                                 ),
                                 const Text(
@@ -161,10 +167,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +179,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1F355C),
+                                color: Color(0xFF0B2F63),
                               ),
                             ),
 
@@ -227,11 +231,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                     textColor = const Color(0xFF1F5C33);
                                     break;
                                   case "absent":
-                                    bgColor = const Color(0xFFE94A56);
+                                    bgColor = const Color(0xFFF12C68);
                                     textColor = Colors.white;
                                     break;
                                   default:
-                                    bgColor = const Color(0xFFF0F0F0);
+                                    bgColor = const Color(0xFFEDEBF7);
                                     textColor = const Color(0xFF5E6D7A);
                                 }
 
@@ -264,12 +268,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                 ),
                                 const SizedBox(width: 16),
                                 _LegendDot(
-                                  color: const Color(0xFFE94A56),
+                                  color: const Color(0xFFF12C68),
                                   label: "Absent",
                                 ),
                                 const SizedBox(width: 16),
                                 _LegendDot(
-                                  color: const Color(0xFFF0F0F0),
+                                  color: const Color(0xFFEDEBF7),
                                   label: "Holiday/Weekend",
                                 ),
                               ],

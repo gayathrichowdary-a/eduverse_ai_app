@@ -3,6 +3,15 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:flutter/material.dart';
+
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
 Future<void> generateAndOpenTeacherPdf(
     BuildContext context, String format, String range) async {
   final pdf = pw.Document();
@@ -77,7 +86,7 @@ class _GenerateReportState extends State<GenerateReport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -87,12 +96,13 @@ class _GenerateReportState extends State<GenerateReport> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD52E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -104,14 +114,12 @@ class _GenerateReportState extends State<GenerateReport> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: const Color(0xFF1F355C),
-                          width: 2,
-                        ),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF1F355C),
+                        color: Color(0xFF0B2F63),
                         size: 20,
                       ),
                     ),
@@ -121,8 +129,8 @@ class _GenerateReportState extends State<GenerateReport> {
                     "Generate Report",
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                 ],
@@ -147,10 +155,8 @@ class _GenerateReportState extends State<GenerateReport> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFF1F355C),
-                            width: 2,
-                          ),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,14 +164,14 @@ class _GenerateReportState extends State<GenerateReport> {
                             Row(
                               children: const [
                                 Icon(Icons.description_outlined,
-                                    color: Color(0xFF1F355C), size: 20),
+                                    color: Color(0xFF0B2F63), size: 20),
                                 SizedBox(width: 8),
                                 Text(
                                   "Report Summary",
                                   style: TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1F355C),
+                                    color: Color(0xFF0B2F63),
                                   ),
                                 ),
                               ],
@@ -192,7 +198,7 @@ class _GenerateReportState extends State<GenerateReport> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -216,13 +222,11 @@ class _GenerateReportState extends State<GenerateReport> {
                               ),
                               decoration: BoxDecoration(
                                 color: isActive
-                                    ? const Color(0xFFE94A56)
+                                    ? const Color(0xFFF12C68)
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: const Color(0xFF1F355C),
-                                  width: 2,
-                                ),
+                                border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                               ),
                               child: Text(
                                 r,
@@ -231,7 +235,7 @@ class _GenerateReportState extends State<GenerateReport> {
                                   fontWeight: FontWeight.w700,
                                   color: isActive
                                       ? Colors.white
-                                      : const Color(0xFF1F355C),
+                                      : const Color(0xFF0B2F63),
                                 ),
                               ),
                             ),
@@ -248,7 +252,7 @@ class _GenerateReportState extends State<GenerateReport> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
 
@@ -273,13 +277,11 @@ class _GenerateReportState extends State<GenerateReport> {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     color: isActive
-                                        ? const Color(0xFF1F355C)
+                                        ? const Color(0xFF4F46E5)
                                         : Colors.white,
                                     borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: const Color(0xFF1F355C),
-                                      width: 2,
-                                    ),
+                                    border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                                   ),
                                   child: Text(
                                     f,
@@ -288,7 +290,7 @@ class _GenerateReportState extends State<GenerateReport> {
                                       fontWeight: FontWeight.w700,
                                       color: isActive
                                           ? Colors.white
-                                          : const Color(0xFF1F355C),
+                                          : const Color(0xFF0B2F63),
                                     ),
                                   ),
                                 ),
@@ -324,12 +326,12 @@ class _GenerateReportState extends State<GenerateReport> {
                   },
                   icon: const Icon(Icons.download, color: Colors.white),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE94A56),
+                    backgroundColor: const Color(0xFFF12C68),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(30), // CHANGED
                     ),
                   ),
                   label: const Text(
@@ -373,7 +375,7 @@ class _SummaryRow extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1F355C),
+            color: Color(0xFF0B2F63),
           ),
         ),
       ],

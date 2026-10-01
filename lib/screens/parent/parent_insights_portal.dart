@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'ai_chat_screen.dart';
 import 'full_report_screen.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class ParentDashboard extends StatelessWidget {
   const ParentDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -16,17 +25,38 @@ class ParentDashboard extends StatelessWidget {
               // ---------------- HEADER ----------------
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 25),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFD52E),
-                  borderRadius: BorderRadius.only(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
                   ),
-                ),
+                boxShadow: _softShadow,
+              ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // Back button -> Parent Home Dashboard
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(21),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.5),
+                          boxShadow: _softShadow,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Color(0xFF0B2F63),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,29 +72,19 @@ class ParentDashboard extends StatelessWidget {
                           Text(
                             "Arjun's Progress",
                             style: TextStyle(
-                              fontSize: 34,
+                              fontSize: 24, // CHANGED: 34 -> 24
                               fontWeight: FontWeight.bold,
+                              color: Color(0xFF0B2F63),
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        "AA",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 20,
-                        ),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // ---------------- ACADEMIC TITLE ----------------
               Padding(
@@ -75,22 +95,22 @@ class ParentDashboard extends StatelessWidget {
                       child: Text(
                         "Academic Mastery",
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 22, // CHANGED: 28 -> 22
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F355C),
+                          color: Color(0xFF0B2F63),
                         ),
                       ),
                     ),
                     Icon(
                       Icons.menu_book,
-                      color: Colors.red,
-                      size: 28,
+                      color: Color(0xFFF12C68),
+                      size: 24,
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
               // ---------------- SUBJECT CARDS ----------------
               Padding(
@@ -128,17 +148,8 @@ class ParentDashboard extends StatelessWidget {
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
-border: Border.all(
-  color: Color(0xFFFFD52E),
-  width: 3,
-),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x22000000),
-          blurRadius: 5,
-          offset: Offset(2, 3),
-        ),
-      ],
+border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +225,7 @@ Padding(
         style: TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF1F355C),
+          color: Color(0xFF0B2F63),
         ),
       ),
 
@@ -224,10 +235,8 @@ Padding(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(
-            color: const Color(0xFF1F355C),
-            width: 2,
-          ),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -241,7 +250,7 @@ Padding(
               ),
               child: const Icon(
                 Icons.rocket_launch,
-                color: Colors.redAccent,
+                color: Color(0xFFF12C68),
               ),
             ),
 
@@ -265,7 +274,7 @@ Padding(
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F355C),
+                      color: Color(0xFF0B2F63),
                     ),
                   ),
                   SizedBox(height: 4),
@@ -313,7 +322,7 @@ Padding(
               icon: const Icon(Icons.smart_toy),
               label: const Text("Talk to AI"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Color(0xFFF12C68),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -350,56 +359,57 @@ class SubjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12), // CHANGED: compact
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(
-          color: const Color(0xFF1F355C),
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 5,
-            offset: Offset(2, 3),
-          ),
-        ],
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(8),
-            ),
+          // color chip + subject name on one line
+          Row(
+            children: [
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  subject,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF4B6A8B),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            subject,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Color(0xFF4B6A8B),
-            ),
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             score,
             style: const TextStyle(
-              fontSize: 34,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1F355C),
+              color: Color(0xFF0B2F63),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
           Text(
             growth,
             style: const TextStyle(
               color: Colors.green,
-              fontSize: 14,
+              fontSize: 11,
               fontWeight: FontWeight.w600,
             ),
           ),

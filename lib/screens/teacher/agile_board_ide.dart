@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// agile_board_ide.dart
 /// Teacher module — instructors review student coding projects line by line
 /// and send feedback. Two screens live in this file:
@@ -9,10 +18,10 @@ import 'package:flutter/material.dart';
 /// Colors match the real EduVerse AI system (from teacher_portal_hub.dart):
 /// navy #1F355C, yellow #FFD52E, background #F8F8F8, coral CTA #E94A56.
 
-const Color kNavy = Color(0xFF1F355C);
+const Color kNavy = Color(0xFF0B2F63);
 const Color kYellow = Color(0xFFFFD52E);
-const Color kBg = Color(0xFFF8F8F8);
-const Color kCoral = Color(0xFFE94A56);
+const Color kBg = Color(0xFFF6F5FD);
+const Color kCoral = Color(0xFFF12C68);
 const Color kMuted = Colors.grey;
 
 enum ReviewStatus { pending, inProgress, reviewed }
@@ -155,12 +164,13 @@ class _AgileBoardIdeState extends State<AgileBoardIde> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: kYellow,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -172,7 +182,8 @@ class _AgileBoardIdeState extends State<AgileBoardIde> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(color: kNavy, width: 2),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(Icons.arrow_back, color: kNavy, size: 20),
                     ),
@@ -180,7 +191,7 @@ class _AgileBoardIdeState extends State<AgileBoardIde> {
                   const SizedBox(width: 14),
                   const Text(
                     "Agile Board",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: kNavy),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: kNavy),
                   ),
                 ],
               ),
@@ -240,7 +251,8 @@ class _ProjectCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kNavy, width: 2),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -402,12 +414,13 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: kYellow,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Colors.white, // CHANGED: yellow -> white
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
+                boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -419,7 +432,8 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(21),
-                        border: Border.all(color: kNavy, width: 2),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: const Icon(Icons.arrow_back, color: kNavy, size: 20),
                     ),
@@ -472,7 +486,7 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                                 : const Icon(Icons.play_arrow_rounded, color: kNavy),
                             label: const Text("Run", style: TextStyle(color: kNavy, fontWeight: FontWeight.w700)),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: kNavy, width: 2),
+                              side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
@@ -489,7 +503,7 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                             icon: const Icon(Icons.bug_report_outlined, color: kNavy),
                             label: const Text("Debug", style: TextStyle(color: kNavy, fontWeight: FontWeight.w700)),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: kNavy, width: 2),
+                              side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
@@ -608,7 +622,8 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: kNavy, width: 2),
+                        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                       ),
                       child: Row(
                         children: [
@@ -647,7 +662,7 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: kNavy, width: 1.4),
+                                border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -723,7 +738,8 @@ class _CodeReviewScreenState extends State<CodeReviewScreen> {
             decoration: BoxDecoration(
               color: isActive ? s.color : Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: kNavy, width: 2),
+              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
             ),
             child: Text(
               s.label,
