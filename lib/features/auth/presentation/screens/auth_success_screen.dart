@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../screens/onboarding/onboarding_student_information.dart';
+import '../../../../screens/parent/parent_home_dashboard.dart';
+import '../../../../screens/teacher/teacher_portal_hub.dart';
+import '../../../../screens/school/school_dashboard.dart';
+import '../../../../screens/admin/admin_dashboard.dart';
 import '../../../../state/locale_controller.dart';
 import '../../../../widgets/language_selector.dart';
 import '../../domain/auth_models.dart';
@@ -16,77 +20,18 @@ class AuthSuccessScreen extends StatelessWidget {
   });
 
   void _proceedToRoleDestination(BuildContext context) {
-    switch (user.role) {
-      case UserRole.student:
-        // 👉 Student goes to Onboarding Process
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => const OnboardingStudentInformation(),
-          ),
-          (route) => false,
-        );
-        break;
+    final Widget destination = switch (user.role) {
+      UserRole.student => const OnboardingStudentInformation(),
+      UserRole.parent => const ParentHomeDashboard(),
+      UserRole.teacher => const TeacherPortalHub(),
+      UserRole.school => const SchoolDashboard(),
+      UserRole.admin => const AdminDashboard(),
+    };
 
-      case UserRole.parent:
-        // 👉 Parent goes to Parent Dashboard
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => _RoleDashboardPlaceholder(
-              roleName: 'Parent',
-              user: user,
-              themeColor: const Color(0xFF12B76A),
-              icon: Icons.family_restroom_rounded,
-            ),
-          ),
-          (route) => false,
-        );
-        break;
-
-      case UserRole.teacher:
-        // 👉 Teacher goes to Teacher Dashboard
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => _RoleDashboardPlaceholder(
-              roleName: 'Teacher',
-              user: user,
-              themeColor: const Color(0xFF0086C9),
-              icon: Icons.cast_for_education_rounded,
-            ),
-          ),
-          (route) => false,
-        );
-        break;
-
-      case UserRole.school:
-        // 👉 School goes to School Institution Dashboard
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => _RoleDashboardPlaceholder(
-              roleName: 'School',
-              user: user,
-              themeColor: const Color(0xFF7F56D9),
-              icon: Icons.apartment_rounded,
-            ),
-          ),
-          (route) => false,
-        );
-        break;
-
-      case UserRole.admin:
-        // 👉 Admin goes to Admin Command Center
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => _RoleDashboardPlaceholder(
-              roleName: 'Admin',
-              user: user,
-              themeColor: const Color(0xFFF79009),
-              icon: Icons.admin_panel_settings_rounded,
-            ),
-          ),
-          (route) => false,
-        );
-        break;
-    }
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => destination),
+      (route) => false,
+    );
   }
 
   @override
@@ -266,96 +211,6 @@ class AuthSuccessScreen extends StatelessWidget {
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-/// Fallback role dashboard container for Parent/Teacher/School/Admin if custom screen is not yet linked
-class _RoleDashboardPlaceholder extends StatelessWidget {
-  final String roleName;
-  final AuthUser user;
-  final Color themeColor;
-  final IconData icon;
-
-  const _RoleDashboardPlaceholder({
-    required this.roleName,
-    required this.user,
-    required this.themeColor,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          '$roleName Space • EduVerse AI',
-          style: const TextStyle(
-              color: Color(0xFF1D3B64),
-              fontSize: 17,
-              fontWeight: FontWeight.w800),
-        ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(28.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: themeColor.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: themeColor, size: 48),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Welcome, ${user.name}!',
-                style: const TextStyle(
-                    color: Color(0xFF1D3B64),
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'You are successfully signed in as $roleName (${user.identifier})',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: Color(0xFF667085), fontSize: 14),
-              ),
-              const SizedBox(height: 28),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE4E7EC)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.check_circle_rounded,
-                        color: Color(0xFF12B76A), size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      '$roleName Dashboard Live & Active',
-                      style: const TextStyle(
-                          color: Color(0xFF1D3B64),
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

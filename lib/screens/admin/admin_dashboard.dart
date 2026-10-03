@@ -164,6 +164,47 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // BUILD
   // ============================================================
 
+  // Asks for confirmation, signs out of Supabase, then returns to the login screen.
+  Future<void> _confirmLogout(BuildContext context) async {
+    final bool? shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Text(
+          'Log out?',
+          style: TextStyle(color: navy, fontWeight: FontWeight.bold),
+        ),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel', style: TextStyle(color: navy)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text(
+              'Log out',
+              style: TextStyle(
+                color: Color(0xFFF12C68),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true && context.mounted) {
+      await Supabase.instance.client.auth.signOut();
+      if (!context.mounted) return;
+
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -243,12 +284,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           ),
                         ),
 
+                        // Logout Button
                         IconButton(
-                          onPressed: () {
-                            Navigator.of(context).maybePop();
-                          },
+                          onPressed: () => _confirmLogout(context),
+                          tooltip: 'Log out',
                           icon: const Icon(
-                            Icons.close_rounded,
+                            Icons.logout_rounded,
                             color: navy,
                           ),
                         ),

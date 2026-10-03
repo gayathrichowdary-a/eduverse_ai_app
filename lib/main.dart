@@ -5,6 +5,7 @@ import 'localization/app_strings.dart';
 import 'screens/welcome_screen.dart';
 import 'features/auth/data/local_auth_repository.dart';
 import 'features/auth/domain/auth_service.dart';
+import 'features/auth/presentation/screens/login_screen.dart';
 import 'state/locale_controller.dart';
 
 Future<void> main() async {
@@ -12,8 +13,8 @@ Future<void> main() async {
 
   // Initialize Supabase with your project credentials
   await Supabase.initialize(
-    url: 'https://vhinpqngeownrpjnsuay.supabase.co',          // 👈 Replace with your Supabase Project URL
-    anonKey: 'sb_publishable_BDYE5Y74y2J_2FhJkEykEw_YnKto2fR', // 👈 Replace with your Supabase anon Key
+    url: 'https://vhinpqngeownrpjnsuay.supabase.co',
+    anonKey: 'sb_publishable_BDYE5Y74y2J_2FhJkEykEw_YnKto2fR',
   );
 
   runApp(const EduVerseApp());
@@ -76,6 +77,13 @@ class _EduVerseAppState extends State<EduVerseApp> {
         localeController: localeController,
         authService: authService,
       ),
+      // Logout from any dashboard opens this screen.
+      routes: {
+        '/login': (context) => LoginScreen(
+              localeController: localeController,
+              authService: authService,
+            ),
+      },
     );
   }
 }
