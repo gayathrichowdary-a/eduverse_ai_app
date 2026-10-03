@@ -23,6 +23,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class DatabaseSchemaScreen extends StatefulWidget {
   const DatabaseSchemaScreen({super.key});
 
@@ -31,9 +40,9 @@ class DatabaseSchemaScreen extends StatefulWidget {
 }
 
 class _DatabaseSchemaScreenState extends State<DatabaseSchemaScreen> {
-  static const Color navy = Color(0xFF1D3B64);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color yellow = Color(0xFFF7C948);
-  static const Color background = Color(0xFFF8F8F8);
+  static const Color background = Color(0xFFF6F5FD);
   static const Color green = Color(0xFF2E7D32);
   static const Color red = Color(0xFFC62828);
 
@@ -86,11 +95,17 @@ class _DatabaseSchemaScreenState extends State<DatabaseSchemaScreen> {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white, // CHANGED
+        foregroundColor: const Color(0xFF0B2F63),
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+        ),
         title: const Text(
           'Database Schema',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
         ),
         actions: [
           IconButton(
@@ -119,8 +134,8 @@ class _DatabaseSchemaScreenState extends State<DatabaseSchemaScreen> {
               'Production Tables',
               style: TextStyle(
                 color: navy,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 6),
@@ -128,7 +143,7 @@ class _DatabaseSchemaScreenState extends State<DatabaseSchemaScreen> {
               _loading
                   ? 'Loading schema from Supabase…'
                   : '${_tables.length} table${_tables.length == 1 ? '' : 's'} found in the public schema.',
-              style: const TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Color(0xFF7B8798)),
             ),
             const SizedBox(height: 20),
 
@@ -143,7 +158,7 @@ class _DatabaseSchemaScreenState extends State<DatabaseSchemaScreen> {
                 child: Center(
                   child: Text(
                     'No tables found in the public schema.',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Color(0xFF7B8798)),
                   ),
                 ),
               )
@@ -221,7 +236,7 @@ class _StatusBanner extends StatelessWidget {
                 if (lastChecked != null)
                   Text(
                     'Last checked: ${lastChecked!.hour.toString().padLeft(2, '0')}:${lastChecked!.minute.toString().padLeft(2, '0')}:${lastChecked!.second.toString().padLeft(2, '0')}',
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12),
                   ),
                 if (!loading && !isOnline && error != null)
                   Padding(
@@ -230,7 +245,7 @@ class _StatusBanner extends StatelessWidget {
                       error!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12),
                     ),
                   ),
               ],
@@ -263,7 +278,8 @@ class _TableCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: navy, width: 1.2),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -280,7 +296,7 @@ class _TableCard extends StatelessWidget {
           subtitle: Text(
             '${table.columns.length} columns'
             '${table.foreignKeys.isNotEmpty ? ' • ${table.foreignKeys.length} foreign key${table.foreignKeys.length == 1 ? '' : 's'}' : ''}',
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
+            style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12),
           ),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           children: [
@@ -300,7 +316,7 @@ class _TableCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 3),
                     child: Row(
                       children: [
-                        const Icon(Icons.link, size: 16, color: Colors.grey),
+                        const Icon(Icons.link, size: 16, color: Color(0xFF7B8798)),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -350,7 +366,7 @@ class _ColumnRow extends StatelessWidget {
             flex: 2,
             child: Text(
               column.dataType,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+              style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12),
             ),
           ),
           if (!column.isNullable)

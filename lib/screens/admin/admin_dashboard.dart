@@ -12,6 +12,15 @@ import 'infra_compiler.dart';
 import 'cms_bank.dart';
 import 'portal_code_generator.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
 
@@ -20,7 +29,7 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  static const Color navy = Color(0xFF1D3B64);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color subtitleBlue = Color(0xFF4D86AD);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color yellow = Color(0xFFFFD52E);
@@ -158,7 +167,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -170,12 +179,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-                decoration: const BoxDecoration(
-                  color: navy,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Colors.white, // CHANGED: navy -> white
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
                   ),
+                  boxShadow: _softShadow,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,12 +198,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           width: 52,
                           height: 52,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: const Color(0xFFF0EEFB),
                             borderRadius: BorderRadius.circular(26),
                           ),
                           child: const Icon(
                             Icons.account_balance,
-                            color: navy,
+                            color: Color(0xFF4F46E5),
                           ),
                         ),
 
@@ -206,15 +216,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               Text(
                                 "Admin Console",
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                                  color: navy,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                               Text(
                                 "System-wide overview",
                                 style: TextStyle(
-                                  color: Color(0xFFB9C6D6),
+                                  color: Color(0xFF7B8798),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -229,7 +239,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           tooltip: 'Refresh live stats',
                           icon: const Icon(
                             Icons.refresh_rounded,
-                            color: Colors.white,
+                            color: navy,
                           ),
                         ),
 
@@ -239,7 +249,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           },
                           icon: const Icon(
                             Icons.close_rounded,
-                            color: Colors.white,
+                            color: navy,
                           ),
                         ),
                       ],
@@ -320,7 +330,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     // 2. MANAGE TEACHERS
                     _AdminModuleTile(
                       icon: Icons.psychology_rounded,
-                      color: const Color(0xFFE94A56),
+                      color: const Color(0xFFF12C68),
                       title: "Manage Teachers",
                       subtitle: "Approve and oversee teacher accounts",
                       onTap: () => _openManageTeachers(context),
@@ -446,9 +456,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: const Color(0xFFF6F5FD),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color, width: 1.4),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -456,7 +466,7 @@ class _StatCard extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              color: color,
+              color: const Color(0xFF0B2F63),
               fontSize: 18,
               fontWeight: FontWeight.w800,
             ),
@@ -465,7 +475,7 @@ class _StatCard extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
+              color: Color(0xFF7B8798),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -495,7 +505,7 @@ class _AdminModuleTile extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color navy = Color(0xFF1D3B64);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
@@ -508,7 +518,8 @@ class _AdminModuleTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy, width: 2),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
         ),
         child: Row(
           children: [
@@ -540,7 +551,7 @@ class _AdminModuleTile extends StatelessWidget {
                     subtitle,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.grey,
+                      color: Color(0xFF7B8798),
                     ),
                   ),
                 ],
