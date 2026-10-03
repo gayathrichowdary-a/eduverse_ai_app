@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class ManageSchools extends StatefulWidget {
   const ManageSchools({super.key});
 
@@ -8,9 +17,9 @@ class ManageSchools extends StatefulWidget {
 }
 
 class _ManageSchoolsState extends State<ManageSchools> {
-  static const Color navy = Color(0xFF1D3B64);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color blue = Color(0xFF58C7F3);
-  static const Color background = Color(0xFFF8F8F8);
+  static const Color background = Color(0xFFF6F5FD);
 
   final List<Map<String, String>> schools = [
     {
@@ -38,6 +47,8 @@ class _ManageSchoolsState extends State<ManageSchools> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text(
             'Add School',
             style: TextStyle(
@@ -85,7 +96,7 @@ class _ManageSchoolsState extends State<ManageSchools> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: blue,
+                backgroundColor: const Color(0xFF4F46E5), // CHANGED
                 foregroundColor: Colors.white,
               ),
               child: const Text('Add'),
@@ -107,16 +118,22 @@ class _ManageSchoolsState extends State<ManageSchools> {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white, // CHANGED
+        foregroundColor: const Color(0xFF0B2F63),
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+        ),
         title: const Text(
           'Manage Schools',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addSchool,
-        backgroundColor: blue,
+        backgroundColor: const Color(0xFF4F46E5), // CHANGED
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: ListView(
@@ -126,14 +143,14 @@ class _ManageSchoolsState extends State<ManageSchools> {
             'Schools',
             style: TextStyle(
               color: navy,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 6),
           const Text(
             'Add, edit, or remove schools from the platform.',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Color(0xFF7B8798)),
           ),
           const SizedBox(height: 20),
           ...List.generate(
@@ -147,7 +164,8 @@ class _ManageSchoolsState extends State<ManageSchools> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: navy, width: 1.5),
+                  border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
                 ),
                 child: Row(
                   children: [
@@ -179,7 +197,7 @@ class _ManageSchoolsState extends State<ManageSchools> {
                           const SizedBox(height: 5),
                           Text(
                             school['location']!,
-                            style: const TextStyle(color: Colors.grey),
+                            style: const TextStyle(color: Color(0xFF7B8798)),
                           ),
                           const SizedBox(height: 3),
                           Text(

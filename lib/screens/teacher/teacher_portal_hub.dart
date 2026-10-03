@@ -8,7 +8,7 @@ import 'exam_compiler.dart';
 import 'agile_board_ide.dart';
 import 'virtual_meet.dart';
 import '../learning/ai_media_studio_screen.dart';
-import '../authentication/role_selection_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
 class TeacherPortalHub extends StatelessWidget {
   const TeacherPortalHub({super.key});
@@ -53,14 +53,11 @@ class TeacherPortalHub extends StatelessWidget {
     );
 
     if (shouldLogout == true && context.mounted) {
-      // TODO: clear your saved token/session here
+  await Supabase.instance.client.auth.signOut();
+  if (!context.mounted) return;
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
-        (route) => false,
-      );
-    }
+  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+}
   }
 
   // NEW: small round header button (back / logout) in the video style

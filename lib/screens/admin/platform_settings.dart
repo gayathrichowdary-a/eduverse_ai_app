@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+// NEW: soft card shadow used across the restyled screens
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class PlatformSettings extends StatefulWidget {
   const PlatformSettings({super.key});
 
@@ -8,9 +17,9 @@ class PlatformSettings extends StatefulWidget {
 }
 
 class _PlatformSettingsState extends State<PlatformSettings> {
-  static const Color navy = Color(0xFF1D3B64);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color green = Color(0xFF9BE3A6);
-  static const Color background = Color(0xFFF8F8F8);
+  static const Color background = Color(0xFFF6F5FD);
 
   bool notifications = true;
   bool maintenanceMode = false;
@@ -22,11 +31,17 @@ class _PlatformSettingsState extends State<PlatformSettings> {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white, // CHANGED
+        foregroundColor: const Color(0xFF0B2F63),
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+        ),
         title: const Text(
           'Platform Settings',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
         ),
       ),
       body: ListView(
@@ -36,14 +51,14 @@ class _PlatformSettingsState extends State<PlatformSettings> {
             'Settings',
             style: TextStyle(
               color: navy,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 6),
           const Text(
             'Configure global app settings.',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Color(0xFF7B8798)),
           ),
           const SizedBox(height: 20),
 
@@ -102,7 +117,8 @@ class _PlatformSettingsState extends State<PlatformSettings> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: navy, width: 1.5),
+              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
             ),
             child: const Row(
               children: [
@@ -144,7 +160,7 @@ class _SettingTile extends StatelessWidget {
     required this.onChanged,
   });
 
-  static const Color navy = Color(0xFF1D3B64);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color green = Color(0xFF9BE3A6);
 
   @override
@@ -155,7 +171,8 @@ class _SettingTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: navy, width: 1.5),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), // CHANGED
+        boxShadow: _softShadow,
       ),
       child: Row(
         children: [
@@ -189,7 +206,7 @@ class _SettingTile extends StatelessWidget {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    color: Colors.grey,
+                    color: Color(0xFF7B8798),
                     fontSize: 12,
                   ),
                 ),
@@ -199,8 +216,8 @@ class _SettingTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: green,
-            activeTrackColor: navy,
+            activeThumbColor: Colors.white, // CHANGED
+            activeTrackColor: const Color(0xFF4F46E5),
           ),
         ],
       ),

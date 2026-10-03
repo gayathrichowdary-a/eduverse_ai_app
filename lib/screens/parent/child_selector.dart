@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../authentication/role_selection_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
 class ChildSelector extends StatelessWidget {
   const ChildSelector({super.key});
@@ -44,14 +44,11 @@ class ChildSelector extends StatelessWidget {
     );
 
     if (shouldLogout == true && context.mounted) {
-      // TODO: clear your saved token/session here
+  await Supabase.instance.client.auth.signOut();
+  if (!context.mounted) return;
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
-        (route) => false,
-      );
-    }
+  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+}
   }
 
   @override

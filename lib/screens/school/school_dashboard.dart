@@ -8,7 +8,7 @@ import 'control_compliance.dart';
 import 'user_directory.dart';
 import 'campus_announcements.dart';
 import 'audit_proctoring.dart';
-import '../authentication/role_selection_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
 class SchoolDashboard extends StatelessWidget {
   const SchoolDashboard({super.key});
@@ -47,14 +47,11 @@ class SchoolDashboard extends StatelessWidget {
     );
 
     if (shouldLogout == true && context.mounted) {
-      // TODO: clear your saved token/session here
+  await Supabase.instance.client.auth.signOut();
+  if (!context.mounted) return;
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
-        (route) => false,
-      );
-    }
+  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+}
   }
 
   // ============================================================
