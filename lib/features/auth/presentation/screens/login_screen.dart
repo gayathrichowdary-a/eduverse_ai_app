@@ -40,13 +40,14 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscure = true;
   bool _loading = false;
   bool _isGoogleSigningIn = false;
+  bool _isGithubSigningIn = false;
 
   StreamSubscription<AuthState>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
-    // Listen for Google OAuth callback session when returning from browser
+    // Catch OAuth session (Google & GitHub) when returning from browser
     _authSubscription =
         Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       final AuthChangeEvent event = data.event;
@@ -55,8 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if ((event == AuthChangeEvent.signedIn ||
               event == AuthChangeEvent.tokenRefreshed) &&
           session != null &&
-          _isGoogleSigningIn) {
+          (_isGoogleSigningIn || _isGithubSigningIn)) {
         _isGoogleSigningIn = false;
+        _isGithubSigningIn = false;
         if (mounted) {
           setState(() => _loading = false);
         }
@@ -79,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     final userEmail = user?.email ?? _identifier.text.trim();
     final displayName = (user?.userMetadata?['full_name'] as String?) ??
+        (user?.userMetadata?['user_name'] as String?) ??
         (user?.userMetadata?['name'] as String?) ??
         (userEmail.isNotEmpty ? userEmail.split('@').first : 'User');
 
@@ -133,6 +136,63 @@ class _LoginScreenState extends State<LoginScreen> {
         UserRole.admin => 'admin@eduverse.ai or ADM-1024',
       };
 
+  // ------------------------------------------------------------
+  // OTP-Based Login Method
+  // ------------------------------------------------------------
+  Future<void> _login() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() => _loading = true);
+
+    try {
+      String emailInput = _identifier.text.trim();
+      if (!emailInput.contains('@')) {
+        emailInput = '$emailInput@eduverse.ai';
+      }
+
+      // Send 6-digit OTP code to the email
+      await Supabase.instance.client.auth.signInWithOtp(
+        email: emailInput,
+        shouldCreateUser: true,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('6-digit OTP sent to $emailInput!'),
+          backgroundColor: const Color(0xFF1D9445),
+        ),
+      );
+
+      // 👉 Go to OTP Verification Screen
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(
+            role: _role.key,
+            email: emailInput,
+            localeController: widget.localeController,
+            profileData: {
+              'email': emailInput,
+              'role': _role.key,
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  // ------------------------------------------------------------
+  // Google Sign-In
+  // ------------------------------------------------------------
   Future<void> _signInWithGoogle() async {
     try {
       setState(() {
@@ -161,70 +221,45 @@ class _LoginScreenState extends State<LoginScreen> {
           _isGoogleSigningIn = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Google Sign-In failed: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Google Sign-In failed: $e'), backgroundColor: Colors.red),
         );
       }
     }
   }
 
-  Future<void> _login() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    setState(() => _loading = true);
-
+  // ------------------------------------------------------------
+  // GitHub Sign-In
+  // ------------------------------------------------------------
+  Future<void> _signInWithGithub() async {
     try {
-      final emailInput = _identifier.text.trim();
+      setState(() {
+        _loading = true;
+        _isGithubSigningIn = true;
+      });
 
-      await Supabase.instance.client.auth.signInWithOtp(
-        email: emailInput,
-        shouldCreateUser: false,
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.github,
+        redirectTo: 'io.supabase.eduverse://login-callback',
       );
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('OTP sent to $emailInput! Check your inbox.'),
-          backgroundColor: const Color(0xFF1D9445),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => OtpVerificationScreen(
-          role: _role.key,
-          email: emailInput,
-          localeController: widget.localeController,
-          profileData: {
-            'email': emailInput,
-            'role': _role.key,
-          },
-        ),
-      ));
     } on AuthException catch (e) {
       if (mounted) {
+        setState(() {
+          _loading = false;
+          _isGithubSigningIn = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _loading = false;
+          _isGithubSigningIn = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('GitHub Sign-In failed: $e'), backgroundColor: Colors.red),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
       }
     }
   }
@@ -233,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return OutlinedButton(
       onPressed: _loading ? null : _signInWithGoogle,
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 54),
+        minimumSize: const Size(double.infinity, 52),
         side: const BorderSide(color: Color(0xFFE5E8F1), width: 1.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.white,
@@ -244,8 +279,8 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           Image.network(
             'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-            height: 24,
-            width: 24,
+            height: 22,
+            width: 22,
             errorBuilder: (_, __, ___) =>
                 const Icon(Icons.g_mobiledata, size: 28, color: Colors.blue),
           ),
@@ -256,7 +291,41 @@ class _LoginScreenState extends State<LoginScreen> {
                 : 'Continue with Google',
             style: const TextStyle(
               color: Color(0xFF1E293B),
-              fontSize: 16,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _githubSignInButton() {
+    return OutlinedButton(
+      onPressed: _loading ? null : _signInWithGithub,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 52),
+        side: const BorderSide(color: Color(0xFFE5E8F1), width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.code_rounded,
+            size: 22,
+            color: Color(0xFF181717),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            _loading && _isGithubSigningIn
+                ? 'Connecting GitHub...'
+                : 'Continue with GitHub',
+            style: const TextStyle(
+              color: Color(0xFF1E293B),
+              fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -326,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: _obscure,
             onVisibilityTap: () => setState(() => _obscure = !_obscure),
             textInputAction: TextInputAction.done,
-            validator: (v) => (v?.length ?? 0) < 8 ? s.weakPassword : null,
+            validator: (v) => (v?.length ?? 0) < 6 ? 'Password must be at least 6 characters' : null,
             onSubmitted: (_) => _login(),
           ),
           Align(
@@ -345,7 +414,7 @@ class _LoginScreenState extends State<LoginScreen> {
           AuthButton(
             label: 'Login',
             onPressed: _login,
-            loading: _loading && !_isGoogleSigningIn,
+            loading: _loading && !_isGoogleSigningIn && !_isGithubSigningIn,
           ),
           const SizedBox(height: 16),
           const Row(
@@ -364,6 +433,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 16),
           _googleSignInButton(),
+          const SizedBox(height: 10),
+          _githubSignInButton(),
           const SizedBox(height: 18),
           Center(
             child: AuthLink(

@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
+
+import '../../../../screens/onboarding/onboarding_student_information.dart';
 import '../../../../state/locale_controller.dart';
 import '../../../../widgets/language_selector.dart';
 import '../../domain/auth_models.dart';
@@ -10,6 +13,7 @@ import '../widgets/auth_field.dart';
 import '../widgets/auth_link.dart';
 import '../widgets/auth_shell.dart';
 import '../widgets/role_selector.dart';
+import 'auth_success_screen.dart';
 import 'login_screen.dart';
 import 'otp_verification_screen.dart';
 
@@ -49,6 +53,10 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscure = true;
   bool _obscureConfirm = true;
   bool _loading = false;
+  bool _isGoogleSigningIn = false;
+  bool _isGithubSigningIn = false;
+
+  StreamSubscription<AuthState>? _authSubscription;
 
   TextEditingController get cName => _c['name']!;
   TextEditingController get cIdentifier => _c['identifier']!;
@@ -69,11 +77,128 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController get cConfirm => _c['confirm']!;
 
   @override
+  void initState() {
+    super.initState();
+    // Catch Google & GitHub redirects
+    _authSubscription =
+        Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+
+      if ((event == AuthChangeEvent.signedIn ||
+              event == AuthChangeEvent.tokenRefreshed) &&
+          session != null &&
+          (_isGoogleSigningIn || _isGithubSigningIn)) {
+        _isGoogleSigningIn = false;
+        _isGithubSigningIn = false;
+        if (mounted) {
+          setState(() => _loading = false);
+        }
+        _navigateAfterOAuth();
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _authSubscription?.cancel();
     for (final controller in _c.values) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void _navigateAfterOAuth() {
+    if (!mounted) return;
+
+    final user = Supabase.instance.client.auth.currentUser;
+    final userEmail = user?.email ?? cIdentifier.text.trim();
+    final displayName = (user?.userMetadata?['full_name'] as String?) ??
+        (user?.userMetadata?['user_name'] as String?) ??
+        (user?.userMetadata?['name'] as String?) ??
+        (userEmail.isNotEmpty ? userEmail.split('@').first : 'User');
+
+    try {
+      Supabase.instance.client.auth.updateUser(
+        UserAttributes(data: {'role': _role.name}),
+      );
+    } catch (_) {}
+
+    if (_role == UserRole.student) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const OnboardingStudentInformation(),
+        ),
+        (route) => false,
+      );
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => AuthSuccessScreen(
+            user: AuthUser(
+              id: user?.id ?? 'user-id',
+              name: displayName,
+              identifier: userEmail,
+              role: _role,
+              profile: AuthProfile(
+                displayName: displayName,
+                identifier: userEmail,
+              ),
+            ),
+            localeController: widget.localeController,
+          ),
+        ),
+        (route) => false,
+      );
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      setState(() {
+        _loading = true;
+        _isGoogleSigningIn = true;
+      });
+
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'io.supabase.eduverse://login-callback',
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _isGoogleSigningIn = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _signInWithGithub() async {
+    try {
+      setState(() {
+        _loading = true;
+        _isGithubSigningIn = true;
+      });
+
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.github,
+        redirectTo: 'io.supabase.eduverse://login-callback',
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _isGithubSigningIn = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('GitHub Sign-In failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   String _title() => switch (_role) {
@@ -232,11 +357,80 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     } finally {
-      // Guaranteed to stop the button from spinning!
       if (mounted) {
         setState(() => _loading = false);
       }
     }
+  }
+
+  Widget _googleSignInButton() {
+    return OutlinedButton(
+      onPressed: _loading ? null : _signInWithGoogle,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 52),
+        side: const BorderSide(color: Color(0xFFE5E8F1), width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.network(
+            'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+            height: 22,
+            width: 22,
+            errorBuilder: (_, __, ___) =>
+                const Icon(Icons.g_mobiledata, size: 28, color: Colors.blue),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            _loading && _isGoogleSigningIn
+                ? 'Connecting Google...'
+                : 'Continue with Google',
+            style: const TextStyle(
+              color: Color(0xFF1E293B),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _githubSignInButton() {
+    return OutlinedButton(
+      onPressed: _loading ? null : _signInWithGithub,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 52),
+        side: const BorderSide(color: Color(0xFFE5E8F1), width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.code_rounded,
+            size: 22,
+            color: Color(0xFF181717),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            _loading && _isGithubSigningIn
+                ? 'Connecting GitHub...'
+                : 'Continue with GitHub',
+            style: const TextStyle(
+              color: Color(0xFF1E293B),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -286,8 +480,29 @@ class _SignupScreenState extends State<SignupScreen> {
               validator: (v) => v != cPassword.text ? s.passwordMismatch : null,
             ),
             const SizedBox(height: 20),
-            AuthButton(label: s.createAccount, onPressed: _createAccount, loading: _loading),
-            const SizedBox(height: 12),
+            AuthButton(label: s.createAccount, onPressed: _createAccount, loading: _loading && !_isGoogleSigningIn && !_isGithubSigningIn),
+            const SizedBox(height: 16),
+            const Row(
+              children: [
+                Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('OR',
+                      style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold)),
+                ),
+                Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Google Sign-In
+            _googleSignInButton(),
+            const SizedBox(height: 10),
+            // GitHub Sign-In (Now clear and visible!)
+            _githubSignInButton(),
+            const SizedBox(height: 18),
             Center(child: AuthLink(prefix: s.alreadyAccount, action: s.signIn, onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => LoginScreen(localeController: widget.localeController, authService: widget.authService))))),
           ]),
         );
