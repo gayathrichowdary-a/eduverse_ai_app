@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class TeacherPerformance extends StatelessWidget {
   const TeacherPerformance({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
-  static const Color red = Color(0xFFE94A56);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color red = Color(0xFFF12C68);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -22,7 +31,7 @@ class TeacherPerformance extends StatelessWidget {
           style: TextStyle(
             color: navy,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
@@ -38,7 +47,7 @@ class TeacherPerformance extends StatelessWidget {
               style: TextStyle(
                 color: navy,
                 fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 14),
@@ -101,7 +110,7 @@ class TeacherPerformance extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 21,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -132,7 +141,8 @@ class TeacherPerformance extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: navy, width: 1.5),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
       ),
       child: Row(
         children: [
@@ -161,7 +171,7 @@ class TeacherPerformance extends StatelessWidget {
                 Text(
                   status,
                   style: const TextStyle(
-                    color: Colors.grey,
+                    color: Color(0xFF7B8798),
                     fontSize: 12,
                   ),
                 ),
@@ -173,7 +183,7 @@ class TeacherPerformance extends StatelessWidget {
             style: TextStyle(
               color: color,
               fontSize: 18,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],

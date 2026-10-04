@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class Enrollment extends StatelessWidget {
   const Enrollment({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color green = Color(0xFF57B97A);
-  static const Color lightBackground = Color(0xFFF8F8F8);
+  static const Color lightBackground = Color(0xFFF6F5FD);
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +28,9 @@ class Enrollment extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
-                decoration: const BoxDecoration(
-                  color: green,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: _softShadow,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
@@ -30,13 +40,13 @@ class Enrollment extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () => Navigator.maybePop(context),
-                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 28),
+                      icon: const Icon(Icons.arrow_back_rounded, color: navy, size: 28),
                     ),
                     const SizedBox(width: 4),
                     Container(
                       width: 48,
                       height: 48,
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                      decoration: BoxDecoration(color: const Color(0xFFE9F7EF), borderRadius: BorderRadius.circular(24)),
                       child: const Icon(Icons.how_to_reg_rounded, color: green, size: 26),
                     ),
                     const SizedBox(width: 12),
@@ -44,9 +54,9 @@ class Enrollment extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Enrollment", style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.bold)),
+                          Text("Enrollment", style: TextStyle(color: navy, fontSize: 23, fontWeight: FontWeight.w800)),
                           SizedBox(height: 3),
-                          Text("Manage student admissions", style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
+                          Text("Manage student admissions", style: TextStyle(color: Color(0xFF7B8798), fontSize: 13, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
@@ -73,7 +83,7 @@ class Enrollment extends StatelessWidget {
               const SizedBox(height: 26),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 18),
-                child: Align(alignment: Alignment.centerLeft, child: Text("Enrollment Management", style: TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.bold))),
+                child: Align(alignment: Alignment.centerLeft, child: Text("Enrollment Management", style: TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800))),
               ),
               const SizedBox(height: 14),
 
@@ -81,11 +91,11 @@ class Enrollment extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: navy, width: 1.3)),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2), boxShadow: _softShadow),
                   child: const TextField(
                     decoration: InputDecoration(
                       hintText: "Search student applications",
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                      hintStyle: TextStyle(color: Color(0xFF7B8798), fontSize: 13),
                       prefixIcon: Icon(Icons.search_rounded, color: navy),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -99,7 +109,7 @@ class Enrollment extends StatelessWidget {
               // ================= APPLICATIONS =================
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 18),
-                child: Align(alignment: Alignment.centerLeft, child: Text("Recent Applications", style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.bold))),
+                child: Align(alignment: Alignment.centerLeft, child: Text("Recent Applications", style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w800))),
               ),
               const SizedBox(height: 12),
 
@@ -128,7 +138,7 @@ class Enrollment extends StatelessWidget {
                     onPressed: () => _showAddStudentDialog(context),
                     icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
                     label: const Text("Add New Student", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
-                    style: ElevatedButton.styleFrom(backgroundColor: navy, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+                    style: ElevatedButton.styleFrom(backgroundColor: navy, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
                   ),
                 ),
               ),
@@ -158,12 +168,12 @@ class Enrollment extends StatelessWidget {
                 const SizedBox(height: 15),
                 _buildDialogField("Parent Contact", Icons.phone_android_outlined),
                 const SizedBox(height: 10),
-                const Text("An AI review will process this application within 24 hours.", style: TextStyle(fontSize: 11, color: Colors.grey, fontStyle: FontStyle.italic)),
+                const Text("An AI review will process this application within 24 hours.", style: TextStyle(fontSize: 11, color: Color(0xFF7B8798), fontStyle: FontStyle.italic)),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.grey))),
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Color(0xFF7B8798)))),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -184,8 +194,8 @@ class Enrollment extends StatelessWidget {
         labelText: label,
         labelStyle: const TextStyle(color: navy, fontSize: 14),
         prefixIcon: Icon(icon, color: navy, size: 20),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.grey)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: navy, width: 2)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF4F46E5), width: 1.6)),
       ),
     );
   }
@@ -201,12 +211,13 @@ class _EnrollmentStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF1F355C), width: 1.3)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow),
       child: Column(
         children: [
-          Text(value, style: const TextStyle(color: Color(0xFF1F355C), fontSize: 18, fontWeight: FontWeight.w800)),
+          Text(value, style: const TextStyle(color: Color(0xFF0B2F63), fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 5),
-          Text(label, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF1F355C), fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF0B2F63), fontSize: 11, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -228,7 +239,8 @@ class _StudentApplicationCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF1F355C), width: 1.7)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow),
       child: Row(
         children: [
           Container(
@@ -240,9 +252,9 @@ class _StudentApplicationCard extends StatelessWidget {
           const SizedBox(width: 13),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(name, style: const TextStyle(color: Color(0xFF1F355C), fontSize: 15, fontWeight: FontWeight.bold)),
-              Text(className, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-              Text(date, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              Text(name, style: const TextStyle(color: Color(0xFF0B2F63), fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(className, style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12)),
+              Text(date, style: const TextStyle(color: Color(0xFF7B8798), fontSize: 11)),
             ]),
           ),
           Container(
@@ -251,7 +263,7 @@ class _StudentApplicationCard extends StatelessWidget {
             decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(status, style: TextStyle(color: statusColor == const Color(0xFFF7C948) ? const Color(0xFF9A7800) : const Color(0xFF2E8B57), fontSize: 10, fontWeight: FontWeight.bold)),
           ),
-          const Icon(Icons.chevron_right_rounded, color: Color(0xFF1F355C)),
+          const Icon(Icons.chevron_right_rounded, color: Color(0xFF0B2F63)),
         ],
       ),
     );

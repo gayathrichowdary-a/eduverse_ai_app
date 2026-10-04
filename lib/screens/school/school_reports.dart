@@ -6,10 +6,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'report_detail_screen.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class SchoolReports extends StatelessWidget {
   const SchoolReports({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color yellow = Color(0xFFF7C948);
 
   // Dummy data - later this will come from your database
@@ -91,7 +100,7 @@ class SchoolReports extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -104,7 +113,7 @@ class SchoolReports extends StatelessWidget {
           style: TextStyle(
             color: navy,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
@@ -120,7 +129,7 @@ class SchoolReports extends StatelessWidget {
               style: TextStyle(
                 color: navy,
                 fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 14),
@@ -149,7 +158,7 @@ class SchoolReports extends StatelessWidget {
             _report(
               context,
               Icons.calendar_month_rounded,
-              const Color(0xFFE94A56),
+              const Color(0xFFF12C68),
               "Annual Report",
               "Export annual school report",
             ),
@@ -165,7 +174,7 @@ class SchoolReports extends StatelessWidget {
                   backgroundColor: navy,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
               ),
             ),
@@ -192,7 +201,7 @@ class SchoolReports extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("School Reports", style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold)),
+                Text("School Reports", style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800)),
                 SizedBox(height: 4),
                 Text("Export term and annual reports", style: TextStyle(color: Color(0xFFB9C6D6), fontSize: 13)),
               ],
@@ -220,7 +229,8 @@ class SchoolReports extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy, width: 1.5),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         child: Row(
           children: [
@@ -237,7 +247,7 @@ class SchoolReports extends StatelessWidget {
                 children: [
                   Text(title, style: const TextStyle(color: navy, fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text(subtitle, style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12)),
                 ],
               ),
             ),

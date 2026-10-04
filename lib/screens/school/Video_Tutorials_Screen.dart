@@ -8,7 +8,7 @@ class VideoTutorialsScreen extends StatefulWidget {
 }
 
 class _VideoTutorialsScreenState extends State<VideoTutorialsScreen> {
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   // Dummy Data - later this will come from your database
   final List<Map<String, String>> videos = [
@@ -54,11 +54,16 @@ class _VideoTutorialsScreenState extends State<VideoTutorialsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       appBar: AppBar(
-        backgroundColor: navy,
-        title: const Text("Video Tutorials", style: TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(22))),
+        iconTheme: const IconThemeData(color: navy),
+        titleTextStyle: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800),
+        title: const Text("Video Tutorials"),
       ),
       body: videos.isEmpty
           ? const Center(child: Text("No videos added yet"))
@@ -68,10 +73,17 @@ class _VideoTutorialsScreenState extends State<VideoTutorialsScreen> {
               itemBuilder: (context, index) {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  color: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0x140B2F63),
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFFE6E2F7), width: 1.2),
+            ),
                   child: ListTile(
                     leading: const CircleAvatar(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Color(0xFFF12C68),
                       child: Icon(Icons.play_arrow, color: Colors.white),
                     ),
                     title: Text(videos[index]['title']!, style: const TextStyle(fontWeight: FontWeight.bold)),

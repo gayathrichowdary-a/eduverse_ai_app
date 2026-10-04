@@ -5,16 +5,25 @@ import 'course_screen.dart';
 import 'topic_screen.dart';     
 import 'materials_screen.dart'; 
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class CurriculumManagement extends StatelessWidget {
   const CurriculumManagement({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color blue = Color(0xFF58C7F3);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -24,7 +33,7 @@ class CurriculumManagement extends StatelessWidget {
         ),
         title: const Text(
           "Curriculum Management",
-          style: TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800),
         ),
       ),
       body: SingleChildScrollView(
@@ -36,7 +45,7 @@ class CurriculumManagement extends StatelessWidget {
             const SizedBox(height: 24),
             const Text(
               "Curriculum Overview",
-              style: TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
             
@@ -52,7 +61,7 @@ class CurriculumManagement extends StatelessWidget {
             
             _module(
               Icons.layers_rounded,
-              const Color(0xFFE94A56),
+              const Color(0xFFF12C68),
               "Courses",
               "Manage course structure",
               () {
@@ -98,7 +107,7 @@ class CurriculumManagement extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Curriculum", style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold)),
+                Text("Curriculum", style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800)),
                 Text("Edit subjects and course structure", style: TextStyle(color: Color(0xFFB9C6D6), fontSize: 13)),
               ],
             ),
@@ -118,7 +127,8 @@ class CurriculumManagement extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy, width: 1.5),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         child: Row(
           children: [
@@ -134,7 +144,7 @@ class CurriculumManagement extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: const TextStyle(color: navy, fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text(subtitle, style: const TextStyle(color: Color(0xFF7B8798), fontSize: 12)),
                 ],
               ),
             ),

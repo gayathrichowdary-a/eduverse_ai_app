@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// SCHOOL / user_directory.dart
 ///
 /// College manages students/instructors: search, registration,
 /// status, and CSV import/export.
-/// Styled to match SchoolDashboard (navy + yellow theme).
+/// Styled to match SchoolDashboard (navy + soft indigo theme).
 class UserDirectoryScreen extends StatefulWidget {
   const UserDirectoryScreen({super.key});
 
@@ -14,8 +23,8 @@ class UserDirectoryScreen extends StatefulWidget {
 
 class _UserDirectoryScreenState extends State<UserDirectoryScreen>
     with SingleTickerProviderStateMixin {
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   late final TabController _tabController = TabController(length: 2, vsync: this)
     ..addListener(() => setState(() {}));
@@ -115,7 +124,7 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
                         backgroundColor: navy,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                       ),
                       onPressed: () {
                         if (nameController.text.trim().isEmpty ||
@@ -154,11 +163,11 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
       labelText: label,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: navy),
+        borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: navy),
+        borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
       ),
     );
   }
@@ -173,7 +182,7 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openRegisterDialog,
         backgroundColor: navy,
@@ -186,8 +195,9 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-              decoration: const BoxDecoration(
-                color: yellow,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: _softShadow,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
@@ -211,7 +221,8 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(26),
-                          border: Border.all(color: navy, width: 2),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
                         ),
                         child: const Icon(Icons.groups_rounded, color: navy),
                       ),
@@ -222,11 +233,11 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
                           children: [
                             Text('User Directory',
                                 style: TextStyle(
-                                    fontSize: 22, fontWeight: FontWeight.bold, color: navy)),
+                                    fontSize: 22, fontWeight: FontWeight.w800, color: navy)),
                             Text('Manage students & instructors',
                                 style: TextStyle(
                                     fontSize: 12.5,
-                                    color: Color(0xFF5E6D7A),
+                                    color: Color(0xFF7B8798),
                                     fontWeight: FontWeight.w600)),
                           ],
                         ),
@@ -245,11 +256,11 @@ class _UserDirectoryScreenState extends State<UserDirectoryScreen>
                       contentPadding: const EdgeInsets.symmetric(vertical: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: navy, width: 1.4),
+                        borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: navy, width: 1.4),
+                        borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
                       ),
                     ),
                     onChanged: (v) => setState(() => _query = v),
@@ -311,8 +322,8 @@ class _SegmentButton extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -323,14 +334,15 @@ class _SegmentButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? navy : Colors.white,
+          color: selected ? const Color(0xFF4F46E5) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: navy, width: 1.4),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? yellow : navy,
+            color: selected ? Colors.white : navy,
             fontWeight: FontWeight.w700,
             fontSize: 13,
           ),
@@ -345,7 +357,7 @@ class _IconSquareButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
@@ -358,7 +370,8 @@ class _IconSquareButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: navy, width: 1.4),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         child: Icon(icon, color: navy, size: 20),
       ),
@@ -372,12 +385,12 @@ class _UserList extends StatelessWidget {
   final List<_DirectoryUser> users;
   final ValueChanged<_DirectoryUser> onToggleActive;
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
     if (users.isEmpty) {
-      return const Center(child: Text('No users found', style: TextStyle(color: Colors.grey)));
+      return const Center(child: Text('No users found', style: TextStyle(color: Color(0xFF7B8798))));
     }
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 90),
@@ -394,7 +407,8 @@ class _UserList extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: navy, width: 2),
+                border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
               ),
               child: Row(
                 children: [
@@ -411,7 +425,7 @@ class _UserList extends StatelessWidget {
                         Text(user.name,
                             style: const TextStyle(fontWeight: FontWeight.w800, color: navy)),
                         Text('${user.id} · ${user.detail}',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF7B8798))),
                       ],
                     ),
                   ),
@@ -430,7 +444,7 @@ class _UserList extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: user.active ? const Color(0xFF2E7D4F) : Colors.grey.shade700,
+                            color: user.active ? const Color(0xFF2E7D4F) : const Color(0xFF7B8798),
                           ),
                         ),
                       ),

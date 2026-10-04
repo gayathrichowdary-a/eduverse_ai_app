@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// SCHOOL / control_compliance.dart
 ///
 /// College controls: proctoring strictness, authorization,
 /// AI tutor settings, student lookup, and audit trail.
-/// Styled to match SchoolDashboard (navy + yellow theme).
+/// Styled to match SchoolDashboard (navy + soft indigo theme).
 class ControlComplianceScreen extends StatefulWidget {
   const ControlComplianceScreen({super.key});
 
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   @override
   State<ControlComplianceScreen> createState() =>
@@ -18,7 +27,7 @@ class ControlComplianceScreen extends StatefulWidget {
 
 class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
   static const Color navy = ControlComplianceScreen.navy;
-  static const Color yellow = ControlComplianceScreen.yellow;
+  static const Color surface = ControlComplianceScreen.surface;
 
   double _proctoringStrictness = 60;
 
@@ -103,7 +112,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -170,7 +179,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                             'Higher strictness increases face/gaze tracking '
                             'sensitivity and flags more borderline behavior '
                             'during AI-proctored sessions.',
-                            style: TextStyle(color: Colors.grey, fontSize: 12.5),
+                            style: TextStyle(color: Color(0xFF7B8798), fontSize: 12.5),
                           ),
                         ],
                       ),
@@ -206,7 +215,7 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                     _SectionCard(
                       title: 'AI Tutor Response Settings',
                       icon: Icons.smart_toy_rounded,
-                      iconColor: const Color(0xFFE94A56),
+                      iconColor: const Color(0xFFF12C68),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -216,11 +225,11 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                               labelText: 'Response verbosity',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: navy),
+                                borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: navy),
+                                borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
                               ),
                             ),
                             items: const [
@@ -285,11 +294,11 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                                     isDense: true,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(color: navy),
+                                      borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(color: navy),
+                                      borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
                                     ),
                                   ),
                                   onSubmitted: (_) => _searchStudent(),
@@ -316,9 +325,9 @@ class _ControlComplianceScreenState extends State<ControlComplianceScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: yellow.withValues(alpha: .18),
+                                color: const Color(0xFFF0EEFB),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: navy.withValues(alpha: .3)),
+                                border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,16 +427,17 @@ class _Header extends StatelessWidget {
   final String subtitle;
   final Widget? trailing;
 
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-      decoration: const BoxDecoration(
-        color: yellow,
+      decoration: BoxDecoration(
+        color: Colors.white,
+                boxShadow: _softShadow,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
@@ -448,7 +458,8 @@ class _Header extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: navy, width: 2),
+              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
             ),
             child: Icon(icon, color: navy),
           ),
@@ -461,7 +472,7 @@ class _Header extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                     color: navy,
                   ),
                 ),
@@ -469,7 +480,7 @@ class _Header extends StatelessWidget {
                   subtitle,
                   style: const TextStyle(
                     fontSize: 12.5,
-                    color: Color(0xFF5E6D7A),
+                    color: Color(0xFF7B8798),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -488,7 +499,7 @@ class _SaveButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback onTap;
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
@@ -500,7 +511,8 @@ class _SaveButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
-          border: Border.all(color: navy, width: 1.4),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         child: Icon(
           Icons.save_rounded,
@@ -525,7 +537,7 @@ class _SectionCard extends StatelessWidget {
   final Color iconColor;
   final Widget child;
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   @override
   Widget build(BuildContext context) {
@@ -535,7 +547,8 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: navy, width: 2),
+        border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

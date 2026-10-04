@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class TopicListScreen extends StatefulWidget {
   const TopicListScreen({super.key});
 
@@ -8,7 +17,7 @@ class TopicListScreen extends StatefulWidget {
 }
 
 class _TopicListScreenState extends State<TopicListScreen> {
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   // Initial Data List
   final List<Map<String, dynamic>> topics = [
@@ -55,7 +64,13 @@ class _TopicListScreenState extends State<TopicListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: navy, title: const Text("Topics & Chapters")),
+      appBar: AppBar(backgroundColor: Colors.white,
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(22))),
+        iconTheme: const IconThemeData(color: navy),
+        titleTextStyle: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800), title: const Text("Topics & Chapters")),
       body: ListView.builder(
         padding: const EdgeInsets.all(18),
         itemCount: topics.length,
@@ -66,14 +81,15 @@ class _TopicListScreenState extends State<TopicListScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: navy, width: 1),
+              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
             ),
             child: Row(
               children: [
                 Icon(Icons.topic_rounded, color: topics[index]['color'], size: 30),
                 const SizedBox(width: 15),
-                Expanded(child: Text(topics[index]['title'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-                Text(topics[index]['count'], style: const TextStyle(color: Colors.grey)),
+                Expanded(child: Text(topics[index]['title'], style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: navy))),
+                Text(topics[index]['count'], style: const TextStyle(color: Color(0xFF7B8798))),
               ],
             ),
           );

@@ -9,7 +9,7 @@ class CourseListScreen extends StatefulWidget {
 }
 
 class _CourseListScreenState extends State<CourseListScreen> {
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   // 1. THIS IS YOUR LIST (Now it can be changed)
   final List<Map<String, String>> courses = [
@@ -73,11 +73,16 @@ class _CourseListScreenState extends State<CourseListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       appBar: AppBar(
-        backgroundColor: navy,
-        title: const Text("Courses", style: TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(22))),
+        iconTheme: const IconThemeData(color: navy),
+        titleTextStyle: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800),
+        title: const Text("Courses"),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -85,11 +90,18 @@ class _CourseListScreenState extends State<CourseListScreen> {
         itemBuilder: (context, index) {
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0x140B2F63),
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFFE6E2F7), width: 1.2),
+            ),
             child: ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: const Color(0xFFE94A56), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: const Color(0xFFF12C68), borderRadius: BorderRadius.circular(10)),
                 child: const Icon(Icons.layers_rounded, color: Colors.white),
               ),
               title: Text(courses[index]['name']!, style: const TextStyle(fontWeight: FontWeight.bold, color: navy)),

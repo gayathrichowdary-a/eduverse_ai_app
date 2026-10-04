@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// SCHOOL / campus_announcements.dart
 ///
 /// Create, edit, and delete campus announcements/events.
-/// Styled to match SchoolDashboard (navy + yellow theme).
+/// Styled to match SchoolDashboard (navy + soft indigo theme).
 class CampusAnnouncementsScreen extends StatefulWidget {
   const CampusAnnouncementsScreen({super.key});
 
@@ -24,7 +33,7 @@ extension on Priority {
   Color get color => switch (this) {
         Priority.low => const Color(0xFF58C7F3),
         Priority.medium => const Color(0xFFF7C948),
-        Priority.high => const Color(0xFFE94A56),
+        Priority.high => const Color(0xFFF12C68),
       };
 }
 
@@ -47,8 +56,8 @@ class _Announcement {
 }
 
 class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   final List<String> _audienceOptions = const [
     'All Students',
@@ -90,11 +99,11 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
       labelText: label,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: navy),
+        borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: navy),
+        borderSide: const BorderSide(color: Color(0xFFD9D4F2), width: 1.2),
       ),
     );
   }
@@ -155,7 +164,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: navy),
+                          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
                         ),
                         child: Row(
                           children: [
@@ -190,11 +199,11 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                         return FilterChip(
                           label: Text(option),
                           selected: selected,
-                          selectedColor: navy,
-                          checkmarkColor: yellow,
+                          selectedColor: const Color(0xFF4F46E5),
+                          checkmarkColor: Colors.white,
                           backgroundColor: Colors.white,
                           side: BorderSide(color: navy.withValues(alpha: .5)),
-                          labelStyle: TextStyle(color: selected ? yellow : navy, fontSize: 12.5),
+                          labelStyle: TextStyle(color: selected ? Colors.white : navy, fontSize: 12.5),
                           onSelected: (v) {
                             setSheetState(() {
                               if (v) {
@@ -229,7 +238,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                             backgroundColor: navy,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
                           onPressed: () {
                             if (titleController.text.trim().isEmpty) return;
@@ -281,7 +290,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openEditor(),
         backgroundColor: navy,
@@ -294,8 +303,9 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: yellow,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: _softShadow,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
@@ -316,7 +326,8 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(26),
-                      border: Border.all(color: navy, width: 2),
+                      border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
                     ),
                     child: const Icon(Icons.campaign_rounded, color: navy),
                   ),
@@ -326,10 +337,10 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Campus Announcements',
-                            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold, color: navy)),
+                            style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: navy)),
                         Text('Notices & upcoming events',
                             style: TextStyle(
-                                fontSize: 12.5, color: Color(0xFF5E6D7A), fontWeight: FontWeight.w600)),
+                                fontSize: 12.5, color: Color(0xFF7B8798), fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -339,7 +350,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
             const SizedBox(height: 18),
             Expanded(
               child: _announcements.isEmpty
-                  ? const Center(child: Text('No announcements yet', style: TextStyle(color: Colors.grey)))
+                  ? const Center(child: Text('No announcements yet', style: TextStyle(color: Color(0xFF7B8798))))
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(18, 0, 18, 90),
                       itemCount: _announcements.length,
@@ -351,7 +362,8 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: navy, width: 2),
+                            border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,9 +416,9 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                                     .map((aud) => Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFF8F8F8),
+                                            color: const Color(0xFFF6F5FD),
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: navy.withValues(alpha: .25)),
+                                            border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
                                           ),
                                           child: Text(aud,
                                               style: const TextStyle(fontSize: 11, color: navy)),
@@ -416,22 +428,22 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Icon(Icons.event_rounded, size: 16, color: Colors.grey.shade600),
+                                  Icon(Icons.event_rounded, size: 16, color: const Color(0xFF7B8798)),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${a.eventDate.day}/${a.eventDate.month}/${a.eventDate.year}',
-                                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5),
+                                    style: TextStyle(color: const Color(0xFF7B8798), fontSize: 12.5),
                                   ),
                                   const SizedBox(width: 14),
                                   Icon(
                                     a.published ? Icons.public_rounded : Icons.lock_clock_rounded,
                                     size: 16,
-                                    color: Colors.grey.shade600,
+                                    color: const Color(0xFF7B8798),
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     a.published ? 'Published' : 'Draft',
-                                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5),
+                                    style: TextStyle(color: const Color(0xFF7B8798), fontSize: 12.5),
                                   ),
                                   const Spacer(),
                                   IconButton(
@@ -439,7 +451,7 @@ class _CampusAnnouncementsScreenState extends State<CampusAnnouncementsScreen> {
                                     onPressed: () => _openEditor(existing: a),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_rounded, size: 20, color: Color(0xFFE94A56)),
+                                    icon: const Icon(Icons.delete_rounded, size: 20, color: Color(0xFFF12C68)),
                                     onPressed: () => _deleteAnnouncement(a),
                                   ),
                                 ],

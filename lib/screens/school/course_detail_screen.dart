@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'topic_screen.dart'; // exports TopicListScreen
 import 'materials_screen.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class CourseDetailScreen extends StatelessWidget {
   final String courseName;
   final String courseCode;
@@ -14,9 +23,9 @@ class CourseDetailScreen extends StatelessWidget {
     required this.studentsText,
   });
 
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color lightBlue = Color(0xFFE3F2FD);
-  static const Color cardBg = Color(0xFFFCE4E4);
+  static const Color cardBg = Color(0xFFF0EEFB);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +39,13 @@ class CourseDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: navy,
+        backgroundColor: Colors.white,
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(22))),
+        iconTheme: const IconThemeData(color: navy),
+        titleTextStyle: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800),
         title: Text(courseName),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -45,13 +60,15 @@ class CourseDetailScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: cardBg,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+              boxShadow: _softShadow,
             ),
             child: Row(
               children: [
                 CircleAvatar(
                   radius: 26,
-                  backgroundColor: Colors.red[400],
+                  backgroundColor: const Color(0xFFF12C68),
                   child: const Icon(Icons.layers, color: Colors.white),
                 ),
                 const SizedBox(width: 16),
@@ -60,7 +77,7 @@ class CourseDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       courseName,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: navy),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: navy),
                     ),
                     const SizedBox(height: 4),
                     Text("$courseCode • $studentsText"),
@@ -73,7 +90,14 @@ class CourseDetailScreen extends StatelessWidget {
 
           // Topics
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0x140B2F63),
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFFE6E2F7), width: 1.2),
+            ),
             child: ListTile(
               leading: const Icon(Icons.menu_book, color: navy),
               title: const Text("Topics", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -91,7 +115,14 @@ class CourseDetailScreen extends StatelessWidget {
 
           // Materials
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0x140B2F63),
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFFE6E2F7), width: 1.2),
+            ),
             child: ListTile(
               leading: const Icon(Icons.folder, color: navy),
               title: const Text("Materials", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -108,12 +139,19 @@ class CourseDetailScreen extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Students
-          const Text("Students", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: navy)),
+          const Text("Students", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: navy)),
           const SizedBox(height: 8),
           ...dummyStudents.map(
             (name) => Card(
               margin: const EdgeInsets.only(bottom: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              color: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0x140B2F63),
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFFE6E2F7), width: 1.2),
+            ),
               child: ListTile(
                 leading: CircleAvatar(backgroundColor: lightBlue, child: Icon(Icons.person, color: navy)),
                 title: Text(name),

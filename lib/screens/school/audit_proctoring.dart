@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// SCHOOL / audit_proctoring.dart
 ///
 /// College reviews AI interview/proctoring violations and
 /// makes access decisions.
-/// Styled to match SchoolDashboard (navy + yellow theme).
+/// Styled to match SchoolDashboard (navy + soft indigo theme).
 class AuditProctoringScreen extends StatefulWidget {
   const AuditProctoringScreen({super.key});
 
@@ -24,7 +33,7 @@ extension on RiskLevel {
   Color get color => switch (this) {
         RiskLevel.low => const Color(0xFF57B97A),
         RiskLevel.medium => const Color(0xFFF7C948),
-        RiskLevel.high => const Color(0xFFE94A56),
+        RiskLevel.high => const Color(0xFFF12C68),
       };
 }
 
@@ -39,9 +48,9 @@ extension on AccessDecision {
       };
 
   Color get color => switch (this) {
-        AccessDecision.pending => Colors.grey,
+        AccessDecision.pending => Color(0xFF7B8798),
         AccessDecision.approved => const Color(0xFF57B97A),
-        AccessDecision.rejected => const Color(0xFFE94A56),
+        AccessDecision.rejected => const Color(0xFFF12C68),
         AccessDecision.flagged => const Color(0xFFF7C948),
       };
 }
@@ -65,8 +74,8 @@ class _ProctoringRecord {
 }
 
 class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   final List<_ProctoringRecord> _records = [
     _ProctoringRecord(
@@ -144,7 +153,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
               ),
               const SizedBox(height: 4),
               Text('ID: ${r.studentId} · Violations: ${r.violationCount}',
-                  style: TextStyle(color: Colors.grey.shade600)),
+                  style: TextStyle(color: const Color(0xFF7B8798))),
               const SizedBox(height: 14),
               const Text('Report', style: TextStyle(fontWeight: FontWeight.w800, color: navy)),
               const SizedBox(height: 4),
@@ -189,10 +198,10 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE94A56),
+                    backgroundColor: const Color(0xFFF12C68),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
                   icon: const Icon(Icons.cancel_rounded),
                   label: const Text('Reject Access', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -209,15 +218,16 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-              decoration: const BoxDecoration(
-                color: yellow,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: _softShadow,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
@@ -238,7 +248,8 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(26),
-                      border: Border.all(color: navy, width: 2),
+                      border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
                     ),
                     child: const Icon(Icons.fact_check_rounded, color: navy),
                   ),
@@ -248,10 +259,10 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Audit & Proctoring',
-                            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold, color: navy)),
+                            style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: navy)),
                         Text('Review AI interview violations',
                             style: TextStyle(
-                                fontSize: 12.5, color: Color(0xFF5E6D7A), fontWeight: FontWeight.w600)),
+                                fontSize: 12.5, color: Color(0xFF7B8798), fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -290,7 +301,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
             Expanded(
               child: _filtered.isEmpty
                   ? const Center(
-                      child: Text('No records match this filter', style: TextStyle(color: Colors.grey)))
+                      child: Text('No records match this filter', style: TextStyle(color: Color(0xFF7B8798))))
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
                       itemCount: _filtered.length,
@@ -302,7 +313,8 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: navy, width: 2),
+                            border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,7 +340,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                                             style: const TextStyle(
                                                 fontSize: 15.5, fontWeight: FontWeight.w800, color: navy)),
                                         Text('ID: ${r.studentId}',
-                                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                                            style: TextStyle(color: const Color(0xFF7B8798), fontSize: 12)),
                                       ],
                                     ),
                                   ),
@@ -349,10 +361,10 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Icon(Icons.warning_amber_rounded, size: 16, color: Colors.grey.shade600),
+                                  Icon(Icons.warning_amber_rounded, size: 16, color: const Color(0xFF7B8798)),
                                   const SizedBox(width: 4),
                                   Text('${r.violationCount} violation(s)',
-                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5)),
+                                      style: TextStyle(color: const Color(0xFF7B8798), fontSize: 12.5)),
                                   const Spacer(),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -376,7 +388,7 @@ class _AuditProctoringScreenState extends State<AuditProctoringScreen> {
                                     backgroundColor: navy,
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 13),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                                   ),
                                   onPressed: () => _openReview(r),
                                   icon: const Icon(Icons.rate_review_rounded, size: 18),
@@ -402,8 +414,8 @@ class _FilterChipButton extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  static const Color navy = Color(0xFF1F355C);
-  static const Color yellow = Color(0xFFFFD52E);
+  static const Color navy = Color(0xFF0B2F63);
+  static const Color surface = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -413,15 +425,16 @@ class _FilterChipButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? navy : Colors.white,
+          color: selected ? const Color(0xFF4F46E5) : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: navy, width: 1.4),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         alignment: Alignment.center,
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? yellow : navy,
+            color: selected ? Colors.white : navy,
             fontWeight: FontWeight.w700,
             fontSize: 12.5,
           ),

@@ -9,7 +9,7 @@ class SubjectListScreen extends StatefulWidget {
 
 class _SubjectListScreenState extends State<SubjectListScreen> {
   // Project Colors (Navy and Blue)
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
   static const Color lightBlue = Color(0xFFE3F2FD);
 
   // Dummy Data - Later this will come from your database
@@ -82,7 +82,13 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: navy,
+        backgroundColor: Colors.white,
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(22))),
+        iconTheme: const IconThemeData(color: navy),
+        titleTextStyle: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800),
         title: const Text("Manage Subjects"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -95,7 +101,14 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
         itemBuilder: (context, index) {
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0x140B2F63),
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFFE6E2F7), width: 1.2),
+            ),
             child: ListTile(
               leading: const CircleAvatar(backgroundColor: lightBlue, child: Icon(Icons.book, color: navy)),
               title: Text(subjects[index]['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),

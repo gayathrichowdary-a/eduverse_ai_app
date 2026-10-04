@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'Lecture_Notes_Screen.dart';
 import 'Video_Tutorials_Screen.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class MaterialsScreen extends StatefulWidget {
   const MaterialsScreen({super.key});
 
@@ -10,7 +19,7 @@ class MaterialsScreen extends StatefulWidget {
 }
 
 class _MaterialsScreenState extends State<MaterialsScreen> {
-  static const Color navy = Color(0xFF1F355C);
+  static const Color navy = Color(0xFF0B2F63);
 
   // Initial Grid Data
   final List<Map<String, dynamic>> materials = [
@@ -76,7 +85,13 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: navy, title: const Text("Study Materials")),
+      appBar: AppBar(backgroundColor: Colors.white,
+        elevation: 3,
+        shadowColor: const Color(0x1A0B2F63),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(22))),
+        iconTheme: const IconThemeData(color: navy),
+        titleTextStyle: const TextStyle(color: navy, fontSize: 20, fontWeight: FontWeight.w800), title: const Text("Study Materials")),
       body: GridView.builder(
         padding: const EdgeInsets.all(20),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -93,14 +108,15 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+                border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+                boxShadow: _softShadow,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(materials[index]['icon'], color: materials[index]['color'], size: 45),
                   const SizedBox(height: 10),
-                  Text(materials[index]['title'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(materials[index]['title'], style: const TextStyle(fontWeight: FontWeight.w700, color: navy)),
                 ],
               ),
             ),
