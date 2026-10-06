@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 /// KNOWLEDGE HUB — Library tab body content.
 ///
 /// IMPORTANT: This widget is BODY CONTENT ONLY. It does NOT include its own
@@ -43,11 +52,11 @@ class KnowledgeHubScreen extends StatefulWidget {
 class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  static const Color kYellow = Color(0xFFF6C700);
-  static const Color kNavy = Color(0xFF17233B);
-  static const Color kRed = Color(0xFFE0483E);
+  static const Color kSurface = Colors.white;
+  static const Color kNavy = Color(0xFF0B2F63);
+  static const Color kRed = Color(0xFFF12C68);
   static const Color kGreen = Color(0xFF3FA66A);
-  static const Color kPurple = Color(0xFF5B21B6);
+  static const Color kPurple = Color(0xFF4F46E5);
 
   final List<_Mistake> _mistakes = const [
     _Mistake(
@@ -79,7 +88,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
     ),
     _ResourceItem(
       icon: Icons.psychology,
-      iconBg: Color(0xFFE0483E),
+      iconBg: Color(0xFFF12C68),
       badge: 'Review',
       category: 'Exam Coach',
       title: 'Algebra Prep',
@@ -102,7 +111,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: const Color(0xFFF6F5FD),
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -126,7 +135,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                   const Text(
                     'Resource Library',
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: kNavy,
                     ),
@@ -148,7 +157,14 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      color: kYellow,
+      decoration: BoxDecoration(
+        color: kSurface,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
+        ),
+        boxShadow: _softShadow,
+      ),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,8 +179,8 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                     Text(
                       'Knowledge Hub',
                       style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
                         color: kNavy,
                         height: 1.1,
                       ),
@@ -173,9 +189,9 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                     Text(
                       'Master your misconceptions',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: kNavy,
+                        color: Color(0xFF7B8798),
                       ),
                     ),
                   ],
@@ -188,6 +204,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                   shape: BoxShape.circle,
                   color: const Color(0xFF4FC3E8),
                   border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: _softShadow,
                 ),
                 alignment: Alignment.center,
                 child: const Text(
@@ -210,12 +227,13 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: kNavy, width: 2),
+                    border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+                    boxShadow: _softShadow,
                   ),
                   child: Row(
                     children: [
                       const SizedBox(width: 14),
-                      const Icon(Icons.search, color: Colors.grey),
+                      const Icon(Icons.search, color: Color(0xFF7B8798)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
@@ -223,7 +241,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                           decoration: const InputDecoration(
                             hintText: 'Search formulas, topics...',
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.grey),
+                            hintStyle: TextStyle(color: Color(0xFF7B8798)),
                           ),
                         ),
                       ),
@@ -238,7 +256,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                 decoration: BoxDecoration(
                   color: kRed,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: kNavy, width: 2),
+                  boxShadow: _softShadow,
                 ),
                 child: const Icon(Icons.tune, color: Colors.white),
               ),
@@ -256,7 +274,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
         const Text(
           'Your AI Insights',
           style: TextStyle(
-            fontSize: 26,
+            fontSize: 22,
             fontWeight: FontWeight.w800,
             color: kNavy,
           ),
@@ -284,9 +302,10 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFFCE1DF),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: kRed, width: 2),
+        color: const Color(0xFFFFF1F5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF9C9D6), width: 1.2),
+        boxShadow: _softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,8 +329,8 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
             m.mistake,
             style: const TextStyle(
               color: kNavy,
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
               height: 1.3,
             ),
           ),
@@ -364,8 +383,9 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: kNavy, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+              boxShadow: _softShadow,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,9 +408,9 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color(0xFFF0EEFB),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.grey.shade400),
+                        border: Border.all(color: const Color(0xFFE6E2F7)),
                       ),
                       child: Text(
                         item.badge,
@@ -409,7 +429,7 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade600,
+                    color: Color(0xFF7B8798),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -438,7 +458,8 @@ class _KnowledgeHubScreenState extends State<KnowledgeHubScreen> {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: kPurple,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: _softShadow,
         ),
         child: Row(
           children: [

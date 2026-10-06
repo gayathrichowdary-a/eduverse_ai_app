@@ -11,6 +11,15 @@ import 'ai_data_usage_screen.dart';
 import 'privacy_policy_screen.dart';
 import '../learning/student_dashboard.dart';
 
+
+final List<BoxShadow> _softShadow = [
+  BoxShadow(
+    color: const Color(0xFF0B2F63).withValues(alpha: 0.06),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+  ),
+];
+
 class SettingsProfile extends StatefulWidget {
   const SettingsProfile({super.key});
 
@@ -26,7 +35,7 @@ class _SettingsProfileState extends State<SettingsProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFFF6F5FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -37,7 +46,11 @@ class _SettingsProfileState extends State<SettingsProfile> {
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.fromLTRB(20, 24, 20, 26),
-                        decoration: const BoxDecoration(color: Color(0xFFFFD52E)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(28), bottomRight: Radius.circular(28)),
+                          boxShadow: _softShadow,
+                        ),
                         child: Column(
                           children: [
                             Align(
@@ -47,9 +60,10 @@ class _SettingsProfileState extends State<SettingsProfile> {
                                 child: Container(
                                   width: 34, height: 34,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF57B97A),
+                                    color: const Color(0xFF4F46E5),
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: const Color(0xFF1F355C), width: 1.5),
+                                    border: Border.all(color: Colors.white, width: 2),
+                                    boxShadow: _softShadow,
                                   ),
                                   child: const Icon(Icons.edit, size: 16, color: Colors.white),
                                 ),
@@ -61,7 +75,8 @@ class _SettingsProfileState extends State<SettingsProfile> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFF3D3D3D),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF1F355C), width: 2),
+                                border: Border.all(color: const Color(0xFFE6E2F7), width: 4),
+                                boxShadow: _softShadow,
                               ),
                               child: const Center(
                                 child: Text("learning\nschool", textAlign: TextAlign.center,
@@ -69,12 +84,12 @@ class _SettingsProfileState extends State<SettingsProfile> {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            const Text("Arjun Sharma", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1F355C))),
+                            const Text("Arjun Sharma", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0B2F63))),
                             const SizedBox(height: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF1F355C), width: 1.5)),
-                              child: const Text("Grade 10 • CBSE", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF1F355C))),
+                              decoration: BoxDecoration(color: const Color(0xFFF0EEFB), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2)),
+                              child: const Text("Grade 10 • CBSE", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0B2F63))),
                             ),
                           ],
                         ),
@@ -88,7 +103,7 @@ class _SettingsProfileState extends State<SettingsProfile> {
                       padding: const EdgeInsets.symmetric(horizontal: 18),
                       child: Row(
                         children: [
-                          Expanded(child: _StatBox(value: "84%", label: "Mastery", valueColor: const Color(0xFFE94A56))),
+                          Expanded(child: _StatBox(value: "84%", label: "Mastery", valueColor: const Color(0xFFF12C68))),
                           const SizedBox(width: 12),
                           Expanded(child: _StatBox(value: "12 Days", label: "Streak", valueColor: const Color(0xFFF7A93A), highlighted: true)),
                           const SizedBox(width: 12),
@@ -110,7 +125,7 @@ class _SettingsProfileState extends State<SettingsProfile> {
                           _NavRow(icon: Icons.school, iconColor: const Color(0xFF58C7F3), title: "AI Mentor Style", subtitle: "Currently: Encouraging & Visual", 
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AiMentorStyleScreen()))),
                           const SizedBox(height: 12),
-                          _NavRow(icon: Icons.psychology_outlined, iconColor: const Color(0xFFE94A56), title: "Subject Focus", subtitle: "Math, Physics, Career Prep", 
+                          _NavRow(icon: Icons.psychology_outlined, iconColor: const Color(0xFFF12C68), title: "Subject Focus", subtitle: "Math, Physics, Career Prep", 
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SubjectFocusScreen()))),
                           
                           const SizedBox(height: 24),
@@ -124,13 +139,14 @@ class _SettingsProfileState extends State<SettingsProfile> {
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 14),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF1F355C), width: 2)),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow),
                             child: Column(
                               children: [
                                 _InlineToggle(title: "Daily Study Reminders", value: dailyReminders, onChanged: (val) => setState(() => dailyReminders = val)),
-                                const Divider(height: 1, color: Color(0xFFEFEFEF)),
+                                const Divider(height: 1, color: Color(0xFFEFECFA)),
                                 _InlineToggle(title: "Emotional Support Mode", value: emotionalSupport, onChanged: (val) => setState(() => emotionalSupport = val)),
-                                const Divider(height: 1, color: Color(0xFFEFEFEF)),
+                                const Divider(height: 1, color: Color(0xFFEFECFA)),
                                 _InlineToggle(title: "Parental Dashboard Sync", value: parentalSync, onChanged: (val) => setState(() => parentalSync = val)),
                               ],
                             ),
@@ -168,7 +184,7 @@ class _SettingsProfileState extends State<SettingsProfile> {
                               },
                               icon: const Icon(Icons.logout, size: 18, color: Colors.white),
                               label: const Text("Sign Out", style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white)),
-                              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94A56), elevation: 0, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF12C68), elevation: 0, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -200,13 +216,14 @@ class _StatBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1F355C), width: highlighted ? 3 : 2),
+        border: Border.all(color: highlighted ? const Color(0xFF4F46E5) : const Color(0xFFE6E2F7), width: highlighted ? 1.8 : 1.2),
+        boxShadow: _softShadow,
       ),
       child: Column(
         children: [
-          Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: valueColor)),
+          Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: valueColor)),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF5E6D7A))),
+          Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF7B8798))),
         ],
       ),
     );
@@ -219,7 +236,7 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F355C)));
+    return Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0B2F63)));
   }
 }
 
@@ -241,27 +258,28 @@ class _NavRow extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF1F355C), width: 2),
+          border: Border.all(color: const Color(0xFFE6E2F7), width: 1.2),
+        boxShadow: _softShadow,
         ),
         child: Row(
           children: [
             Container(
               width: 40, height: 40,
               decoration: BoxDecoration(color: iconColor, shape: BoxShape.circle),
-              child: Icon(icon, color: iconOnLight ? const Color(0xFF1F355C) : Colors.white, size: 18),
+              child: Icon(icon, color: iconOnLight ? const Color(0xFF0B2F63) : Colors.white, size: 18),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF1F355C))),
+                  Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF0B2F63))),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF7B8798))),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFF1F355C)),
+            const Icon(Icons.chevron_right, color: Color(0xFF0B2F63)),
           ],
         ),
       ),
@@ -282,8 +300,8 @@ class _InlineToggle extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1F355C))),
-          Switch(value: value, onChanged: onChanged, activeThumbColor: Colors.white, activeTrackColor: const Color(0xFFE94A56)),
+          Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0B2F63))),
+          Switch(value: value, onChanged: onChanged, activeThumbColor: Colors.white, activeTrackColor: const Color(0xFF4F46E5)),
         ],
       ),
     );
@@ -298,7 +316,7 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? const Color(0xFFE94A56) : const Color(0xFF9AA5B1);
+    final color = isActive ? const Color(0xFFF12C68) : const Color(0xFF9AA5B1);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
