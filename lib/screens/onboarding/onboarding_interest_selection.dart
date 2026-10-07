@@ -23,7 +23,7 @@ class OnboardingInterestSelection extends StatefulWidget {
 
 class _OnboardingInterestSelectionState
     extends State<OnboardingInterestSelection> {
-  // Sir's Brand Design Colors
+  // ================= SIR'S BRAND DESIGN COLORS =================
   static const Color navy = Color(0xFF1D3B64);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color brandGradientEnd = Color(0xFFF12C68);
@@ -71,47 +71,31 @@ class _OnboardingInterestSelectionState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: navy),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-          ],
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 20),
+          // ================= 6-SEGMENT PROGRESS BAR (ALL 6 STEPS ACTIVE) =================
+          child: Row(
+            children: List.generate(6, (index) {
+              return Expanded(
+                child: Container(
+                  height: 5,
+                  margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [brandRed, brandGradientEnd],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
       ),
       body: SafeArea(
@@ -124,41 +108,49 @@ class _OnboardingInterestSelectionState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title in Sir's exact typography
+                    // Title
                     const Text(
-                      'What do you enjoy?',
+                      'What are your interests?',
                       style: TextStyle(
                         color: navy,
                         fontSize: 24,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,
                       ),
                     ),
                     const SizedBox(height: 8),
 
-                    // Subtitle
+                    // Subtitle + Counter Badge
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             'Choose at least 3 interests to personalize topics.',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: textMuted,
                               fontSize: 14,
                               height: 1.4,
                             ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: _canContinue ? const Color(0xFFECFDF3) : const Color(0xFFF2F4F7),
+                            color: _canContinue
+                                ? const Color(0xFFFFF0F2)
+                                : const Color(0xFFF2F4F7),
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: _canContinue ? brandRed : Colors.transparent,
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             '$_selectedCount / 3 selected',
                             style: TextStyle(
-                              color: _canContinue ? const Color(0xFF027A48) : textMuted,
+                              color: _canContinue ? brandRed : textMuted,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -177,7 +169,7 @@ class _OnboardingInterestSelectionState
                         crossAxisCount: 2,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
-                        mainAxisExtent: 64,
+                        mainAxisExtent: 60,
                       ),
                       itemBuilder: (context, index) {
                         final interest = _interests[index];
@@ -193,10 +185,10 @@ class _OnboardingInterestSelectionState
               ),
             ),
 
-            // Bottom Continue Section
+            // ================= BOTTOM CAPSULE CONTINUE BUTTON =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -215,7 +207,7 @@ class _OnboardingInterestSelectionState
                         )
                       : null,
                   color: _canContinue ? null : const Color(0xFFF2F4F7),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(30), // Sir's capsule pill shape
                   boxShadow: _canContinue
                       ? [
                           BoxShadow(
@@ -233,7 +225,7 @@ class _OnboardingInterestSelectionState
                     disabledBackgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: Row(
@@ -244,7 +236,7 @@ class _OnboardingInterestSelectionState
                         style: TextStyle(
                           color: _canContinue ? Colors.white : const Color(0xFF98A2B3),
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       if (_canContinue) ...[

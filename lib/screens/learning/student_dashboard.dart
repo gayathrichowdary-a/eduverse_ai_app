@@ -150,12 +150,22 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgSurface,
-      body: SafeArea(
-        child: _buildBodyForActiveTab(),
+    // 👉 FIX: PopScope ensures system back gesture never drops into old assessment screens!
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_activeTab != MainTab.home) {
+          setState(() => _activeTab = MainTab.home);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: bgSurface,
+        body: SafeArea(
+          child: _buildBodyForActiveTab(),
+        ),
+        bottomNavigationBar: _buildBottomNav(),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 

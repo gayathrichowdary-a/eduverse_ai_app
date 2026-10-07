@@ -10,7 +10,7 @@ class OnboardingLearningGoal extends StatefulWidget {
 }
 
 class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
-  // Sir's Brand Design Colors
+  // ================= SIR'S BRAND DESIGN COLORS =================
   static const Color navy = Color(0xFF1D3B64);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color brandGradientEnd = Color(0xFFF12C68);
@@ -49,40 +49,35 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: navy),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-          ],
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 20),
+          // ================= 6-SEGMENT PROGRESS BAR (STEP 4 OF 6) =================
+          child: Row(
+            children: List.generate(6, (index) {
+              final bool isActive = index <= 3; // First 4 segments active
+              return Expanded(
+                child: Container(
+                  height: 5,
+                  margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
+                  decoration: BoxDecoration(
+                    gradient: isActive
+                        ? const LinearGradient(
+                            colors: [brandRed, brandGradientEnd],
+                          )
+                        : null,
+                    color: isActive ? null : const Color(0xFFF0F2F4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
       ),
       body: SafeArea(
@@ -102,7 +97,7 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
                       style: TextStyle(
                         color: navy,
                         fontSize: 24,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,
                         height: 1.25,
                       ),
@@ -200,7 +195,7 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
                                     color: isSelected ? brandRed : Colors.transparent,
                                     border: Border.all(
                                       color: isSelected ? brandRed : cardBorder,
-                                      width: 2,
+                                      width: isSelected ? 0 : 1.5,
                                     ),
                                   ),
                                   child: isSelected
@@ -218,10 +213,10 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
               ),
             ),
 
-            // ================= BOTTOM SECTION =================
+            // ================= BOTTOM CAPSULE CONTINUE BUTTON =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -240,7 +235,7 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(30), // Sir's capsule pill shape
                   boxShadow: [
                     BoxShadow(
                       color: brandRed.withOpacity(0.35),
@@ -255,7 +250,7 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: const Row(
@@ -266,7 +261,7 @@ class _OnboardingLearningGoalState extends State<OnboardingLearningGoal> {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(width: 8),

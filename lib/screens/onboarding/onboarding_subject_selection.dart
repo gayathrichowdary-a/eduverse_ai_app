@@ -25,7 +25,7 @@ class OnboardingSubjectSelection extends StatefulWidget {
 
 class _OnboardingSubjectSelectionState
     extends State<OnboardingSubjectSelection> {
-  // Sir's Brand Colors
+  // ================= SIR'S BRAND COLORS =================
   static const Color navy = Color(0xFF1D3B64);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color brandGradientEnd = Color(0xFFF12C68);
@@ -41,7 +41,7 @@ class _OnboardingSubjectSelectionState
     Subject(name: 'Social Studies', icon: Icons.public),
     Subject(name: 'Comp. Science', icon: Icons.terminal),
     Subject(name: 'Artificial Intel.', icon: Icons.smart_toy),
-    Subject(name: 'Biology', icon: Icons.biotech_outlined),
+    Subject(name: 'Biology', icon: Icons.biotech),
     Subject(name: 'Physics', icon: Icons.architecture),
     Subject(name: 'Medicine', icon: Icons.medical_services_outlined),
   ];
@@ -93,33 +93,35 @@ class _OnboardingSubjectSelectionState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: navy),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-          ],
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 20),
+          // ================= 6-SEGMENT PROGRESS BAR (STEP 3 OF 6) =================
+          child: Row(
+            children: List.generate(6, (index) {
+              final bool isActive = index <= 2; // First 3 segments active
+              return Expanded(
+                child: Container(
+                  height: 5,
+                  margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
+                  decoration: BoxDecoration(
+                    gradient: isActive
+                        ? const LinearGradient(
+                            colors: [brandRed, brandGradientEnd],
+                          )
+                        : null,
+                    color: isActive ? null : const Color(0xFFF0F2F4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
       ),
       body: SafeArea(
@@ -139,7 +141,7 @@ class _OnboardingSubjectSelectionState
                             'Choose Your Subjects',
                             style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: navy,
                               letterSpacing: -0.3,
                             ),
@@ -159,23 +161,34 @@ class _OnboardingSubjectSelectionState
                             style: const TextStyle(fontSize: 14, color: navy),
                             decoration: InputDecoration(
                               hintText: 'Search subjects...',
-                              hintStyle: const TextStyle(color: Color(0xFF98A2B3), fontSize: 14),
-                              prefixIcon: const Icon(Icons.search, color: textMuted, size: 20),
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF98A2B3),
+                                fontSize: 14,
+                              ),
+                              prefixIcon: const Icon(
+                                Icons.search,
+                                color: textMuted,
+                                size: 20,
+                              ),
                               filled: true,
                               fillColor: const Color(0xFFF9FAFB),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: cardBorder),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 14,
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: cardBorder),
+                                borderSide: const BorderSide(
+                                  color: cardBorder,
+                                  width: 1.0,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: navy, width: 1.5),
+                                borderSide: const BorderSide(
+                                  color: brandRed,
+                                  width: 1.5,
+                                ),
                               ),
                             ),
                           ),
@@ -191,7 +204,7 @@ class _OnboardingSubjectSelectionState
                         crossAxisCount: 2,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
-                        mainAxisExtent: 140,
+                        mainAxisExtent: 136,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -209,10 +222,10 @@ class _OnboardingSubjectSelectionState
               ),
             ),
 
-            // Bottom Continue Section
+            // ================= BOTTOM CAPSULE CONTINUE BUTTON =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -228,7 +241,7 @@ class _OnboardingSubjectSelectionState
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(30), // Sir's capsule pill shape
                   boxShadow: [
                     BoxShadow(
                       color: brandRed.withOpacity(0.35),
@@ -243,7 +256,7 @@ class _OnboardingSubjectSelectionState
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: const Row(
@@ -253,7 +266,7 @@ class _OnboardingSubjectSelectionState
                         'Continue',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),
@@ -327,13 +340,13 @@ class _SubjectCard extends StatelessWidget {
                 ),
                 if (subject.selected)
                   Container(
-                    width: 22,
-                    height: 22,
+                    width: 20,
+                    height: 20,
                     decoration: const BoxDecoration(
                       color: brandRed,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check, color: Colors.white, size: 14),
+                    child: const Icon(Icons.check, color: Colors.white, size: 13),
                   ),
               ],
             ),
@@ -343,7 +356,7 @@ class _SubjectCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w700,
                 color: subject.selected ? brandRed : navy,
               ),

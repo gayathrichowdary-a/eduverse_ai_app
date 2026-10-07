@@ -11,7 +11,7 @@ class OnboardingClassSelection extends StatefulWidget {
 }
 
 class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
-  // Sir's Brand Design Colors
+  // ================= SIR'S BRAND COLORS =================
   static const Color navy = Color(0xFF1D3B64);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color brandGradientEnd = Color(0xFFF12C68);
@@ -28,33 +28,35 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: navy),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: const Color(0xFFEAECF0)),
-              ),
-            ),
-          ],
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 20),
+          // ================= 6-SEGMENT PROGRESS BAR (STEP 2 OF 6) =================
+          child: Row(
+            children: List.generate(6, (index) {
+              final bool isActive = index <= 1; // First 2 segments active
+              return Expanded(
+                child: Container(
+                  height: 5,
+                  margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
+                  decoration: BoxDecoration(
+                    gradient: isActive
+                        ? const LinearGradient(
+                            colors: [brandRed, brandGradientEnd],
+                          )
+                        : null,
+                    color: isActive ? null : const Color(0xFFF0F2F4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
       ),
       body: SafeArea(
@@ -68,13 +70,13 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title in Sir's exact typography
+                    // Title
                     const Text(
                       'Which class are you\nstudying?',
                       style: TextStyle(
                         color: navy,
                         fontSize: 24,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,
                         height: 1.25,
                       ),
@@ -92,7 +94,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Foundational
+                    // ================= FOUNDATIONAL =================
                     const Text(
                       'Foundational',
                       style: TextStyle(
@@ -108,7 +110,8 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Primary',
                             subtitle: 'Classes 1–5',
-                            value: '1st–5th Class',
+                            value: 'Primary',
+                            quizCategory: '1st–5th Class',
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -116,14 +119,15 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Middle School',
                             subtitle: 'Classes 6–8',
-                            value: '6th–10th Class',
+                            value: 'Middle School',
+                            quizCategory: '6th–10th Class',
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 22),
 
-                    // Schooling
+                    // ================= SCHOOLING =================
                     const Text(
                       'Schooling',
                       style: TextStyle(
@@ -139,7 +143,8 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'High School',
                             subtitle: 'Classes 9–10',
-                            value: '6th–10th Class',
+                            value: 'High School',
+                            quizCategory: '6th–10th Class',
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -147,7 +152,8 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Intermediate',
                             subtitle: 'Classes 11–12',
-                            value: '11th–12th Class',
+                            value: 'Intermediate',
+                            quizCategory: '11th–12th Class',
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -155,14 +161,15 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Other',
                             subtitle: 'Other schooling',
-                            value: '6th–10th Class',
+                            value: 'Other Schooling',
+                            quizCategory: '6th–10th Class',
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 22),
 
-                    // Higher Education
+                    // ================= HIGHER EDUCATION =================
                     const Text(
                       'Higher Education',
                       style: TextStyle(
@@ -178,7 +185,8 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'College',
                             subtitle: 'Undergraduate (UG)',
-                            value: 'Undergraduate / College Students',
+                            value: 'College',
+                            quizCategory: 'Undergraduate / College Students',
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -186,7 +194,8 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Postgraduate',
                             subtitle: "Master's degree (PG)",
-                            value: 'Postgraduate / Higher Studies',
+                            value: 'Postgraduate',
+                            quizCategory: 'Postgraduate / Higher Studies',
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -194,7 +203,8 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                           child: _classCard(
                             title: 'Management',
                             subtitle: 'MBA / Business',
-                            value: 'MBA / Management Students',
+                            value: 'Management',
+                            quizCategory: 'MBA / Management Students',
                           ),
                         ),
                       ],
@@ -208,7 +218,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
             // ================= BOTTOM SECTION =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -233,11 +243,11 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                               end: Alignment.centerRight,
                             ),
                       color: selectedClass == null ? const Color(0xFFF2F4F7) : null,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30), // Sir's capsule pill shape
                       boxShadow: selectedClass != null
                           ? [
                               BoxShadow(
-                                color: brandRed.withOpacity(0.3),
+                                color: brandRed.withOpacity(0.35),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -251,7 +261,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                         disabledBackgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                       child: Row(
@@ -264,7 +274,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                                   ? const Color(0xFF98A2B3)
                                   : Colors.white,
                               fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -279,7 +289,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
                   const Text(
                     'You can change this anytime in settings',
@@ -287,7 +297,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
                     style: TextStyle(
                       color: textMuted,
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
@@ -304,6 +314,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
     required String title,
     required String subtitle,
     required String value,
+    required String quizCategory,
   }) {
     final bool isSelected = selectedClass == value;
 
@@ -311,6 +322,7 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
       onTap: () {
         setState(() {
           selectedClass = value;
+          _activeQuizCategory = quizCategory;
         });
       },
       child: AnimatedContainer(
@@ -379,11 +391,12 @@ class _OnboardingClassSelectionState extends State<OnboardingClassSelection> {
     );
   }
 
+  String _activeQuizCategory = '6th–10th Class';
+
   void _continue() {
     FocusScope.of(context).unfocus();
     if (selectedClass != null) {
-      // Passes the selected category forward to the quiz screen
-      OnboardingAssessmentInProgress.activeClassCategory = selectedClass!;
+      OnboardingAssessmentInProgress.activeClassCategory = _activeQuizCategory;
     }
     Navigator.push(
       context,

@@ -1,6 +1,27 @@
 import 'package:flutter/material.dart';
 import 'onboarding_class_selection.dart';
 
+// ============================================================
+// SHARED STUDENT PROFILE MODEL (STORES ONBOARDING DATA)
+// ============================================================
+class StudentProfileData {
+  static String firstName = 'Alex';
+  static String lastName = 'Rivera';
+  static String nickname = 'Alex';
+  static String gender = 'Male';
+  static String dateOfBirth = '01/01/2008';
+  static String selectedClass = 'Primary';
+  static String city = 'Mumbai';
+  static String state = 'Maharashtra';
+
+  static String get fullName => '$firstName $lastName'.trim();
+  static String get initials {
+    final f = firstName.isNotEmpty ? firstName[0].toUpperCase() : 'A';
+    final l = lastName.isNotEmpty ? lastName[0].toUpperCase() : 'R';
+    return '$f$l';
+  }
+}
+
 class OnboardingStudentInformation extends StatefulWidget {
   const OnboardingStudentInformation({super.key});
 
@@ -20,16 +41,34 @@ class _OnboardingStudentInformationState
   static const Color fieldBg = Color(0xFFF9FAFB);
 
   // ================= CONTROLLERS =================
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController nicknameController = TextEditingController();
-  final TextEditingController dateOfBirthController = TextEditingController();
-  final TextEditingController stateController =
-      TextEditingController(text: 'Maharashtra');
-  final TextEditingController cityController =
-      TextEditingController(text: 'Mumbai');
+  late final TextEditingController firstNameController;
+  late final TextEditingController lastNameController;
+  late final TextEditingController nicknameController;
+  late final TextEditingController dateOfBirthController;
+  late final TextEditingController stateController;
+  late final TextEditingController cityController;
+  late final TextEditingController languageController;
+  late final TextEditingController countryController;
 
   String? selectedGender;
+
+  @override
+  void initState() {
+    super.initState();
+    firstNameController =
+        TextEditingController(text: StudentProfileData.firstName);
+    lastNameController =
+        TextEditingController(text: StudentProfileData.lastName);
+    nicknameController =
+        TextEditingController(text: StudentProfileData.nickname);
+    dateOfBirthController =
+        TextEditingController(text: StudentProfileData.dateOfBirth);
+    stateController = TextEditingController(text: StudentProfileData.state);
+    cityController = TextEditingController(text: StudentProfileData.city);
+    languageController = TextEditingController(text: 'English (India)');
+    countryController = TextEditingController(text: 'India');
+    selectedGender = StudentProfileData.gender;
+  }
 
   @override
   void dispose() {
@@ -39,12 +78,21 @@ class _OnboardingStudentInformationState
     dateOfBirthController.dispose();
     stateController.dispose();
     cityController.dispose();
+    languageController.dispose();
+    countryController.dispose();
     super.dispose();
   }
 
   // ================= BUILD =================
   @override
   Widget build(BuildContext context) {
+    final String initial1 = firstNameController.text.trim().isNotEmpty
+        ? firstNameController.text.trim()[0].toUpperCase()
+        : 'A';
+    final String initial2 = lastNameController.text.trim().isNotEmpty
+        ? lastNameController.text.trim()[0].toUpperCase()
+        : 'R';
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -54,37 +102,33 @@ class _OnboardingStudentInformationState
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= PROGRESS BAR =================
+                    // ================= 6-SEGMENT PROGRESS BAR (STEP 1 OF 6) =================
                     Row(
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [brandRed, brandGradientEnd],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
+                      children: List.generate(6, (index) {
+                        final bool isFirst = index == 0;
+                        return Expanded(
                           child: Container(
-                            height: 6,
+                            height: 5,
+                            margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF0F2F4),
+                              gradient: isFirst
+                                  ? const LinearGradient(
+                                      colors: [brandRed, brandGradientEnd],
+                                    )
+                                  : null,
+                              color: isFirst ? null : const Color(0xFFF0F2F4),
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                        ),
-                      ],
+                        );
+                      }),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
                     // ================= TITLE =================
                     const Text(
@@ -93,7 +137,7 @@ class _OnboardingStudentInformationState
                         color: navy,
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: -0.4,
+                        letterSpacing: -0.3,
                       ),
                     ),
 
@@ -108,7 +152,7 @@ class _OnboardingStudentInformationState
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 26),
 
                     // ================= PROFILE AVATAR =================
                     Center(
@@ -116,16 +160,16 @@ class _OnboardingStudentInformationState
                         clipBehavior: Clip.none,
                         children: [
                           Container(
-                            width: 96,
-                            height: 96,
+                            width: 94,
+                            height: 94,
                             decoration: const BoxDecoration(
                               color: Color(0xFFFFF1F3),
                               shape: BoxShape.circle,
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                'AR',
-                                style: TextStyle(
+                                '$initial1$initial2',
+                                style: const TextStyle(
                                   color: brandRed,
                                   fontSize: 28,
                                   fontWeight: FontWeight.w700,
@@ -142,11 +186,10 @@ class _OnboardingStudentInformationState
                               decoration: BoxDecoration(
                                 color: brandRed,
                                 shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 2),
+                                border: Border.all(color: Colors.white, width: 2.5),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: brandRed.withOpacity(0.3),
+                                    color: brandRed.withOpacity(0.35),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
                                   ),
@@ -194,7 +237,7 @@ class _OnboardingStudentInformationState
                       label: 'Nickname',
                       controller: nicknameController,
                       hint: 'How should we call you?',
-                      prefixIcon: Icons.face_outlined,
+                      prefixIcon: Icons.sentiment_satisfied_alt_outlined,
                     ),
 
                     const SizedBox(height: 18),
@@ -225,14 +268,13 @@ class _OnboardingStudentInformationState
                     // ================= LANGUAGE =================
                     _buildLabeledField(
                       label: 'Preferred Language',
-                      controller:
-                          TextEditingController(text: 'English (India)'),
-                      hint: '',
+                      controller: languageController,
+                      hint: 'English (India)',
                       prefixIcon: Icons.language,
                       readOnly: true,
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 26),
 
                     // ================= LOCATION =================
                     const Text(
@@ -249,8 +291,8 @@ class _OnboardingStudentInformationState
                     // ================= COUNTRY =================
                     _buildLabeledField(
                       label: 'Country',
-                      controller: TextEditingController(text: 'India'),
-                      hint: '',
+                      controller: countryController,
+                      hint: 'India',
                       prefixIcon: Icons.public,
                       readOnly: true,
                     ),
@@ -285,10 +327,10 @@ class _OnboardingStudentInformationState
               ),
             ),
 
-            // ================= FIXED CONTINUE BUTTON =================
+            // ================= SIR'S CAPSULE PILL CONTINUE BUTTON =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 14, 24, 16),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -304,10 +346,10 @@ class _OnboardingStudentInformationState
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(30), // Sir's exact pill shape
                   boxShadow: [
                     BoxShadow(
-                      color: brandRed.withOpacity(0.3),
+                      color: brandRed.withOpacity(0.35),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -319,7 +361,7 @@ class _OnboardingStudentInformationState
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: const Row(
@@ -330,12 +372,12 @@ class _OnboardingStudentInformationState
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(width: 8),
                       Icon(
-                        Icons.arrow_forward_rounded,
+                        Icons.arrow_forward,
                         color: Colors.white,
                         size: 18,
                       ),
@@ -351,7 +393,7 @@ class _OnboardingStudentInformationState
   }
 
   // ============================================================
-  // LABELED TEXT FIELD
+  // LABELED TEXT FIELD (MATCHING SIR'S CLEAN BORDER & RADIUS)
   // ============================================================
   Widget _buildLabeledField({
     required String label,
@@ -367,9 +409,9 @@ class _OnboardingStudentInformationState
         Text(
           label,
           style: const TextStyle(
-            color: navy,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
+            color: textMuted,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 6),
@@ -377,9 +419,10 @@ class _OnboardingStudentInformationState
           controller: controller,
           readOnly: readOnly,
           onTap: onTap,
+          onChanged: (_) => setState(() {}),
           style: const TextStyle(
             color: navy,
-            fontSize: 14,
+            fontSize: 14.5,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
@@ -394,8 +437,8 @@ class _OnboardingStudentInformationState
                 ? null
                 : Icon(
                     prefixIcon,
-                    color: textMuted,
-                    size: 18,
+                    color: const Color(0xFF667085),
+                    size: 19,
                   ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
@@ -405,14 +448,14 @@ class _OnboardingStudentInformationState
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: cardBorder,
-                width: 1.2,
+                width: 1.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: brandRed,
-                width: 1.6,
+                width: 1.5,
               ),
             ),
           ),
@@ -431,9 +474,9 @@ class _OnboardingStudentInformationState
         const Text(
           'Gender',
           style: TextStyle(
-            color: navy,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
+            color: textMuted,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 6),
@@ -455,7 +498,7 @@ class _OnboardingStudentInformationState
           ),
           style: const TextStyle(
             color: navy,
-            fontSize: 14,
+            fontSize: 14.5,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
@@ -469,14 +512,14 @@ class _OnboardingStudentInformationState
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: cardBorder,
-                width: 1.2,
+                width: 1.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: brandRed,
-                width: 1.6,
+                width: 1.5,
               ),
             ),
           ),
@@ -505,8 +548,8 @@ class _OnboardingStudentInformationState
   Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime(2005),
-      firstDate: DateTime(1950),
+      initialDate: DateTime(2008),
+      firstDate: DateTime(1960),
       lastDate: DateTime.now(),
       builder: (context, child) {
         return Theme(
@@ -534,10 +577,33 @@ class _OnboardingStudentInformationState
   }
 
   // ============================================================
-  // CONTINUE
+  // CONTINUE: SAVES STUDENT PROFILE AND NAVIGATES FORWARD
   // ============================================================
   void _continue() {
     FocusScope.of(context).unfocus();
+
+    if (firstNameController.text.trim().isNotEmpty) {
+      StudentProfileData.firstName = firstNameController.text.trim();
+    }
+    if (lastNameController.text.trim().isNotEmpty) {
+      StudentProfileData.lastName = lastNameController.text.trim();
+    }
+    if (nicknameController.text.trim().isNotEmpty) {
+      StudentProfileData.nickname = nicknameController.text.trim();
+    }
+    if (dateOfBirthController.text.trim().isNotEmpty) {
+      StudentProfileData.dateOfBirth = dateOfBirthController.text.trim();
+    }
+    if (selectedGender != null) {
+      StudentProfileData.gender = selectedGender!;
+    }
+    if (stateController.text.trim().isNotEmpty) {
+      StudentProfileData.state = stateController.text.trim();
+    }
+    if (cityController.text.trim().isNotEmpty) {
+      StudentProfileData.city = cityController.text.trim();
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(

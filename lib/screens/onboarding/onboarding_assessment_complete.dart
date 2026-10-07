@@ -646,7 +646,7 @@ class AssessmentComplete extends StatelessWidget {
               ),
             ),
 
-            // Bottom Continue Button
+            // Bottom Continue Button (Clears the entire onboarding history!)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -679,10 +679,17 @@ class AssessmentComplete extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onContinue ??
                           () {
-                            Navigator.of(context).pushReplacement(
+                            // 👉 FIX: Clears all onboarding screens from navigation history!
+                            Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                builder: (context) => const StudentDashboard(),
+                                builder: (context) => StudentDashboard(
+                                  studentName: studentName,
+                                  avatarInitial: studentName.isNotEmpty
+                                      ? studentName[0].toUpperCase()
+                                      : 'A',
+                                ),
                               ),
+                              (route) => false,
                             );
                           },
                       style: ElevatedButton.styleFrom(

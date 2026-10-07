@@ -9,7 +9,7 @@ class OnboardingLearningStyle extends StatefulWidget {
 }
 
 class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
-  // Sir's Brand Colors
+  // ================= SIR'S BRAND COLORS =================
   static const Color navy = Color(0xFF1D3B64);
   static const Color brandRed = Color(0xFFEF3340);
   static const Color brandGradientEnd = Color(0xFFF12C68);
@@ -17,12 +17,12 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
   static const Color cardBorder = Color(0xFFE4E7EC);
 
   final List<Map<String, dynamic>> _styles = [
-    {'title': 'Watching', 'icon': Icons.play_circle_outline, 'sel': true},
+    {'title': 'Watching', 'icon': Icons.play_arrow_rounded, 'sel': true},
     {'title': 'Reading', 'icon': Icons.menu_book_outlined, 'sel': false},
     {'title': 'Listening', 'icon': Icons.headphones_outlined, 'sel': false},
     {'title': 'Writing', 'icon': Icons.edit_note_outlined, 'sel': false},
     {'title': 'Hands-on', 'icon': Icons.science_outlined, 'sel': true},
-    {'title': 'Discussion', 'icon': Icons.forum_outlined, 'sel': false},
+    {'title': 'Discussion', 'icon': Icons.chat_bubble_outline_rounded, 'sel': false},
   ];
 
   @override
@@ -32,47 +32,35 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: navy),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: navy),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(height: 5, color: brandRed),
-              ),
-            ),
-          ],
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 20),
+          // ================= 6-SEGMENT PROGRESS BAR (STEP 5 OF 6) =================
+          child: Row(
+            children: List.generate(6, (index) {
+              final bool isActive = index <= 4; // First 5 segments active
+              return Expanded(
+                child: Container(
+                  height: 5,
+                  margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
+                  decoration: BoxDecoration(
+                    gradient: isActive
+                        ? const LinearGradient(
+                            colors: [brandRed, brandGradientEnd],
+                          )
+                        : null,
+                    color: isActive ? null : const Color(0xFFF0F2F4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
       ),
       body: SafeArea(
@@ -90,7 +78,7 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                       'How do you learn best?',
                       style: TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         color: navy,
                         letterSpacing: -0.3,
                       ),
@@ -114,7 +102,7 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                         crossAxisCount: 2,
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
-                        mainAxisExtent: 125,
+                        mainAxisExtent: 135,
                       ),
                       itemCount: _styles.length,
                       itemBuilder: (context, index) {
@@ -145,9 +133,21 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                             child: Stack(
                               children: [
                                 if (isSel)
-                                  const Align(
+                                  Align(
                                     alignment: Alignment.topRight,
-                                    child: Icon(Icons.check_circle, color: brandRed, size: 18),
+                                    child: Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: const BoxDecoration(
+                                        color: brandRed,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                        size: 13,
+                                      ),
+                                    ),
                                   ),
                                 Center(
                                   child: Column(
@@ -190,10 +190,10 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
               ),
             ),
 
-            // Bottom Continue Section
+            // ================= BOTTOM CAPSULE CONTINUE BUTTON =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -209,7 +209,7 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(30), // Sir's capsule pill shape
                   boxShadow: [
                     BoxShadow(
                       color: brandRed.withOpacity(0.35),
@@ -223,7 +223,7 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   onPressed: () {
@@ -242,7 +242,7 @@ class _OnboardingLearningStyleState extends State<OnboardingLearningStyle> {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(width: 8),
